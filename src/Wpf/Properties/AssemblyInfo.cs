@@ -1,7 +1,12 @@
 using Microsoft.Extensions.Configuration.UserSecrets;
+using System.Reflection;
 using System.Runtime.Versioning;
 using System.Windows;
 
+[assembly: AssemblyTitle("SoftThorn.Monstercat.Browser.Wpf")]
+[assembly: AssemblyDescription("")]
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCulture("")]
 [assembly: SupportedOSPlatform("windows7.0")]
 [assembly: UserSecretsId("3f7364ab-ad03-4cfe-b484-b41309f22954")]
 [assembly: ThemeInfo(
