@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <Product>SoftThorn.Monstercat.Browser</Product>
+        <Company>SoftThorn</Company>
+        <Authors>Peter Vietense</Authors>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/Insire/SoftThorn.Monstercat.Browser</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/Insire/SoftThorn.Monstercat.Browser</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageReleaseNotes></PackageReleaseNotes>
+    </PropertyGroup>
+</Project>

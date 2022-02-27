@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+    <ItemGroup>
+        <Compile Include="..\SharedAssemblyInfo.cs" Link="Properties\SharedAssemblyInfo.cs" />
+    </ItemGroup>
+
+    <PropertyGroup>
+        <Nullable>enable</Nullable>
+        <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+        <LangVersion>10.0</LangVersion>
+        <CodeAnalysisRuleSet>.\..\..\SoftThorn.Monstercat.Browser.ruleset</CodeAnalysisRuleSet>
+    </PropertyGroup>
+
+    <ItemGroup Condition=" '$(Configuration)'=='Debug' ">
+        <PackageReference Include="Roslynator.Analyzers" Version="4.0.2">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+</Project>
