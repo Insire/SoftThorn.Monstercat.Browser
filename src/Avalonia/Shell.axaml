@@ -1,0 +1,159 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+        xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
+        xmlns:core="clr-namespace:SoftThorn.Monstercat.Browser.Core;assembly=SoftThorn.Monstercat.Browser.Core"
+        xmlns:styles="clr-namespace:Material.Styles;assembly=Material.Styles"
+        xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+        xmlns:colors="clr-namespace:Material.Colors;assembly=Material.Colors"
+        xmlns:recommendcolors="clr-namespace:Material.Colors.Recommended;assembly=Material.Colors"
+        xmlns:local="clr-namespace:SoftThorn.Monstercat.Browser.Avalonia;assembly=SoftThorn.Monstercat.Browser.Avalonia"
+        xmlns:material="using:Material.Icons.Avalonia"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="820"
+        Width="800"
+        Height="820"
+        Icon="{x:Null}"
+        x:DataType="core:ShellViewModel"
+        x:CompileBindings="True"
+        x:Class="SoftThorn.Monstercat.Browser.Avalonia.Shell"
+        Title="SoftThorn.Monstercat.Browser.Avalonia">
+
+    <Window.Resources>
+        <local:ReleaseIdToBitmapValueConverter x:Key="ReleaseIdToBitmapValueConverter" />
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="8" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="8" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="8" />
+        </Grid.ColumnDefinitions>
+
+        <styles:Card Margin="16"
+                     Grid.Row="0"
+                     Grid.Column="1"
+                     Padding="32,16">
+            <TextBox Text="{Binding TextFilter}" Watermark="Filter" />
+        </styles:Card>
+
+        <ScrollViewer VerticalAlignment="Stretch"
+                      VerticalContentAlignment="Top"
+                      Grid.Row="1"
+                      Grid.Column="1"
+                      VerticalScrollBarVisibility="Hidden"
+                      HorizontalScrollBarVisibility="Disabled">
+            <ItemsRepeater Items="{Binding Tracks}">
+                <ItemsRepeater.ItemTemplate>
+                    <DataTemplate DataType="{x:Type core:TrackViewModel}">
+                        <styles:Card Margin="16" Padding="32">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="60" />
+                                    <ColumnDefinition Width="8" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="8" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <!--  Cover Art  -->
+                                <Button Width="60" Grid.Column="0"
+                                        Height="60"
+                                        Padding="0"
+                                        BorderThickness="0">
+                                    <Image local:ImageLoader.Source="{Binding ImageUrl}" />
+                                </Button>
+
+                                <!--  Title Info  -->
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="{Binding Title}" />
+                                    <TextBlock FontSize="16" Text="{Binding ArtistsTitle}" />
+                                    <TextBlock FontSize="14" Text="{Binding Version}">
+                                    </TextBlock>
+                                </StackPanel>
+
+                                <!--  Flags  -->
+                                <DockPanel Grid.Row="1"
+                                           Grid.Column="0"
+                                           Grid.ColumnSpan="3"
+                                           IsHitTestVisible="False">
+                                    <CheckBox Content="Streamable" IsChecked="{Binding Streamable}" />
+                                    <CheckBox Margin="32,0"
+                                              Content="Downloadable"
+                                              IsChecked="{Binding Downloadable}" />
+                                    <CheckBox Content="Early Access" IsChecked="{Binding InEarlyAccess}" />
+                                </DockPanel>
+
+                                <!--  Tags  -->
+                                <ItemsRepeater Grid.Row="4"
+                                              Grid.Column="0"
+                                              Grid.ColumnSpan="3"
+                                              IsHitTestVisible="False"
+                                              Items="{Binding Tags}">
+                                    <ItemsRepeater.ItemTemplate>
+                                        <DataTemplate>
+                                            <styles:FloatingButton IsExtended="True"
+                                                                   assists:ShadowAssist.ShadowDepth="Depth0"
+                                                                   Margin="0,0,4,0"
+                                                                   Height="36"
+                                                                   MinWidth="36"
+                                                                   MinHeight="36"
+                                                                   Classes="Light">
+                                                <styles:FloatingButton.Background>
+                                                    <SolidColorBrush Color="{x:Static recommendcolors:GreySwatch.Grey200}" />
+                                                </styles:FloatingButton.Background>
+                                                <TextBlock Text="{Binding}"
+                                                           Classes="Caption"
+                                                           VerticalAlignment="Center" />
+                                            </styles:FloatingButton>
+                                        </DataTemplate>
+                                    </ItemsRepeater.ItemTemplate>
+
+                                    <ItemsRepeater.Layout>
+                                        <StackLayout Orientation="Horizontal" />
+                                    </ItemsRepeater.Layout>
+                                </ItemsRepeater>
+                            </Grid>
+                        </styles:Card>
+                    </DataTemplate>
+                </ItemsRepeater.ItemTemplate>
+            </ItemsRepeater>
+        </ScrollViewer>
+
+        <ProgressBar Value="{Binding Progress.Current.Value}" Maximum="100"
+                     Grid.Row="3" Name="DataTriggerProgressBar"
+                     Grid.ColumnSpan="3" IsVisible="{Binding IsLoading}"
+                     Grid.Column="0">
+        </ProgressBar>
+
+        <styles:FloatingButton Classes="Accent"
+                               Grid.Column="1"
+                               Grid.Row="1"
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Bottom">
+            <ToolTip.Tip>
+                <StackPanel Margin="8,0,0,0" Orientation="Horizontal">
+                    <TextBlock Text="Download all " />
+                    <TextBlock Text="{Binding Tracks.Count, Mode=OneWay}" />
+                    <TextBlock Text=" Tracks now" />
+                </StackPanel>
+            </ToolTip.Tip>
+
+            <material:MaterialIcon Kind="Download" />
+        </styles:FloatingButton>
+    </Grid>
+</Window>
