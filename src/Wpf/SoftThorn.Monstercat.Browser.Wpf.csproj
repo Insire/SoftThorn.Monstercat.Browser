@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <UserSecretsId>d5c3400a-7aaf-4593-b3fa-63ce86917618</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Core\SoftThorn.Monstercat.Browser.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+      <PackageReference Include="NAudio" Version="2.0.1" />
+
+      <PackageReference Include="Jot" Version="2.1.13" />
+      <PackageReference Include="Ookii.Dialogs.Wpf" Version="5.0.1" />
+      <PackageReference Include="MahApps.Metro.IconPacks.FontAwesome" Version="4.11.0" />
+      <PackageReference Include="MaterialDesignThemes.MahApps" Version="0.2.1-ci89" />
+      <PackageReference Include="MahApps.Metro" Version="2.4.9" />
+
+      <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="6.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="6.0.1" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
+  </ItemGroup>
+
+</Project>
