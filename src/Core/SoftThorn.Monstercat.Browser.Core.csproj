@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Library</OutputType>
+        <TargetFramework>net6.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0-preview1" />
+        <PackageReference Include="DynamicData" Version="7.5.4" />
+        <PackageReference Include="Gress" Version="2.0.1" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0-preview.1.22076.8" />
+        <PackageReference Include="MonstercatNet" Version="3.0.9" />
+        <PackageReference Include="NAudio.Core" Version="2.0.0" />
+    </ItemGroup>
+
+</Project>
