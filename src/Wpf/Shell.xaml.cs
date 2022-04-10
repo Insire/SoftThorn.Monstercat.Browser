@@ -1,6 +1,7 @@
 using Jot;
 using Ookii.Dialogs.Wpf;
 using SoftThorn.Monstercat.Browser.Core;
+using System.Threading;
 
 namespace SoftThorn.Monstercat.Browser.Wpf
 {
@@ -20,31 +21,55 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             return (result ?? false, dlg.SelectedPath);
         }
 
-        private readonly DownloadViewModel _downloadViewModel;
+        private readonly ShellViewModel _shellViewModel;
 
-        public Shell(ShellViewModel shellViewModel, DownloadViewModel downloadViewModel, Tracker tracker)
+        public Shell(ShellViewModel shellViewModel, Tracker tracker)
         {
-            DataContext = shellViewModel;
-            _downloadViewModel = downloadViewModel;
+            DataContext = _shellViewModel = shellViewModel;
 
             InitializeComponent();
 
             tracker.Track(this);
         }
 
-        private void Download_Click(object sender, System.Windows.RoutedEventArgs e)
+        private async void Download_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            var wnd = new DownloadView(_downloadViewModel)
+            if (!_shellViewModel.Login.IsLoggedIn)
+            {
+                _shellViewModel.Login.Validate();
+                if (_shellViewModel.Login.HasErrors)
+                {
+                    var loginView = new LoginView(_shellViewModel.Login)
+                    {
+                        Owner = this,
+                    };
+                    _shellViewModel.Login.ClearValidation();
+                    _shellViewModel.Login.OnLogin = () => loginView.DialogResult = true;
+
+                    loginView.ShowDialog();
+                }
+                else
+                {
+                    await _shellViewModel.Login.Login(CancellationToken.None);
+                }
+            }
+
+            if (!_shellViewModel.Login.IsLoggedIn)
+            {
+                return;
+            }
+
+            var wnd = new DownloadView(_shellViewModel.Downloads)
             {
                 Owner = this,
             };
-            _downloadViewModel.SelectFolderProxy = TrySelectFolder;
-            _downloadViewModel.OnDownloadStarted = () => wnd.DialogResult = true;
+            _shellViewModel.Downloads.SelectFolderProxy = TrySelectFolder;
+            _shellViewModel.Downloads.OnDownloadStarted = () => wnd.DialogResult = true;
 
             wnd.ShowDialog();
 
-            _downloadViewModel.OnDownloadStarted = null;
-            _downloadViewModel.SelectFolderProxy = null;
+            _shellViewModel.Downloads.OnDownloadStarted = null;
+            _shellViewModel.Downloads.SelectFolderProxy = null;
         }
     }
 }

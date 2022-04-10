@@ -15,10 +15,10 @@ namespace SoftThorn.Monstercat.Browser.Wpf
 {
     public partial class App : Application
     {
-        private readonly ApiCredentials _credentials;
         private readonly HttpClient _apiHttpClient;
-        private readonly IMonstercatApi _api;
         private readonly PlaybackService _playbackService;
+        private readonly IMonstercatApi _api;
+        private readonly IConfiguration _configuration;
 
         private CompositeDisposable? _subscription;
 
@@ -26,20 +26,14 @@ namespace SoftThorn.Monstercat.Browser.Wpf
 
         public App()
         {
-            _credentials = new ApiCredentials();
             _apiHttpClient = new HttpClient().UseMonstercatApiV2();
             _api = MonstercatApi.Create(_apiHttpClient);
 
-            var configuration = new ConfigurationBuilder()
+            _configuration = new ConfigurationBuilder()
                 .AddCommandLine(Environment.GetCommandLineArgs())
                 .AddEnvironmentVariables()
-                .AddUserSecrets<Shell>()
+                //.AddUserSecrets<Shell>()
                 .Build();
-
-            var sectionName = typeof(ApiCredentials).Name;
-            var section = configuration.GetSection(sectionName);
-
-            section.Bind(_credentials);
 
             var timer = new DispatcherTimer
             {
@@ -53,8 +47,6 @@ namespace SoftThorn.Monstercat.Browser.Wpf
         {
             base.OnStartup(e);
 
-            await _api.Login(_credentials);
-
             _tracker = new Tracker(new JsonFileStore(Environment.SpecialFolder.CommonApplicationData));
             _tracker.Configure<Shell>()
                 .Id(_ => $"[Width={SystemParameters.VirtualScreenWidth},Height{SystemParameters.VirtualScreenHeight}]")
@@ -62,13 +54,14 @@ namespace SoftThorn.Monstercat.Browser.Wpf
                 .PersistOn(nameof(Window.Closing))
                 .StopTrackingOn(nameof(Window.Closing));
 
+            var loginViewModel = new LoginViewModel(_api, _configuration);
             var synchronizationContext = SynchronizationContext.Current!;
             var progress = new ProgressContainer<Percentage>();
             var dispatcherProgress = new DispatcherProgress<Percentage>(synchronizationContext, (p) => progress.Report(p), TimeSpan.FromMilliseconds(250));
             var trackRepository = new TrackRepository(dispatcherProgress, _api);
             var downloadViewModel = new DownloadViewModel(SynchronizationContext.Current!, _api, trackRepository);
-            var shellViewModel = new ShellViewModel(synchronizationContext, trackRepository, _playbackService, downloadViewModel, progress);
-            var shell = new Shell(shellViewModel, downloadViewModel, _tracker);
+            var shellViewModel = new ShellViewModel(synchronizationContext, trackRepository, _playbackService, downloadViewModel, loginViewModel, progress);
+            var shell = new Shell(shellViewModel, _tracker);
 
             _subscription = new CompositeDisposable(dispatcherProgress, trackRepository, downloadViewModel, shellViewModel);
 

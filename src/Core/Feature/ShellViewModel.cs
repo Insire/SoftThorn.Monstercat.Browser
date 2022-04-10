@@ -41,11 +41,13 @@ namespace SoftThorn.Monstercat.Browser.Core
         public ProgressContainer<Percentage> Progress { get; }
 
         public DownloadViewModel Downloads { get; }
+        public LoginViewModel Login { get; }
 
         public ShellViewModel(SynchronizationContext synchronizationContext,
                               TrackRepository trackRepository,
                               IPlaybackService playbackService,
                               DownloadViewModel downloadViewModel,
+                              LoginViewModel login,
                               ProgressContainer<Percentage> progress)
         {
             if (synchronizationContext is null)
@@ -56,6 +58,7 @@ namespace SoftThorn.Monstercat.Browser.Core
             _trackRepository = trackRepository ?? throw new ArgumentNullException(nameof(trackRepository));
             _playbackService = playbackService ?? throw new ArgumentNullException(nameof(playbackService));
             Downloads = downloadViewModel ?? throw new ArgumentNullException(nameof(downloadViewModel));
+            Login = login ?? throw new ArgumentNullException(nameof(login));
             Progress = progress ?? throw new ArgumentNullException(nameof(progress));
 
             _cancellationTokenSource = new CancellationTokenSource();

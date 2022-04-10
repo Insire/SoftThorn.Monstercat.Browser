@@ -3,9 +3,7 @@
                          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                          xmlns:core="clr-namespace:SoftThorn.Monstercat.Browser.Core;assembly=SoftThorn.Monstercat.Browser.Core"
                          xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
                          xmlns:iconpacks="clr-namespace:MahApps.Metro.IconPacks;assembly=MahApps.Metro.IconPacks.FontAwesome"
-                         xmlns:local="clr-namespace:SoftThorn.Monstercat.Browser.Wpf"
                          xmlns:mahControls="http://metro.mahapps.com/winfx/xaml/controls"
                          xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
                          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -187,7 +185,6 @@
                             </TextBlock>
                         </materialDesign:HintAssist.Hint>
                     </TextBox>
-
                 </DockPanel>
             </materialDesign:Card>
         </Grid>

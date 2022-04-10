@@ -1,52 +1,45 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Gress;
 using Microsoft.Extensions.Configuration;
 using SoftThorn.Monstercat.Browser.Core;
 using SoftThorn.MonstercatNet;
 using System;
 using System.Net.Http;
+using System.Reactive.Disposables;
 using System.Threading;
 
 namespace SoftThorn.Monstercat.Browser.Avalonia
 {
     public class App : Application
     {
-        private readonly ApiCredentials _credentials;
-        private readonly PlaybackService _playbackService;
-
         private readonly HttpClient _apiHttpClient;
         private readonly IMonstercatApi _api;
 
         private readonly HttpClient _cdnHttpClient;
         private readonly IMonstercatCdnService _cdn;
 
-        private ShellViewModel? _shellViewmodel;
+        private readonly PlaybackService _playbackService;
+        private readonly IConfiguration _configuration;
+
+        private CompositeDisposable? _subscription;
 
         public App()
         {
-            _credentials = new ApiCredentials();
             _apiHttpClient = new HttpClient().UseMonstercatApiV2();
             _api = MonstercatApi.Create(_apiHttpClient);
 
             _cdnHttpClient = new HttpClient().UseMonstercatCdn();
             _cdn = MonstercatCdn.Create(_cdnHttpClient);
 
-            var configuration = new ConfigurationBuilder()
+            _configuration = new ConfigurationBuilder()
                 .AddCommandLine(Environment.GetCommandLineArgs())
                 .AddEnvironmentVariables()
                 .AddUserSecrets<Shell>()
                 .Build();
 
-            var sectionName = typeof(ApiCredentials).Name;
-            var section = configuration.GetSection(sectionName);
-
-            section.Bind(_credentials);
-
             _playbackService = new PlaybackService();
-
-            AvaloniaLocator.CurrentMutable.Bind<PlaybackService>().ToFunc(() => _playbackService);
-            AvaloniaLocator.CurrentMutable.Bind<IMonstercatCdnService>().ToFunc(() => _cdn);
         }
 
         public override void Initialize()
@@ -56,7 +49,15 @@ namespace SoftThorn.Monstercat.Browser.Avalonia
 
         public override void OnFrameworkInitializationCompleted()
         {
-            var shellViewModel = _shellViewmodel = new ShellViewModel(SynchronizationContext.Current!, _api, _playbackService);
+            var loginViewModel = new LoginViewModel(_api, _configuration);
+            var synchronizationContext = SynchronizationContext.Current!;
+            var progress = new ProgressContainer<Percentage>();
+            var dispatcherProgress = new DispatcherProgress<Percentage>(synchronizationContext, (p) => progress.Report(p), TimeSpan.FromMilliseconds(250));
+            var trackRepository = new TrackRepository(dispatcherProgress, _api);
+            var downloadViewModel = new DownloadViewModel(SynchronizationContext.Current!, _api, trackRepository);
+            var shellViewModel = new ShellViewModel(synchronizationContext, trackRepository, _playbackService, downloadViewModel, loginViewModel, progress);
+
+            _subscription = new CompositeDisposable(dispatcherProgress, trackRepository, downloadViewModel, shellViewModel);
 
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
@@ -65,5 +66,7 @@ namespace SoftThorn.Monstercat.Browser.Avalonia
 
             base.OnFrameworkInitializationCompleted();
         }
+
+        // TODO dispose _subscription
     }
 }
