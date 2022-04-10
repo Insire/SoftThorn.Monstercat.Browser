@@ -11,7 +11,7 @@ using System.Windows.Threading;
 
 namespace SoftThorn.Monstercat.Browser.Wpf
 {
-    public sealed partial class PlaybackService : IPlaybackService
+    internal sealed class PlaybackService : IPlaybackService
     {
         private readonly DispatcherTimer _timer;
         private readonly IMonstercatApi _api;

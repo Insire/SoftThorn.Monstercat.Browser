@@ -1,15 +1,14 @@
 <mahControls:MetroWindow x:Class="SoftThorn.Monstercat.Browser.Wpf.Shell"
                          xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-                         xmlns:mahControls="http://metro.mahapps.com/winfx/xaml/controls"
-                         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-                         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                         xmlns:iconpacks="clr-namespace:MahApps.Metro.IconPacks;assembly=MahApps.Metro.IconPacks.FontAwesome"
                          xmlns:core="clr-namespace:SoftThorn.Monstercat.Browser.Core;assembly=SoftThorn.Monstercat.Browser.Core"
+                         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+                         xmlns:iconpacks="clr-namespace:MahApps.Metro.IconPacks;assembly=MahApps.Metro.IconPacks.FontAwesome"
                          xmlns:local="clr-namespace:SoftThorn.Monstercat.Browser.Wpf"
-                         xmlns:system="clr-namespace:System;assembly=mscorlib"
+                         xmlns:mahControls="http://metro.mahapps.com/winfx/xaml/controls"
+                         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+                         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                          Title="SoftThorn.Monstercat.Browser.Wpf"
                          Width="800"
                          Height="820"
@@ -44,231 +43,197 @@
             <materialDesign:TransitionEffect Kind="SlideInFromBottom" />
         </materialDesign:TransitioningContent.OpeningEffects>
 
-        <materialDesign:DialogHost IsOpen="{Binding IsDialogOpen, Mode=TwoWay}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="8" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-            <!--  Dialog  -->
-            <materialDesign:DialogHost.DialogContent>
-                <DockPanel Margin="16">
-                    <TextBlock DockPanel.Dock="Top" Text="Download files to this folder" />
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="8" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="8" />
+            </Grid.ColumnDefinitions>
 
-                    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal">
-                        <Button Margin="0,8,8,0"
-                                Command="{Binding DownloadCommand}"
-                                Content="ACCEPT"
-                                IsDefault="True"
-                                Style="{StaticResource MaterialDesignFlatButton}">
-                            <Button.CommandParameter>
-                                <system:Boolean>True</system:Boolean>
-                            </Button.CommandParameter>
-                        </Button>
+            <!--  Search  -->
 
-                        <Button Margin="0,8,8,0"
-                                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
-                                Content="CANCEL"
-                                IsCancel="True"
-                                Style="{StaticResource MaterialDesignFlatButton}">
-                            <Button.CommandParameter>
-                                <system:Boolean>False</system:Boolean>
-                            </Button.CommandParameter>
-                        </Button>
-                    </StackPanel>
+            <materialDesign:Card Grid.Row="0"
+                                 Grid.Column="1"
+                                 Margin="16"
+                                 Padding="32,16">
+                <TextBox VerticalAlignment="Center"
+                         materialDesign:TextFieldAssist.HasClearButton="True"
+                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                         Text="{Binding TextFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=125}">
+                    <materialDesign:HintAssist.Hint>
+                        <StackPanel Margin="-2,0,0,0" Orientation="Horizontal">
+                            <iconpacks:PackIconFontAwesome Margin="0,0,2,0" Kind="SearchSolid" />
+                            <TextBlock Text="Filter" />
+                        </StackPanel>
+                    </materialDesign:HintAssist.Hint>
+                </TextBox>
+            </materialDesign:Card>
 
-                    <TextBox Margin="0,8,0,8"
-                             HorizontalAlignment="Stretch"
-                             Text="{Binding DownloadPath, UpdateSourceTrigger=PropertyChanged, Delay=250}" />
-                </DockPanel>
-            </materialDesign:DialogHost.DialogContent>
+            <!--  Tracks  -->
 
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="8" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+            <ItemsControl Grid.Row="1"
+                          Grid.Column="1"
+                          ItemsSource="{Binding Tracks, Mode=OneTime}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel IsItemsHost="True"
+                                                IsVirtualizing="True"
+                                                VirtualizationMode="Recycling" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
 
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="8" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="8" />
-                </Grid.ColumnDefinitions>
+                <ItemsControl.Template>
+                    <ControlTemplate TargetType="ItemsControl">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ScrollViewer Padding="{TemplateBinding Padding}"
+                                          CanContentScroll="True"
+                                          Focusable="False"
+                                          VerticalScrollBarVisibility="Hidden">
+                                <ItemsPresenter />
+                            </ScrollViewer>
+                        </Border>
+                    </ControlTemplate>
+                </ItemsControl.Template>
 
-                <!--  Search  -->
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type core:TrackViewModel}">
+                        <materialDesign:Card Margin="16" Padding="32">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="60" />
+                                    <ColumnDefinition Width="8" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
 
-                <materialDesign:Card Grid.Row="0"
-                                     Grid.Column="1"
-                                     Margin="16"
-                                     Padding="32,16">
-                    <TextBox VerticalAlignment="Center"
-                             materialDesign:TextFieldAssist.HasClearButton="True"
-                             Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                             Text="{Binding TextFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=125}">
-                        <materialDesign:HintAssist.Hint>
-                            <StackPanel Margin="-2,0,0,0" Orientation="Horizontal">
-                                <iconpacks:PackIconFontAwesome Margin="0,0,2,0" Kind="SearchSolid" />
-                                <TextBlock Text="Filter" />
-                            </StackPanel>
-                        </materialDesign:HintAssist.Hint>
-                    </TextBox>
-                </materialDesign:Card>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="8" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
 
-                <!--  Tracks  -->
+                                <!--  Cover Art  -->
+                                <materialDesign:Badged Grid.Column="0"
+                                                       BadgeColorZoneMode="PrimaryMid"
+                                                       Focusable="False"
+                                                       ToolTip="Play Track">
+                                    <materialDesign:Badged.Badge>
+                                        <materialDesign:PackIcon Kind="Play" />
+                                    </materialDesign:Badged.Badge>
 
-                <ItemsControl Grid.Row="1"
-                              Grid.Column="1"
-                              ItemsSource="{Binding Tracks, Mode=OneTime}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <VirtualizingStackPanel IsItemsHost="True"
-                                                    IsVirtualizing="True"
-                                                    VirtualizationMode="Recycling" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
+                                    <Button Width="60"
+                                            Height="60"
+                                            Padding="0"
+                                            materialDesign:RippleAssist.RippleOnTop="True"
+                                            Background="Transparent"
+                                            BorderThickness="0"
+                                            Command="{Binding Data.PlayCommand, Source={StaticResource BindingProxy}}"
+                                            CommandParameter="{Binding}"
+                                            Focusable="True"
+                                            UseLayoutRounding="True">
+                                        <Image RenderOptions.BitmapScalingMode="NearestNeighbor"
+                                               RenderOptions.EdgeMode="Aliased"
+                                               SnapsToDevicePixels="True"
+                                               Source="{Binding ImageUrl, Mode=OneTime}" />
+                                    </Button>
+                                </materialDesign:Badged>
 
-                    <ItemsControl.Template>
-                        <ControlTemplate TargetType="ItemsControl">
-                            <Border Background="{TemplateBinding Background}"
-                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                    BorderThickness="{TemplateBinding BorderThickness}">
-                                <ScrollViewer Padding="{TemplateBinding Padding}"
-                                              CanContentScroll="True"
-                                              Focusable="False"
-                                              VerticalScrollBarVisibility="Hidden">
-                                    <ItemsPresenter />
-                                </ScrollViewer>
-                            </Border>
-                        </ControlTemplate>
-                    </ItemsControl.Template>
+                                <!--  Title Info  -->
+                                <TextBlock Grid.Column="2" Style="{StaticResource MaterialDesignHeadline5TextBlock}">
+                                    <Run Text="{Binding Title}" />
+                                    <LineBreak />
+                                    <Run FontSize="16" Text="{Binding ArtistsTitle}" />
+                                    <LineBreak />
+                                    <Run FontSize="14" Text="{Binding Version}" />
+                                </TextBlock>
 
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate DataType="{x:Type core:TrackViewModel}">
-                            <materialDesign:Card Margin="16" Padding="32">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="60" />
-                                        <ColumnDefinition Width="8" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
+                                <!--  Flags  -->
+                                <DockPanel Grid.Row="1"
+                                           Grid.Column="0"
+                                           Grid.ColumnSpan="3"
+                                           IsHitTestVisible="False">
+                                    <CheckBox Content="Streamable" IsChecked="{Binding Streamable}" />
+                                    <CheckBox Margin="32,0"
+                                              Content="Downloadable"
+                                              IsChecked="{Binding Downloadable}" />
+                                    <CheckBox Content="Early Access" IsChecked="{Binding InEarlyAccess}" />
+                                </DockPanel>
 
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="*" />
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="8" />
-                                        <RowDefinition Height="Auto" />
-                                    </Grid.RowDefinitions>
+                                <!--  Tags  -->
+                                <ItemsControl Grid.Row="4"
+                                              Grid.Column="0"
+                                              Grid.ColumnSpan="3"
+                                              IsHitTestVisible="False"
+                                              ItemsSource="{Binding Tags}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <materialDesign:Chip Margin="0,0,4,0" Content="{Binding}" />
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
 
-                                    <!--  Cover Art  -->
-                                    <materialDesign:Badged Grid.Column="0"
-                                                           BadgeColorZoneMode="PrimaryMid"
-                                                           Focusable="False"
-                                                           ToolTip="Play Track">
-                                        <materialDesign:Badged.Badge>
-                                            <materialDesign:PackIcon Kind="Play" />
-                                        </materialDesign:Badged.Badge>
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+                            </Grid>
+                        </materialDesign:Card>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
 
-                                        <Button Width="60"
-                                                Height="60"
-                                                Padding="0"
-                                                materialDesign:RippleAssist.RippleOnTop="True"
-                                                Background="Transparent"
-                                                BorderThickness="0"
-                                                Command="{Binding Data.PlayCommand, Source={StaticResource BindingProxy}}"
-                                                CommandParameter="{Binding}"
-                                                Focusable="True"
-                                                UseLayoutRounding="True">
-                                            <Image RenderOptions.BitmapScalingMode="NearestNeighbor"
-                                                   RenderOptions.EdgeMode="Aliased"
-                                                   SnapsToDevicePixels="True"
-                                                   Source="{Binding ImageUrl, Mode=OneTime}" />
-                                        </Button>
-                                    </materialDesign:Badged>
+            <!--  Download  -->
 
-                                    <!--  Title Info  -->
-                                    <TextBlock Grid.Column="2" Style="{StaticResource MaterialDesignHeadline5TextBlock}">
-                                        <Run Text="{Binding Title}" />
-                                        <LineBreak />
-                                        <Run FontSize="16" Text="{Binding ArtistsTitle}" />
-                                        <LineBreak />
-                                        <Run FontSize="14" Text="{Binding Version}" />
-                                    </TextBlock>
+            <Button Grid.Row="1"
+                    Grid.Column="1"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom"
+                    materialDesign:ButtonProgressAssist.IsIndicatorVisible="{Binding Downloads.IsDownLoading}"
+                    materialDesign:ButtonProgressAssist.Value="{Binding Downloads.Progress.Current.Value}"
+                    Click="Download_Click"
+                    Style="{StaticResource MaterialDesignFloatingActionAccentButton}">
+                <Button.ToolTip>
+                    <TextBlock Margin="8,0,0,0" VerticalAlignment="Center">
+                        <Run Text="Download all" />
+                        <Run Text="{Binding Tracks.Count, Mode=OneWay}" />
+                        <Run Text="Tracks now" />
+                    </TextBlock>
+                </Button.ToolTip>
 
-                                    <!--  Flags  -->
-                                    <DockPanel Grid.Row="1"
-                                               Grid.Column="0"
-                                               Grid.ColumnSpan="3"
-                                               IsHitTestVisible="False">
-                                        <CheckBox Content="Streamable" IsChecked="{Binding Streamable}" />
-                                        <CheckBox Margin="32,0"
-                                                  Content="Downloadable"
-                                                  IsChecked="{Binding Downloadable}" />
-                                        <CheckBox Content="Early Access" IsChecked="{Binding InEarlyAccess}" />
-                                    </DockPanel>
+                <iconpacks:PackIconFontAwesome Kind="DownloadSolid" />
+            </Button>
 
-                                    <!--  Tags  -->
-                                    <ItemsControl Grid.Row="4"
-                                                  Grid.Column="0"
-                                                  Grid.ColumnSpan="3"
-                                                  IsHitTestVisible="False"
-                                                  ItemsSource="{Binding Tags}">
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <materialDesign:Chip Margin="0,0,4,0" Content="{Binding}" />
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
+            <!--  Progress  -->
 
-                                        <ItemsControl.ItemsPanel>
-                                            <ItemsPanelTemplate>
-                                                <StackPanel Orientation="Horizontal" />
-                                            </ItemsPanelTemplate>
-                                        </ItemsControl.ItemsPanel>
-                                    </ItemsControl>
-                                </Grid>
-                            </materialDesign:Card>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+            <ContentControl Grid.Row="3" Grid.ColumnSpan="3">
+                <ProgressBar Maximum="100">
+                    <i:Interaction.Behaviors>
+                        <local:SmoothProgressBehavior Percentage="{Binding Progress.Current.Value, Mode=OneWay}" />
+                    </i:Interaction.Behaviors>
+                </ProgressBar>
 
-                <!--  Download  -->
-
-                <Button Grid.Row="1"
-                        Grid.Column="1"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Bottom"
-                        Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}"
-                        Style="{StaticResource MaterialDesignFloatingActionAccentButton}">
-                    <Button.ToolTip>
-                        <TextBlock Margin="8,0,0,0" VerticalAlignment="Center">
-                            <Run Text="Download all" />
-                            <Run Text="{Binding Tracks.Count, Mode=OneWay}" />
-                            <Run Text="Tracks now" />
-                        </TextBlock>
-                    </Button.ToolTip>
-
-                    <iconpacks:PackIconFontAwesome Kind="DownloadSolid" />
-                </Button>
-
-                <!--  Progress  -->
-
-                <ContentControl Grid.Row="3" Grid.ColumnSpan="3">
-                    <ProgressBar Maximum="100">
-                        <i:Interaction.Behaviors>
-                            <local:SmoothProgressBehavior Percentage="{Binding Progress.Current.Value, Mode=OneWay}" />
-                        </i:Interaction.Behaviors>
-                    </ProgressBar>
-
-                    <ContentControl.Style>
-                        <Style TargetType="{x:Type ContentControl}">
-                            <Setter Property="Visibility" Value="Collapsed" />
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsLoading}" Value="True">
-                                    <Setter Property="Visibility" Value="Visible" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ContentControl.Style>
-                </ContentControl>
-            </Grid>
-        </materialDesign:DialogHost>
+                <ContentControl.Style>
+                    <Style TargetType="{x:Type ContentControl}">
+                        <Setter Property="Visibility" Value="Collapsed" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsLoading}" Value="True">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ContentControl.Style>
+            </ContentControl>
+        </Grid>
     </materialDesign:TransitioningContent>
 </mahControls:MetroWindow>

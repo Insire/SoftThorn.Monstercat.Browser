@@ -7,11 +7,9 @@ using SoftThorn.MonstercatNet;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -20,67 +18,66 @@ namespace SoftThorn.Monstercat.Browser.Core
     [ObservableObject]
     public sealed partial class ShellViewModel : IDisposable
     {
-        private readonly SourceCache<KeyValuePair<string, Track>, string> _cache;
-        private readonly ObservableCollectionExtended<TrackViewModel> _releases;
-        private readonly IMonstercatApi _api;
+        private readonly ObservableCollectionExtended<TrackViewModel> _tracks;
         private readonly IDisposable _subscription;
+        private readonly TrackRepository _trackRepository;
         private readonly IPlaybackService _playbackService;
-        private readonly DispatcherProgress<Percentage> _progressService;
         private readonly CancellationTokenSource _cancellationTokenSource;
 
         [ObservableProperty]
         private string? _textFilter;
 
-        [AlsoNotifyCanExecuteFor(nameof(DownloadCommand))]
-        [ObservableProperty]
-        private string? _downloadPath;
-
-        [AlsoNotifyCanExecuteFor(nameof(DownloadCommand))]
         [ObservableProperty]
         private bool _isLoading;
-
-        [AlsoNotifyCanExecuteFor(nameof(DownloadCommand))]
-        [ObservableProperty]
-        private bool _isDownLoading;
-
-        [ObservableProperty]
-        private bool _isDialogOpen;
-
-        [ObservableProperty]
-        private int _onlineTotal;
 
         private bool _disposedValue;
 
         public IAsyncRelayCommand PlayCommand { get; }
-        public IAsyncRelayCommand DownloadCommand { get; }
+
         public IAsyncRelayCommand RefreshCommand { get; }
-        public IRelayCommand SelectFolderCommand { get; }
-        public ObservableCollectionExtended<TrackViewModel> Tracks => _releases;
+
+        public ReadOnlyObservableCollection<TrackViewModel> Tracks { get; }
 
         public ProgressContainer<Percentage> Progress { get; }
-        public Func<(bool IsSuccess, string Folder)>? SelectFolderProxy { get; set; }
 
-        public ShellViewModel(SynchronizationContext synchronizationContext, IMonstercatApi api, IPlaybackService playbackService)
+        public DownloadViewModel Downloads { get; }
+
+        public ShellViewModel(SynchronizationContext synchronizationContext,
+                              TrackRepository trackRepository,
+                              IPlaybackService playbackService,
+                              DownloadViewModel downloadViewModel,
+                              ProgressContainer<Percentage> progress)
         {
-            _downloadPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Monstercat Downloads");
-            Directory.CreateDirectory(_downloadPath);
+            if (synchronizationContext is null)
+            {
+                throw new ArgumentNullException(nameof(synchronizationContext));
+            }
+
+            _trackRepository = trackRepository ?? throw new ArgumentNullException(nameof(trackRepository));
+            _playbackService = playbackService ?? throw new ArgumentNullException(nameof(playbackService));
+            Downloads = downloadViewModel ?? throw new ArgumentNullException(nameof(downloadViewModel));
+            Progress = progress ?? throw new ArgumentNullException(nameof(progress));
+
+            _cancellationTokenSource = new CancellationTokenSource();
+            _tracks = new ObservableCollectionExtended<TrackViewModel>();
+
+            Tracks = new ReadOnlyObservableCollection<TrackViewModel>(_tracks);
+            RefreshCommand = new AsyncRelayCommand(Refresh);
+            PlayCommand = new AsyncRelayCommand<object?>(Play, CanPlay);
 
             var filter = this.WhenPropertyChanged(x => x.TextFilter)
                 .DistinctUntilChanged()
                 .Throttle(TimeSpan.FromMilliseconds(250))
                 .Select(x => BuildFilter(x.Value));
 
-            _api = api;
-            _playbackService = playbackService;
-            _cancellationTokenSource = new CancellationTokenSource();
-            _cache = new SourceCache<KeyValuePair<string, Track>, string>(vm => vm.Key);
-            _releases = new ObservableCollectionExtended<TrackViewModel>();
-            _subscription = _cache
+            _subscription = trackRepository
                 .Connect()
                 .ObserveOn(TaskPoolScheduler.Default)
                 .DistinctUntilChanged()
                 .Filter(filter)
-                .Sort(SortExpressionComparer<KeyValuePair<string, Track>>.Ascending(p => p.Value.Title))
+                .Sort(SortExpressionComparer<KeyValuePair<string, Track>>
+                    .Descending(p => p.Value.Release.ReleaseDate.Date)
+                    .ThenByAscending(p => p.Value.Title))
                 .Transform(p => new TrackViewModel()
                 {
                     Id = p.Value.Id,
@@ -97,41 +94,12 @@ namespace SoftThorn.Monstercat.Browser.Core
                     GenrePrimary = p.Value.GenrePrimary,
                     Brand = p.Value.Brand,
                     Version = p.Value.Version,
-                    Tags = CreateTags(p.Value),
+                    Tags = p.Value.CreateTags(),
                     ImageUrl = p.Value.Release.GetSmallCoverArtUri(),
                 })
                 .ObserveOn(synchronizationContext)
-                .Bind(_releases)
+                .Bind(_tracks)
                 .Subscribe();
-
-            RefreshCommand = new AsyncRelayCommand(Refresh);
-            PlayCommand = new AsyncRelayCommand<object?>(Play, CanPlay);
-            DownloadCommand = new AsyncRelayCommand(Download, CanDownload);
-            SelectFolderCommand = new RelayCommand(SelectFolder);
-
-            Progress = new ProgressContainer<Percentage>();
-            _progressService = new DispatcherProgress<Percentage>(synchronizationContext, (p) => Progress.Report(p), TimeSpan.FromMilliseconds(250));
-
-            static ObservableCollection<string> CreateTags(Track track)
-            {
-                var collection = new ObservableCollection<string>(track.Tags ?? Enumerable.Empty<string>());
-                if (!string.IsNullOrWhiteSpace(track.GenrePrimary))
-                {
-                    collection.Add(track.GenrePrimary);
-                }
-
-                if (!string.IsNullOrWhiteSpace(track.GenreSecondary))
-                {
-                    collection.Add(track.GenreSecondary);
-                }
-
-                if (!string.IsNullOrWhiteSpace(track.Brand))
-                {
-                    collection.Add(track.Brand);
-                }
-
-                return collection;
-            }
 
             static Func<KeyValuePair<string, Track>, bool> BuildFilter(string? searchText)
             {
@@ -143,123 +111,6 @@ namespace SoftThorn.Monstercat.Browser.Core
                 return vm => vm.Value.Title.IndexOf(searchText, StringComparison.CurrentCultureIgnoreCase) > -1
                     || vm.Value.ArtistsTitle.IndexOf(searchText, StringComparison.CurrentCultureIgnoreCase) > -1;
             }
-        }
-
-        private async Task Download(CancellationToken token)
-        {
-            if (string.IsNullOrWhiteSpace(_downloadPath))
-            {
-                return;
-            }
-
-            if (token.IsCancellationRequested)
-            {
-                return;
-            }
-
-            IsLoading = true;
-            IsDialogOpen = false;
-            IsDownLoading = true;
-
-            DownloadCommand.NotifyCanExecuteChanged();
-
-            try
-            {
-                var downloadPath = _downloadPath;
-                var localCopy = _cache.Items.Where(p => p.Value.Downloadable).ToArray();
-                var current = 0;
-
-                var tasks = new List<Task>();
-                foreach (var batch in localCopy.Batch(localCopy.Length / 4))
-                {
-                    tasks.Add(Task.Run(async () =>
-                    {
-                        var builder = new StringBuilder();
-                        foreach (var item in batch)
-                        {
-                            if (token.IsCancellationRequested)
-                            {
-                                return;
-                            }
-
-                            builder.Append(item.Value.ArtistsTitle);
-                            builder.Append(" - ");
-                            builder.Append(item.Value.Title);
-
-                            if (!string.IsNullOrWhiteSpace(item.Value.Version))
-                            {
-                                builder.Append('(');
-                                builder.Append(item.Value.Version);
-                                builder.Append(')');
-                            }
-
-                            builder.Append(".flac");
-
-                            var fileName = builder.ToString().SanitizeAsFileName();
-                            builder.Clear();
-
-                            var filePath = Path.Combine(downloadPath, fileName!);
-                            if (File.Exists(filePath))
-                            {
-                                current++;
-                                _progressService.Report(current, localCopy.Length);
-                                continue;
-                            }
-
-                            using var stream = await _api.DownloadTrackAsStream(new TrackDownloadRequest()
-                            {
-                                Format = FileFormat.flac,
-                                ReleaseId = item.Value.Release.Id,
-                                TrackId = item.Value.Id,
-                            });
-
-                            if (token.IsCancellationRequested)
-                            {
-                                return;
-                            }
-
-                            using var writeStream = File.Open(filePath, FileMode.OpenOrCreate, FileAccess.Write, FileShare.Write);
-
-                            await stream.CopyToAsync(writeStream);
-
-                            current++;
-                            _progressService.Report(current, localCopy.Length);
-                        }
-                    }, token));
-                }
-
-                await Task.WhenAll(tasks);
-            }
-            finally
-            {
-                IsDownLoading = false;
-                IsLoading = false;
-            }
-        }
-
-        private bool CanDownload()
-        {
-            return !_isDownLoading
-                && !_isLoading
-                && !string.IsNullOrWhiteSpace(_downloadPath)
-                && Directory.Exists(_downloadPath);
-        }
-
-        private void SelectFolder()
-        {
-            var proxy = SelectFolderProxy;
-            if (proxy is null)
-            {
-                return;
-            }
-
-            var (IsSuccess, Folder) = proxy.Invoke();
-            if (!IsSuccess)
-            {
-                return;
-            }
-
-            DownloadPath = Folder;
         }
 
         private async Task Play(object? args)
@@ -283,50 +134,10 @@ namespace SoftThorn.Monstercat.Browser.Core
 
         private async Task Refresh()
         {
-            const int ApiRequestLimit = 100;
-
             IsLoading = true;
             try
             {
-                var result = await _api.SearchTracks(new TrackSearchRequest()
-                {
-                    Limit = ApiRequestLimit,
-                    Skip = 0,
-                });
-
-                if (result?.Results is null)
-                {
-                    _progressService.Report(0, 0);
-                    return;
-                }
-
-                _onlineTotal = result.Total;
-
-                var count = result.Results.Length;
-                _progressService.Report(count, result.Total);
-                _cache.AddOrUpdate(result.Results.Select(p => new KeyValuePair<string, Track>($"{p.Release.Id}_{ p.Id}", p)));
-
-                while (count < result.Total || result.Results is null || result.Results.Length == 0)
-                {
-                    var skip = result.Offset + result.Limit;
-                    //System.Diagnostics.Debug.WriteLine($"Offset: {skip} ({count}/{result.Total}) - Limit: {result.Limit}");
-
-                    result = await _api.SearchTracks(new TrackSearchRequest()
-                    {
-                        Limit = result.Limit,
-                        Skip = skip,
-                    });
-
-                    if (result?.Results is null)
-                    {
-                        _progressService.Report(count, count);
-                        break;
-                    }
-
-                    count += result.Results.Length;
-                    _progressService.Report(count, result.Total);
-                    _cache.AddOrUpdate(result.Results.Select(p => new KeyValuePair<string, Track>($"{p.Release.Id}_{ p.Id}", p)));
-                }
+                await _trackRepository.Refresh();
             }
             finally
             {

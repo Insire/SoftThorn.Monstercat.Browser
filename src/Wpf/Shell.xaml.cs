@@ -20,17 +20,31 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             return (result ?? false, dlg.SelectedPath);
         }
 
-        private readonly ShellViewModel _shellViewModel;
+        private readonly DownloadViewModel _downloadViewModel;
 
-        public Shell(ShellViewModel shellViewModel, Tracker tracker)
+        public Shell(ShellViewModel shellViewModel, DownloadViewModel downloadViewModel, Tracker tracker)
         {
-            DataContext = _shellViewModel = shellViewModel;
-
-            shellViewModel.SelectFolderProxy = TrySelectFolder;
+            DataContext = shellViewModel;
+            _downloadViewModel = downloadViewModel;
 
             InitializeComponent();
 
             tracker.Track(this);
+        }
+
+        private void Download_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            var wnd = new DownloadView(_downloadViewModel)
+            {
+                Owner = this,
+            };
+            _downloadViewModel.SelectFolderProxy = TrySelectFolder;
+            _downloadViewModel.OnDownloadStarted = () => wnd.DialogResult = true;
+
+            wnd.ShowDialog();
+
+            _downloadViewModel.OnDownloadStarted = null;
+            _downloadViewModel.SelectFolderProxy = null;
         }
     }
 }

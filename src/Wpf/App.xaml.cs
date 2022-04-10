@@ -1,3 +1,4 @@
+using Gress;
 using Jot;
 using Jot.Storage;
 using Microsoft.Extensions.Configuration;
@@ -5,6 +6,7 @@ using SoftThorn.Monstercat.Browser.Core;
 using SoftThorn.MonstercatNet;
 using System;
 using System.Net.Http;
+using System.Reactive.Disposables;
 using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
@@ -18,8 +20,9 @@ namespace SoftThorn.Monstercat.Browser.Wpf
         private readonly IMonstercatApi _api;
         private readonly PlaybackService _playbackService;
 
+        private CompositeDisposable? _subscription;
+
         private Tracker? _tracker;
-        private ShellViewModel? _shellViewmodel;
 
         public App()
         {
@@ -59,8 +62,15 @@ namespace SoftThorn.Monstercat.Browser.Wpf
                 .PersistOn(nameof(Window.Closing))
                 .StopTrackingOn(nameof(Window.Closing));
 
-            var shellViewModel = _shellViewmodel = new ShellViewModel(SynchronizationContext.Current!, _api, _playbackService);
-            var shell = new Shell(shellViewModel, _tracker);
+            var synchronizationContext = SynchronizationContext.Current!;
+            var progress = new ProgressContainer<Percentage>();
+            var dispatcherProgress = new DispatcherProgress<Percentage>(synchronizationContext, (p) => progress.Report(p), TimeSpan.FromMilliseconds(250));
+            var trackRepository = new TrackRepository(dispatcherProgress, _api);
+            var downloadViewModel = new DownloadViewModel(SynchronizationContext.Current!, _api, trackRepository);
+            var shellViewModel = new ShellViewModel(synchronizationContext, trackRepository, _playbackService, downloadViewModel, progress);
+            var shell = new Shell(shellViewModel, downloadViewModel, _tracker);
+
+            _subscription = new CompositeDisposable(dispatcherProgress, trackRepository, downloadViewModel, shellViewModel);
 
             shell.Show();
         }
@@ -69,7 +79,7 @@ namespace SoftThorn.Monstercat.Browser.Wpf
         {
             _tracker?.PersistAll();
 
-            _shellViewmodel?.Dispose();
+            _subscription?.Dispose();
 
             base.OnExit(e);
         }
