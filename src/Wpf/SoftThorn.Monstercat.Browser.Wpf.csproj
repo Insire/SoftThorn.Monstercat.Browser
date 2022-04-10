@@ -18,12 +18,12 @@
       <PackageReference Include="Jot" Version="2.1.13" />
       <PackageReference Include="Ookii.Dialogs.Wpf" Version="5.0.1" />
       <PackageReference Include="MahApps.Metro.IconPacks.FontAwesome" Version="4.11.0" />
-      <PackageReference Include="MaterialDesignThemes.MahApps" Version="0.2.1-ci89" />
+      <PackageReference Include="MaterialDesignThemes.MahApps" Version="0.2.2-ci133" />
       <PackageReference Include="MahApps.Metro" Version="2.4.9" />
 
       <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="6.0.0" />
       <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="6.0.1" />
-      <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
+
       <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
       <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
   </ItemGroup>
