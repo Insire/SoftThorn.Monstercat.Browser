@@ -15,5 +15,10 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             DataContext = downloadViewModel;
             InitializeComponent();
         }
+
+        private void OnCancelClick(object sender, System.Windows.RoutedEventArgs e)
+        {
+            DialogResult = false;
+        }
     }
 }

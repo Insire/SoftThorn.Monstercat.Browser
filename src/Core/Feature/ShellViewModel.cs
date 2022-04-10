@@ -28,13 +28,10 @@ namespace SoftThorn.Monstercat.Browser.Core
         private string? _textFilter;
 
         [ObservableProperty]
+        [AlsoNotifyCanExecuteFor(nameof(RefreshCommand))]
         private bool _isLoading;
 
         private bool _disposedValue;
-
-        public IAsyncRelayCommand PlayCommand { get; }
-
-        public IAsyncRelayCommand RefreshCommand { get; }
 
         public ReadOnlyObservableCollection<TrackViewModel> Tracks { get; }
 
@@ -65,8 +62,6 @@ namespace SoftThorn.Monstercat.Browser.Core
             _tracks = new ObservableCollectionExtended<TrackViewModel>();
 
             Tracks = new ReadOnlyObservableCollection<TrackViewModel>(_tracks);
-            RefreshCommand = new AsyncRelayCommand(Refresh);
-            PlayCommand = new AsyncRelayCommand<object?>(Play, CanPlay);
 
             var filter = this.WhenPropertyChanged(x => x.TextFilter)
                 .DistinctUntilChanged()
@@ -116,7 +111,8 @@ namespace SoftThorn.Monstercat.Browser.Core
             }
         }
 
-        private async Task Play(object? args)
+        [ICommand(AllowConcurrentExecutions = false, CanExecute = nameof(CanPlay))]
+        public async Task Play(object? args)
         {
             if (args is TrackViewModel track)
             {
@@ -135,7 +131,8 @@ namespace SoftThorn.Monstercat.Browser.Core
             return args is TrackViewModel;
         }
 
-        private async Task Refresh()
+        [ICommand(AllowConcurrentExecutions = false)]
+        public async Task Refresh()
         {
             IsLoading = true;
             try

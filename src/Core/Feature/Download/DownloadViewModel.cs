@@ -43,10 +43,6 @@ namespace SoftThorn.Monstercat.Browser.Core
         [ObservableProperty]
         private string? _downloadPath;
 
-        public IRelayCommand SelectFolderCommand { get; }
-
-        public IAsyncRelayCommand DownloadCommand { get; }
-
         public Func<(bool IsSuccess, string Folder)>? SelectFolderProxy { get; set; }
 
         public Action? OnDownloadStarted { get; set; }
@@ -70,11 +66,6 @@ namespace SoftThorn.Monstercat.Browser.Core
             Tracks = new ReadOnlyObservableCollection<TrackViewModel>(_tracks);
             Tags = new ReadOnlyObservableCollection<TagViewModel>(_tags);
             SelectedTags = new ReadOnlyObservableCollection<TagViewModel>(_selectedTags);
-
-            _downloadPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Monstercat Downloads");
-
-            DownloadCommand = new AsyncRelayCommand(Download, CanDownload);
-            SelectFolderCommand = new RelayCommand(SelectFolder);
 
             Progress = new ProgressContainer<Percentage>();
             _progressService = new DispatcherProgress<Percentage>(synchronizationContext, (p) => Progress.Report(p), TimeSpan.FromMilliseconds(250));
@@ -174,6 +165,7 @@ namespace SoftThorn.Monstercat.Browser.Core
             }
         }
 
+        [ICommand(AllowConcurrentExecutions = false, CanExecute = nameof(CanDownload), IncludeCancelCommand = true)]
         private async Task Download(CancellationToken token)
         {
             if (string.IsNullOrWhiteSpace(_downloadPath))
@@ -185,8 +177,6 @@ namespace SoftThorn.Monstercat.Browser.Core
             {
                 return;
             }
-
-            Directory.CreateDirectory(_downloadPath);
 
             OnDownloadStarted?.Invoke();
 
@@ -274,6 +264,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                 && Directory.Exists(_downloadPath);
         }
 
+        [ICommand]
         private void SelectFolder()
         {
             var proxy = SelectFolderProxy;

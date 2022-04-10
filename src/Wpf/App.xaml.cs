@@ -32,7 +32,7 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             _configuration = new ConfigurationBuilder()
                 .AddCommandLine(Environment.GetCommandLineArgs())
                 .AddEnvironmentVariables()
-                //.AddUserSecrets<Shell>()
+                .AddUserSecrets<Shell>()
                 .Build();
 
             var timer = new DispatcherTimer
@@ -43,7 +43,7 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             _playbackService = new PlaybackService(_api, timer);
         }
 
-        protected override async void OnStartup(StartupEventArgs e)
+        protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 

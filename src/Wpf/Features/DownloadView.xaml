@@ -141,7 +141,7 @@
                 <DockPanel>
                     <DockPanel DockPanel.Dock="Bottom" LastChildFill="False">
                         <Button Margin="0,8,8,0"
-                                Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"
+                                Click="OnCancelClick"
                                 Content="CANCEL"
                                 DockPanel.Dock="Right"
                                 IsCancel="True"

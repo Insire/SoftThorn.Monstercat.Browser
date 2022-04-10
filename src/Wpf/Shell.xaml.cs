@@ -52,6 +52,8 @@ namespace SoftThorn.Monstercat.Browser.Wpf
                 {
                     await _shellViewModel.Login.Login(CancellationToken.None);
                 }
+
+                await _shellViewModel.Refresh();
             }
 
             if (!_shellViewModel.Login.IsLoggedIn)
