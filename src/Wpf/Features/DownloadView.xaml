@@ -8,6 +8,7 @@
                          xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
                          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                          xmlns:system="clr-namespace:System;assembly=mscorlib"
+                         xmlns:wpf="clr-namespace:SoftThorn.Monstercat.Browser.Wpf"
                          Title="SoftThorn.Monstercat.Browser.Wpf"
                          Width="800"
                          Height="820"
@@ -69,29 +70,53 @@
                     <!--  Tags  -->
 
                     <Grid Margin="0,16,0,0">
-                        <ItemsControl ItemsSource="{Binding SelectedTags}">
+                        <Grid.Resources>
+                            <wpf:BindingProxy x:Key="SelectedTagsProxy" Data="{Binding SelectedTags}" />
+
+                            <ToggleButton x:Key="PopupToggle"
+                                          Width="32"
+                                          Height="32"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          Foreground="{DynamicResource PrimaryHueMidBrush}"
+                                          Style="{StaticResource MaterialDesignIconForegroundButton}">
+                                <materialDesign:PackIcon Kind="Plus" />
+                            </ToggleButton>
+
+                            <DataTemplate DataType="{x:Type core:TagViewModel}">
+                                <CheckBox Margin="0,0,4,4"
+                                          Content="{Binding Value}"
+                                          IsChecked="{Binding IsSelected}"
+                                          Style="{StaticResource MaterialDesignFilterChipPrimaryCheckBox}" />
+                            </DataTemplate>
+                        </Grid.Resources>
+
+                        <ItemsControl x:Name="SelectedTagsView">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <WrapPanel IsItemsHost="True" />
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <CheckBox Margin="0,0,4,4"
-                                              Content="{Binding Value}"
-                                              IsChecked="{Binding IsSelected}"
-                                              Style="{StaticResource MaterialDesignFilterChipPrimaryCheckBox}" />
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
+
+                            <ItemsControl.ItemsSource>
+                                <CompositeCollection>
+                                    <CollectionContainer Collection="{Binding Data, Source={StaticResource SelectedTagsProxy}}" />
+
+                                    <ContentControl Content="{StaticResource PopupToggle}" />
+                                </CompositeCollection>
+                            </ItemsControl.ItemsSource>
                         </ItemsControl>
 
-                        <materialDesign:PopupBox HorizontalAlignment="Right"
-                                                 VerticalAlignment="Bottom"
-                                                 PlacementMode="BottomAndAlignCentres"
-                                                 StaysOpen="True"
-                                                 Style="{StaticResource MaterialDesignMultiFloatingActionPopupBox}">
+                        <materialDesign:PopupEx HorizontalAlignment="Right"
+                                                VerticalAlignment="Bottom"
+                                                IsOpen="{Binding IsChecked, Source={StaticResource PopupToggle}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                Placement="MousePoint"
+                                                PlacementTarget="{Binding ElementName=SelectedTagsView}"
+                                                StaysOpen="False">
 
-                            <ScrollViewer Background="{DynamicResource MaterialDesignPaper}">
+                            <ScrollViewer Height="620"
+                                          Background="{DynamicResource MaterialDesignPaper}"
+                                          Style="{StaticResource MaterialDesignScrollViewer}">
                                 <ItemsControl ItemsSource="{Binding Tags}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate DataType="{x:Type core:TagViewModel}">
@@ -100,37 +125,77 @@
                                                       Style="{StaticResource MaterialDesignFilterChipPrimaryCheckBox}" />
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
+
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <VirtualizingStackPanel IsItemsHost="True" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
                                 </ItemsControl>
                             </ScrollViewer>
-                        </materialDesign:PopupBox>
+                        </materialDesign:PopupEx>
                     </Grid>
                 </StackPanel>
             </materialDesign:Card>
 
             <!--  Tracks  -->
 
-            <DataGrid Grid.Row="1"
-                      Grid.Column="1"
-                      Padding="32,0"
-                      AutoGenerateColumns="False"
-                      IsReadOnly="True"
-                      ItemsSource="{Binding Tracks}"
-                      SelectionMode="Single"
-                      SelectionUnit="FullRow">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Binding="{Binding Title}" Header="Title" />
-                    <DataGridTextColumn Binding="{Binding ArtistsTitle}" Header="Artist" />
-                    <DataGridTextColumn Binding="{Binding Version}" Header="Version" />
-                    <DataGridTextColumn Binding="{Binding CatalogId}" Header="Catalog Id" />
-                    <DataGridTextColumn Binding="{Binding Brand}" Header="Brand" />
-                    <DataGridTextColumn Binding="{Binding GenreSecondary}" />
-                    <DataGridCheckBoxColumn Binding="{Binding InEarlyAccess}" Header="Early Access" />
-                    <DataGridCheckBoxColumn Binding="{Binding Streamable}" Header="Streamable" />
-                    <DataGridCheckBoxColumn Binding="{Binding Downloadable}" Header="Downloadable" />
-                    <DataGridTextColumn Binding="{Binding ReleaseDate}" Header="Release" />
-                    <DataGridTextColumn Binding="{Binding DebutDate}" Header="Debut" />
-                </DataGrid.Columns>
-            </DataGrid>
+            <ItemsControl Grid.Row="1"
+                          Grid.Column="1"
+                          Margin="16,0"
+                          Grid.IsSharedSizeScope="True"
+                          ItemsSource="{Binding Tracks, Mode=OneTime}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <VirtualizingStackPanel IsItemsHost="True"
+                                                IsVirtualizing="True"
+                                                VirtualizationMode="Recycling" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.Template>
+                    <ControlTemplate TargetType="ItemsControl">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ScrollViewer Padding="{TemplateBinding Padding}"
+                                          CanContentScroll="True"
+                                          Focusable="False"
+                                          VerticalScrollBarVisibility="Hidden">
+                                <ItemsPresenter />
+                            </ScrollViewer>
+                        </Border>
+                    </ControlTemplate>
+                </ItemsControl.Template>
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type core:TrackViewModel}">
+
+                        <Border Padding="8"
+                                BorderBrush="{DynamicResource MaterialDesignDivider}"
+                                BorderThickness="0,0,0,1">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition SharedSizeGroup="Checkerz" />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+
+                                <Image Height="60"
+                                       VerticalAlignment="Center"
+                                       RenderOptions.BitmapScalingMode="NearestNeighbor"
+                                       RenderOptions.EdgeMode="Aliased"
+                                       SnapsToDevicePixels="True"
+                                       Source="{Binding ImageUrl, Mode=OneTime}" />
+                                <StackPanel Grid.Column="1" Margin="8,0,0,0">
+                                    <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}" Text="{Binding Title}" />
+                                    <TextBlock Text="{Binding ArtistsTitle}" Style="{StaticResource MaterialDesignBody2TextBlock}" />
+                                    <TextBlock Text="{Binding Version}" Style="{StaticResource MaterialDesignCaptionTextBlock}" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
 
             <!--  Download location  -->
 
@@ -145,7 +210,7 @@
                                 Content="CANCEL"
                                 DockPanel.Dock="Right"
                                 IsCancel="True"
-                                Style="{StaticResource MaterialDesignFlatButton}">
+                                Style="{StaticResource MaterialDesignOutlinedSecondaryButton}">
                             <Button.CommandParameter>
                                 <system:Boolean>False</system:Boolean>
                             </Button.CommandParameter>
@@ -156,7 +221,7 @@
                                 Content="ACCEPT"
                                 DockPanel.Dock="Right"
                                 IsDefault="True"
-                                Style="{StaticResource MaterialDesignFlatButton}">
+                                Style="{StaticResource MaterialDesignFlatSecondaryMidBgButton}">
                             <Button.CommandParameter>
                                 <system:Boolean>True</system:Boolean>
                             </Button.CommandParameter>
@@ -166,7 +231,7 @@
                                 Command="{Binding SelectFolderCommand}"
                                 Content="SELECT"
                                 DockPanel.Dock="Left"
-                                Style="{StaticResource MaterialDesignFlatButton}" />
+                                Style="{StaticResource MaterialDesignOutlinedSecondaryDarkButton}" />
                     </DockPanel>
 
                     <TextBox Margin="0,8,0,8"

@@ -9,6 +9,8 @@ namespace SoftThorn.Monstercat.Browser.Avalonia
     {
         private readonly ShellViewModel _shellViewModel;
 
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+
         public Shell()
         {
             InitializeComponent();
@@ -16,6 +18,8 @@ namespace SoftThorn.Monstercat.Browser.Avalonia
             this.AttachDevTools();
 #endif
         }
+
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
         public Shell(ShellViewModel shellViewModel)
         {

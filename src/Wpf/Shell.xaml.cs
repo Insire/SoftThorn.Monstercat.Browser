@@ -34,31 +34,16 @@ namespace SoftThorn.Monstercat.Browser.Wpf
 
         private async void Download_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            if (!_shellViewModel.Login.IsLoggedIn)
-            {
-                _shellViewModel.Login.Validate();
-                if (_shellViewModel.Login.HasErrors)
-                {
-                    var loginView = new LoginView(_shellViewModel.Login)
-                    {
-                        Owner = this,
-                    };
-                    _shellViewModel.Login.ClearValidation();
-                    _shellViewModel.Login.OnLogin = () => loginView.DialogResult = true;
+            var wasLoggedIn = _shellViewModel.Login.IsLoggedIn;
 
-                    loginView.ShowDialog();
-                }
-                else
-                {
-                    await _shellViewModel.Login.Login(CancellationToken.None);
-                }
-
-                await _shellViewModel.Refresh();
-            }
-
-            if (!_shellViewModel.Login.IsLoggedIn)
+            if (!await _shellViewModel.TryLogin(ShowLoginDialog, CancellationToken.None))
             {
                 return;
+            }
+
+            if (wasLoggedIn != _shellViewModel.Login.IsLoggedIn)
+            {
+                await _shellViewModel.Refresh();
             }
 
             var wnd = new DownloadView(_shellViewModel.Downloads)
@@ -72,6 +57,18 @@ namespace SoftThorn.Monstercat.Browser.Wpf
 
             _shellViewModel.Downloads.OnDownloadStarted = null;
             _shellViewModel.Downloads.SelectFolderProxy = null;
+        }
+
+        private void ShowLoginDialog()
+        {
+            var loginView = new LoginView(_shellViewModel.Login)
+            {
+                Owner = this,
+            };
+            _shellViewModel.Login.ClearValidation();
+            _shellViewModel.Login.OnLogin = () => loginView.DialogResult = true;
+
+            loginView.ShowDialog();
         }
     }
 }

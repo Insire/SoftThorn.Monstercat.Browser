@@ -43,7 +43,7 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             _playbackService = new PlaybackService(_api, timer);
         }
 
-        protected override void OnStartup(StartupEventArgs e)
+        protected override async void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 
@@ -66,6 +66,9 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             _subscription = new CompositeDisposable(dispatcherProgress, trackRepository, downloadViewModel, shellViewModel);
 
             shell.Show();
+
+            await shellViewModel.TryLogin(null, CancellationToken.None);
+            await shellViewModel.Refresh();
         }
 
         protected override void OnExit(ExitEventArgs e)

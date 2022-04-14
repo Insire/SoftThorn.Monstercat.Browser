@@ -103,17 +103,13 @@ namespace SoftThorn.Monstercat.Browser.Core
                 .Bind(_tags, new AddingObservableCollectionAdaptor<TagViewModel, string>())
                 .Subscribe();
 
-            var tagFilter = tags
-                .Throttle(TimeSpan.FromMilliseconds(250))
-                .Flatten()
-                .Select(x => BuildTagFilter(x.Current));
-
             var trackSubscription = trackRepository
                 .Connect()
                 .ObserveOn(TaskPoolScheduler.Default)
                 .DistinctUntilChanged()
+                .AutoRefreshOnObservable(_ => _selectedTags.ObserveCollectionChanges(), TimeSpan.FromMilliseconds(250))
                 .Filter(textFilter)
-                .Filter(tagFilter)
+                .Filter(BuildTagFilter(_selectedTags))
                 .Sort(SortExpressionComparer<KeyValuePair<string, Track>>
                     .Ascending(p => p.Value.Title)
                     .ThenByAscending(p => p.Value.ArtistsTitle)
@@ -143,14 +139,22 @@ namespace SoftThorn.Monstercat.Browser.Core
 
             _subscription = new CompositeDisposable(tagSubscription, trackSubscription, selectedTagSubscription);
 
-            static Func<KeyValuePair<string, Track>, bool> BuildTagFilter(TagViewModel? tag)
+            static Func<KeyValuePair<string, Track>, bool> BuildTagFilter(IEnumerable<TagViewModel>? tags)
             {
-                if (tag is null || string.IsNullOrEmpty(tag.Value) || !tag.IsSelected)
+                return vm =>
                 {
-                    return _ => true;
-                }
+                    if (tags?.Any() != true)
+                    {
+                        return true;
+                    }
 
-                return vm => vm.Value.Tags?.Any(p => p.Equals(tag.Value, StringComparison.CurrentCultureIgnoreCase)) == true;
+                    if (vm.Value.Tags is null || vm.Value.Tags.Length == 0)
+                    {
+                        return false;
+                    }
+
+                    return tags.Select(p => p.Value).Intersect(vm.Value.Tags).Any();
+                };
             }
 
             static Func<KeyValuePair<string, Track>, bool> BuildTextFilter(string? searchText)

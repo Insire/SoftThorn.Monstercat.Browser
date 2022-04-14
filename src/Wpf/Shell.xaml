@@ -31,12 +31,6 @@
         <local:BindingProxy x:Key="BindingProxy" Data="{Binding}" />
     </mahControls:MetroWindow.Resources>
 
-    <i:Interaction.Triggers>
-        <i:EventTrigger EventName="Loaded">
-            <i:InvokeCommandAction Command="{Binding RefreshCommand}" />
-        </i:EventTrigger>
-    </i:Interaction.Triggers>
-
     <materialDesign:TransitioningContent>
         <materialDesign:TransitioningContent.OpeningEffects>
             <materialDesign:TransitionEffect Kind="FadeIn" />
@@ -162,11 +156,16 @@
                                            Grid.Column="0"
                                            Grid.ColumnSpan="3"
                                            IsHitTestVisible="False">
-                                    <CheckBox Content="Streamable" IsChecked="{Binding Streamable}" />
+                                    <CheckBox Background="{DynamicResource PrimaryHueLightBrush}"
+                                              Content="Streamable"
+                                              IsChecked="{Binding Streamable}" />
                                     <CheckBox Margin="32,0"
+                                              Background="{DynamicResource PrimaryHueLightBrush}"
                                               Content="Downloadable"
                                               IsChecked="{Binding Downloadable}" />
-                                    <CheckBox Content="Early Access" IsChecked="{Binding InEarlyAccess}" />
+                                    <CheckBox Background="{DynamicResource PrimaryHueLightBrush}"
+                                              Content="Early Access"
+                                              IsChecked="{Binding InEarlyAccess}" />
                                 </DockPanel>
 
                                 <!--  Tags  -->
@@ -177,7 +176,10 @@
                                               ItemsSource="{Binding Tags}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <materialDesign:Chip Margin="0,0,4,0" Content="{Binding}" />
+                                            <RadioButton Margin="0,0,4,4"
+                                                         Content="{Binding}"
+                                                         IsChecked="True"
+                                                         Style="{StaticResource MaterialDesignChoiceChipPrimaryRadioButton}" />
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
 

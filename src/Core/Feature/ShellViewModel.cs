@@ -38,6 +38,7 @@ namespace SoftThorn.Monstercat.Browser.Core
         public ProgressContainer<Percentage> Progress { get; }
 
         public DownloadViewModel Downloads { get; }
+
         public LoginViewModel Login { get; }
 
         public ShellViewModel(SynchronizationContext synchronizationContext,
@@ -143,6 +144,26 @@ namespace SoftThorn.Monstercat.Browser.Core
             {
                 IsLoading = false;
             }
+        }
+
+        public async Task<bool> TryLogin(Action? handleLoginValidationErrors, CancellationToken token)
+        {
+            if (Login.IsLoggedIn)
+            {
+                return Login.IsLoggedIn;
+            }
+
+            Login.Validate();
+            if (Login.HasErrors)
+            {
+                handleLoginValidationErrors?.Invoke();
+            }
+            else
+            {
+                await Login.Login(token);
+            }
+
+            return Login.IsLoggedIn;
         }
 
         private void Dispose(bool disposing)

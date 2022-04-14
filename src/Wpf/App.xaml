@@ -22,6 +22,7 @@
             </ResourceDictionary.MergedDictionaries>
 
             <SolidColorBrush x:Key="WindowTitleColorBrush" Color="{DynamicResource Primary700}" />
+            <Style BasedOn="{StaticResource MaterialDesignScrollBarMinimal}" TargetType="ScrollBar" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>
