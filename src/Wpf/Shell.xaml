@@ -5,11 +5,11 @@
                          xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                          xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
                          xmlns:iconpacks="clr-namespace:MahApps.Metro.IconPacks;assembly=MahApps.Metro.IconPacks.FontAwesome"
-                         xmlns:local="clr-namespace:SoftThorn.Monstercat.Browser.Wpf"
                          xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
                          xmlns:mahControls="http://metro.mahapps.com/winfx/xaml/controls"
                          xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
                          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                         xmlns:wpf="clr-namespace:SoftThorn.Monstercat.Browser.Wpf"
                          Title="SoftThorn.Monstercat.Browser.Wpf"
                          Width="800"
                          Height="820"
@@ -29,7 +29,7 @@
                          mc:Ignorable="d">
 
     <mahControls:MetroWindow.Resources>
-        <local:BindingProxy x:Key="BindingProxy" Data="{Binding}" />
+        <wpf:BindingProxy x:Key="BindingProxy" Data="{Binding}" />
     </mahControls:MetroWindow.Resources>
 
     <materialDesign:TransitioningContent>
@@ -87,7 +87,7 @@
                                         <DataTemplate>
                                             <Image Width="30"
                                                    Height="30"
-                                                   Source="{Binding ImageUrl}" />
+                                                   wpf:ImageLoader.Source="{Binding ImageUrl}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
@@ -314,7 +314,7 @@
             <ContentControl Grid.Row="3" Grid.ColumnSpan="3">
                 <ProgressBar Maximum="100">
                     <i:Interaction.Behaviors>
-                        <local:SmoothProgressBehavior Percentage="{Binding Progress.Current.Value, Mode=OneWay}" />
+                        <wpf:SmoothProgressBehavior Percentage="{Binding Progress.Current.Value, Mode=OneWay}" />
                     </i:Interaction.Behaviors>
                 </ProgressBar>
 

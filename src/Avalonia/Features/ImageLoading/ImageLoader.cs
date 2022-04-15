@@ -1,6 +1,8 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Media.Imaging;
 using Microsoft.IO;
+using SoftThorn.Monstercat.Browser.Core;
 using System;
 using System.Reactive.Linq;
 
@@ -10,7 +12,8 @@ namespace SoftThorn.Monstercat.Browser.Avalonia
     public static class ImageLoader
     {
         public static RecyclableMemoryStreamManager Manager { get; set; } = new RecyclableMemoryStreamManager();
-        public static IAsyncImageLoader AsyncImageLoader { get; set; } = new RamCachedWebImageLoader(Manager);
+        public static IImageFactory<IBitmap> ImageFactory { get; set; } = new ImageFactory();
+        public static IAsyncImageLoader<IBitmap> AsyncImageLoader { get; set; } = new RamCachedWebImageLoader<IBitmap>(Manager, ImageFactory);
 
         static ImageLoader()
         {

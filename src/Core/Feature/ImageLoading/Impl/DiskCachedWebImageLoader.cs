@@ -1,36 +1,36 @@
+using Microsoft.IO;
 using System;
 using System.IO;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using Avalonia.Media.Imaging;
-using Microsoft.IO;
 
-namespace SoftThorn.Monstercat.Browser.Avalonia
+namespace SoftThorn.Monstercat.Browser.Core
 {
     /// <summary>
     /// Provides memory and disk cached way to asynchronously load images for <see cref="ImageLoader"/>
     /// Can be used as base class if you want to create custom caching mechanism
     /// </summary>
-    public class DiskCachedWebImageLoader : RamCachedWebImageLoader
+    public class DiskCachedWebImageLoader<T> : RamCachedWebImageLoader<T>
+        where T : class
     {
         private readonly string _cacheFolder;
 
-        public DiskCachedWebImageLoader(RecyclableMemoryStreamManager streamManager, string cacheFolder = "Cache/Images/")
-            : base(streamManager)
+        public DiskCachedWebImageLoader(RecyclableMemoryStreamManager streamManager, IImageFactory<T> imageFactory, string cacheFolder = "Cache/Images/")
+            : base(streamManager, imageFactory)
         {
             _cacheFolder = cacheFolder;
         }
 
-        public DiskCachedWebImageLoader(HttpClient httpClient, RecyclableMemoryStreamManager streamManager, bool disposeHttpClient, string cacheFolder = "Cache/Images/")
-            : base(httpClient, streamManager, disposeHttpClient)
+        public DiskCachedWebImageLoader(HttpClient httpClient, RecyclableMemoryStreamManager streamManager, IImageFactory<T> imageFactory, bool disposeHttpClient, string cacheFolder = "Cache/Images/")
+            : base(httpClient, streamManager, imageFactory, disposeHttpClient)
         {
             _cacheFolder = cacheFolder;
         }
 
         /// <inheritdoc />
-        protected override async Task<Bitmap?> LoadFromGlobalCache(Uri? url)
+        protected override async Task<T?> LoadFromGlobalCache(Uri? url)
         {
             if (url is null)
             {
@@ -44,7 +44,7 @@ namespace SoftThorn.Monstercat.Browser.Avalonia
                 return null;
             }
 
-            return new Bitmap(path);
+            return ImageFactory.From(path);
         }
 
         protected override async Task SaveToGlobalCache(Uri? url, Stream imageBytes)

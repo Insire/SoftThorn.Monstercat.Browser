@@ -1,32 +1,32 @@
+using Microsoft.IO;
 using System;
 using System.Collections.Concurrent;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Avalonia.Media.Imaging;
-using Microsoft.IO;
 
-namespace SoftThorn.Monstercat.Browser.Avalonia
+namespace SoftThorn.Monstercat.Browser.Core
 {
     /// <summary>
     /// Provides memory cached way to asynchronously load images for <see cref="ImageLoader"/>
     /// Can be used as base class if you want to create custom in memory caching
     /// </summary>
-    public class RamCachedWebImageLoader : BaseWebImageLoader
+    public class RamCachedWebImageLoader<T> : BaseWebImageLoader<T>
+        where T : class
     {
-        private readonly ConcurrentDictionary<Uri, Task<IBitmap?>> _memoryCache = new();
+        private readonly ConcurrentDictionary<Uri, Task<T?>> _memoryCache = new();
 
         /// <inheritdoc />
-        public RamCachedWebImageLoader(RecyclableMemoryStreamManager streamManager)
-            : base(streamManager)
+        public RamCachedWebImageLoader(RecyclableMemoryStreamManager streamManager, IImageFactory<T> imageFactory)
+            : base(streamManager, imageFactory)
         {
         }
 
         /// <inheritdoc />
-        public RamCachedWebImageLoader(HttpClient httpClient, RecyclableMemoryStreamManager streamManager, bool disposeHttpClient)
-            : base(httpClient, streamManager, disposeHttpClient) { }
+        public RamCachedWebImageLoader(HttpClient httpClient, RecyclableMemoryStreamManager streamManager, IImageFactory<T> imageFactory, bool disposeHttpClient)
+            : base(httpClient, streamManager, imageFactory, disposeHttpClient) { }
 
         /// <inheritdoc />
-        public override async Task<IBitmap?> ProvideImageAsync(Uri? url)
+        public override async Task<T?> ProvideImageAsync(Uri? url)
         {
             if (url is null)
             {

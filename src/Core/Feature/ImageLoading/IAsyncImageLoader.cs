@@ -1,16 +1,16 @@
 using System;
 using System.Threading.Tasks;
-using Avalonia.Media.Imaging;
 
-namespace SoftThorn.Monstercat.Browser.Avalonia
+namespace SoftThorn.Monstercat.Browser.Core
 {
-    public interface IAsyncImageLoader : IDisposable
+    public interface IAsyncImageLoader<T> : IDisposable
+        where T : class
     {
         /// <summary>
         /// Loads image
         /// </summary>
         /// <param name="url">Target url</param>
         /// <returns>Bitmap</returns>
-        public Task<IBitmap?> ProvideImageAsync(Uri? url);
+        public Task<T?> ProvideImageAsync(Uri? url);
     }
 }

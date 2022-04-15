@@ -1,29 +1,30 @@
+using Microsoft.IO;
 using System;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Avalonia.Media.Imaging;
-using Microsoft.IO;
 
-namespace SoftThorn.Monstercat.Browser.Avalonia
+namespace SoftThorn.Monstercat.Browser.Core
 {
     /// <summary>
     /// Provides non cached way to asynchronously load images for <see cref="ImageLoader"/>
     /// Can be used as base class if you want to create custom caching mechanism
     /// </summary>
-    public class BaseWebImageLoader : IAsyncImageLoader
+    public class BaseWebImageLoader<T> : IAsyncImageLoader<T>
+        where T : class
     {
         private readonly bool _shouldDisposeHttpClient;
 
         protected HttpClient HttpClient { get; }
 
         protected RecyclableMemoryStreamManager StreamManager { get; }
+        public IImageFactory<T> ImageFactory { get; }
 
         /// <summary>
         /// Initializes a new instance with new <see cref="HttpClient"/> instance
         /// </summary>
-        public BaseWebImageLoader(RecyclableMemoryStreamManager streamManager)
-            : this(new HttpClient(), streamManager, true)
+        public BaseWebImageLoader(RecyclableMemoryStreamManager streamManager, IImageFactory<T> imageFactory)
+            : this(new HttpClient(), streamManager, imageFactory, true)
         {
         }
 
@@ -32,15 +33,16 @@ namespace SoftThorn.Monstercat.Browser.Avalonia
         /// </summary>
         /// <param name="httpClient">The HttpMessageHandler responsible for processing the HTTP response messages.</param>
         /// <param name="disposeHttpClient">true if the inner handler should be disposed of by Dispose; false if you intend to reuse the HttpClient.</param>
-        public BaseWebImageLoader(HttpClient httpClient, RecyclableMemoryStreamManager streamManager, bool disposeHttpClient)
+        public BaseWebImageLoader(HttpClient httpClient, RecyclableMemoryStreamManager streamManager, IImageFactory<T> imageFactory, bool disposeHttpClient)
         {
             HttpClient = httpClient;
             StreamManager = streamManager;
+            ImageFactory = imageFactory;
             _shouldDisposeHttpClient = disposeHttpClient;
         }
 
         /// <inheritdoc />
-        public virtual Task<IBitmap?> ProvideImageAsync(Uri? url)
+        public virtual Task<T?> ProvideImageAsync(Uri? url)
         {
             return LoadAsync(url);
         }
@@ -50,7 +52,7 @@ namespace SoftThorn.Monstercat.Browser.Avalonia
         /// </summary>
         /// <param name="url">Target url</param>
         /// <returns>Bitmap</returns>
-        protected virtual async Task<IBitmap?> LoadAsync(Uri? url)
+        protected virtual async Task<T?> LoadAsync(Uri? url)
         {
             var internalOrCachedBitmap = await LoadFromInternalAsync(url) ?? await LoadFromGlobalCache(url);
             if (internalOrCachedBitmap is not null)
@@ -68,7 +70,7 @@ namespace SoftThorn.Monstercat.Browser.Avalonia
 
                 using (externalBytes)
                 {
-                    var bitmap = new Bitmap(externalBytes);
+                    var bitmap = ImageFactory.From(externalBytes);
 
                     await SaveToGlobalCache(url, externalBytes);
                     return bitmap;
@@ -86,20 +88,20 @@ namespace SoftThorn.Monstercat.Browser.Avalonia
         /// </summary>
         /// <param name="url">Target url</param>
         /// <returns>Bitmap</returns>
-        protected virtual Task<Bitmap?> LoadFromInternalAsync(Uri? url)
+        protected virtual Task<T?> LoadFromInternalAsync(Uri? url)
         {
             if (url?.Scheme.Equals("HTTPS", StringComparison.InvariantCultureIgnoreCase) != false || url.Scheme.Equals("HTTP", StringComparison.InvariantCultureIgnoreCase))
             {
-                return Task.FromResult<Bitmap?>(null);
+                return Task.FromResult<T?>(null);
             }
 
             try
             {
-                return Task.FromResult(new Bitmap(url.ToString()))!;
+                return Task.FromResult(ImageFactory.From(url))!;
             }
             catch
             {
-                return Task.FromResult<Bitmap?>(null);
+                return Task.FromResult<T?>(null);
             }
         }
 
@@ -139,10 +141,10 @@ namespace SoftThorn.Monstercat.Browser.Avalonia
         /// </summary>
         /// <param name="url">Target url</param>
         /// <returns>Bitmap</returns>
-        protected virtual Task<Bitmap?> LoadFromGlobalCache(Uri? url)
+        protected virtual Task<T?> LoadFromGlobalCache(Uri? url)
         {
             // Current implementation does not provide global caching
-            return Task.FromResult<Bitmap?>(null);
+            return Task.FromResult<T?>(null);
         }
 
         /// <summary>
