@@ -76,7 +76,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                 .Select(x => BuildTextFilter(x.Value));
 
             var tags = trackRepository
-                .Connect()
+                .ConnectTracks()
                 .ObserveOn(TaskPoolScheduler.Default)
                 .DistinctUntilChanged()
                 .TransformMany(p => p.Value.Tags, p => p)
@@ -99,12 +99,14 @@ namespace SoftThorn.Monstercat.Browser.Core
                 .Connect()
                 .ObserveOn(TaskPoolScheduler.Default)
                 .DistinctUntilChanged()
+                .Sort(SortExpressionComparer<TagViewModel>
+                    .Ascending(p => p.Value))
                 .ObserveOn(synchronizationContext)
                 .Bind(_tags, new AddingObservableCollectionAdaptor<TagViewModel, string>())
                 .Subscribe();
 
             var trackSubscription = trackRepository
-                .Connect()
+                .ConnectTracks()
                 .ObserveOn(TaskPoolScheduler.Default)
                 .DistinctUntilChanged()
                 .AutoRefreshOnObservable(_ => _selectedTags.ObserveCollectionChanges(), TimeSpan.FromMilliseconds(250))

@@ -11,17 +11,17 @@ namespace SoftThorn.Monstercat.Browser.Core
             var collection = new ObservableCollection<string>(track.Tags ?? Enumerable.Empty<string>());
             if (!string.IsNullOrWhiteSpace(track.GenrePrimary))
             {
-                collection.Add(track.GenrePrimary);
+                collection.Add(track.GenrePrimary.Trim().ToLowerInvariant());
             }
 
             if (!string.IsNullOrWhiteSpace(track.GenreSecondary))
             {
-                collection.Add(track.GenreSecondary);
+                collection.Add(track.GenreSecondary.Trim().ToLowerInvariant());
             }
 
             if (!string.IsNullOrWhiteSpace(track.Brand))
             {
-                collection.Add(track.Brand);
+                collection.Add(track.Brand.Trim().ToLowerInvariant());
             }
 
             return collection;

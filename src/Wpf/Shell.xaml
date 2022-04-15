@@ -6,6 +6,7 @@
                          xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
                          xmlns:iconpacks="clr-namespace:MahApps.Metro.IconPacks;assembly=MahApps.Metro.IconPacks.FontAwesome"
                          xmlns:local="clr-namespace:SoftThorn.Monstercat.Browser.Wpf"
+                         xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
                          xmlns:mahControls="http://metro.mahapps.com/winfx/xaml/controls"
                          xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
                          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -39,7 +40,6 @@
 
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="8" />
                 <RowDefinition Height="Auto" />
@@ -51,153 +51,246 @@
                 <ColumnDefinition Width="8" />
             </Grid.ColumnDefinitions>
 
-            <!--  Search  -->
-
-            <materialDesign:Card Grid.Row="0"
-                                 Grid.Column="1"
-                                 Margin="16"
-                                 Padding="32,16">
-                <TextBox VerticalAlignment="Center"
-                         materialDesign:TextFieldAssist.HasClearButton="True"
-                         Style="{StaticResource MaterialDesignFloatingHintTextBox}"
-                         Text="{Binding TextFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=125}">
-                    <materialDesign:HintAssist.Hint>
-                        <StackPanel Margin="-2,0,0,0" Orientation="Horizontal">
-                            <iconpacks:PackIconFontAwesome Margin="0,0,2,0" Kind="SearchSolid" />
-                            <TextBlock Text="Filter" />
-                        </StackPanel>
-                    </materialDesign:HintAssist.Hint>
-                </TextBox>
-            </materialDesign:Card>
-
-            <!--  Tracks  -->
-
-            <ItemsControl Grid.Row="1"
+            <ScrollViewer Grid.Row="0"
                           Grid.Column="1"
-                          ItemsSource="{Binding Tracks, Mode=OneTime}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <VirtualizingStackPanel IsItemsHost="True"
-                                                IsVirtualizing="True"
-                                                VirtualizationMode="Recycling" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
+                          materialDesign:ScrollViewerAssist.IsAutoHideEnabled="True">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="8" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="8" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="8" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
 
-                <ItemsControl.Template>
-                    <ControlTemplate TargetType="ItemsControl">
-                        <Border Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}">
-                            <ScrollViewer Padding="{TemplateBinding Padding}"
-                                          CanContentScroll="True"
-                                          Focusable="False"
-                                          VerticalScrollBarVisibility="Hidden">
-                                <ItemsPresenter />
-                            </ScrollViewer>
-                        </Border>
-                    </ControlTemplate>
-                </ItemsControl.Template>
-
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate DataType="{x:Type core:TrackViewModel}">
-                        <materialDesign:Card Margin="16" Padding="32">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="60" />
-                                    <ColumnDefinition Width="8" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="*" />
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="Auto" />
-                                    <RowDefinition Height="8" />
-                                    <RowDefinition Height="Auto" />
-                                </Grid.RowDefinitions>
-
-                                <!--  Cover Art  -->
-                                <materialDesign:Badged Grid.Column="0"
-                                                       BadgeColorZoneMode="PrimaryMid"
-                                                       Focusable="False"
-                                                       ToolTip="Play Track">
-                                    <materialDesign:Badged.Badge>
-                                        <materialDesign:PackIcon Kind="Play" />
-                                    </materialDesign:Badged.Badge>
-
-                                    <Button Width="60"
-                                            Height="60"
-                                            Padding="0"
-                                            materialDesign:RippleAssist.RippleOnTop="True"
-                                            Background="Transparent"
-                                            BorderThickness="0"
-                                            Command="{Binding Data.PlayCommand, Source={StaticResource BindingProxy}}"
-                                            CommandParameter="{Binding}"
-                                            Focusable="True"
-                                            UseLayoutRounding="True">
-                                        <Image RenderOptions.BitmapScalingMode="NearestNeighbor"
-                                               RenderOptions.EdgeMode="Aliased"
-                                               SnapsToDevicePixels="True"
-                                               Source="{Binding ImageUrl, Mode=OneTime}" />
-                                    </Button>
-                                </materialDesign:Badged>
-
-                                <!--  Title Info  -->
-                                <TextBlock Grid.Column="2" Style="{StaticResource MaterialDesignHeadline5TextBlock}">
-                                    <Run Text="{Binding Title}" />
-                                    <LineBreak />
-                                    <Run FontSize="16" Text="{Binding ArtistsTitle}" />
-                                    <LineBreak />
-                                    <Run FontSize="14" Text="{Binding Version}" />
-                                </TextBlock>
-
-                                <!--  Flags  -->
-                                <DockPanel Grid.Row="1"
-                                           Grid.Column="0"
-                                           Grid.ColumnSpan="3"
-                                           IsHitTestVisible="False">
-                                    <CheckBox Background="{DynamicResource PrimaryHueLightBrush}"
-                                              Content="Streamable"
-                                              IsChecked="{Binding Streamable}" />
-                                    <CheckBox Margin="32,0"
-                                              Background="{DynamicResource PrimaryHueLightBrush}"
-                                              Content="Downloadable"
-                                              IsChecked="{Binding Downloadable}" />
-                                    <CheckBox Background="{DynamicResource PrimaryHueLightBrush}"
-                                              Content="Early Access"
-                                              IsChecked="{Binding InEarlyAccess}" />
-                                </DockPanel>
-
-                                <!--  Tags  -->
-                                <ItemsControl Grid.Row="4"
-                                              Grid.Column="0"
-                                              Grid.ColumnSpan="3"
-                                              IsHitTestVisible="False"
-                                              ItemsSource="{Binding Tags}">
-                                    <ItemsControl.ItemTemplate>
+                    <!--  Newest Tracks  -->
+                    <GroupBox Grid.Row="0"
+                              Height="300"
+                              Margin="16"
+                              Padding="16"
+                              materialDesign:ShadowAssist.ShadowDepth="Depth3"
+                              BorderThickness="0"
+                              DockPanel.Dock="Top"
+                              Header="Top 15 Newest Releases"
+                              Style="{DynamicResource MaterialDesignGroupBox}">
+                        <DataGrid AutoGenerateColumns="False"
+                                  CanUserSortColumns="False"
+                                  IsReadOnly="True"
+                                  ItemsSource="{Binding Releases.Tracks}"
+                                  SelectionMode="Single"
+                                  SelectionUnit="FullRow">
+                            <DataGrid.Columns>
+                                <DataGridTemplateColumn>
+                                    <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <RadioButton Margin="0,0,4,4"
-                                                         Content="{Binding}"
-                                                         IsChecked="True"
-                                                         Style="{StaticResource MaterialDesignChoiceChipPrimaryRadioButton}" />
+                                            <Image Width="30"
+                                                   Height="30"
+                                                   Source="{Binding ImageUrl}" />
                                         </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTextColumn Binding="{Binding Title}" Header="Title" />
+                                <DataGridTextColumn Binding="{Binding Version}" />
+                                <DataGridTextColumn Width="*"
+                                                    Binding="{Binding ArtistsTitle}"
+                                                    Header="Artist" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </GroupBox>
 
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <StackPanel Orientation="Horizontal" />
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                </ItemsControl>
-                            </Grid>
-                        </materialDesign:Card>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+                    <!--  Popular Tags  -->
+                    <GroupBox Grid.Row="2"
+                              Height="300"
+                              Margin="16"
+                              Padding="16"
+                              materialDesign:ShadowAssist.ShadowDepth="Depth3"
+                              BorderThickness="0"
+                              DockPanel.Dock="Top"
+                              Header="Top 15 Most Popular Tags"
+                              Style="{DynamicResource MaterialDesignGroupBox}">
+                        <lvc:CartesianChart Grid.Row="6"
+                                            Grid.Column="0"
+                                            Grid.ColumnSpan="5"
+                                            Series="{Binding Tags.SeriesCollection}"
+                                            XAxes="{Binding Tags.XAxes}">
+                            <lvc:CartesianChart.Style>
+                                <Style TargetType="{x:Type lvc:CartesianChart}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsLoading}" Value="true">
+                                            <Setter Property="Opacity" Value="0.5" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsLoading}" Value="false">
+                                            <Setter Property="Opacity" Value="1" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </lvc:CartesianChart.Style>
+                        </lvc:CartesianChart>
+                    </GroupBox>
+
+                    <!--  Brands  -->
+                    <ItemsControl Grid.Row="4" Margin="16">
+                        <ItemsControl.ItemContainerStyle>
+                            <Style>
+                                <Setter Property="FrameworkElement.Margin" Value="8,16" />
+                            </Style>
+                        </ItemsControl.ItemContainerStyle>
+
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Rows="1" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+
+                        <ItemsControl.Items>
+                            <materialDesign:Card materialDesign:ShadowAssist.ShadowDepth="Depth3">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="140" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="16" />
+                                    </Grid.RowDefinitions>
+
+                                    <Border HorizontalAlignment="Stretch" Background="#FF673AB7" />
+
+                                    <Button Grid.Row="0"
+                                            Margin="0,0,16,-20"
+                                            HorizontalAlignment="Right"
+                                            VerticalAlignment="Bottom"
+                                            Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}">
+                                        <materialDesign:PackIcon Kind="Star" />
+                                    </Button>
+
+                                    <StackPanel Grid.Row="1" Margin="8,24,0,0">
+                                        <TextBlock FontWeight="Bold" Text="UNCAGED" />
+                                    </StackPanel>
+                                </Grid>
+                            </materialDesign:Card>
+
+                            <materialDesign:Card materialDesign:ShadowAssist.ShadowDepth="Depth3">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="140" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="16" />
+                                    </Grid.RowDefinitions>
+
+                                    <Border Background="#FF673AB7" />
+
+                                    <Button Grid.Row="0"
+                                            Margin="0,0,16,-20"
+                                            HorizontalAlignment="Right"
+                                            VerticalAlignment="Bottom"
+                                            Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}">
+                                        <materialDesign:PackIcon Kind="Star" />
+                                    </Button>
+
+                                    <StackPanel Grid.Row="1" Margin="8,24,0,0">
+                                        <TextBlock FontWeight="Bold" Text="INSTINCT" />
+                                    </StackPanel>
+                                </Grid>
+                            </materialDesign:Card>
+
+                            <materialDesign:Card materialDesign:ShadowAssist.ShadowDepth="Depth3">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="140" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="16" />
+                                    </Grid.RowDefinitions>
+
+                                    <Border HorizontalAlignment="Stretch" Background="#FF673AB7" />
+
+                                    <Button Grid.Row="0"
+                                            Margin="0,0,16,-20"
+                                            HorizontalAlignment="Right"
+                                            VerticalAlignment="Bottom"
+                                            Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}">
+                                        <materialDesign:PackIcon Kind="Star" />
+                                    </Button>
+
+                                    <TextBlock Grid.Row="1"
+                                               Margin="8,24,0,0"
+                                               FontWeight="Bold"
+                                               Text="SILK" />
+                                </Grid>
+                            </materialDesign:Card>
+                        </ItemsControl.Items>
+                    </ItemsControl>
+
+                    <!--  Brands  -->
+                    <GroupBox Grid.Row="6"
+                              Height="300"
+                              Margin="16"
+                              Padding="16"
+                              materialDesign:ShadowAssist.ShadowDepth="Depth3"
+                              BorderThickness="0"
+                              DockPanel.Dock="Top"
+                              Header="Top 15 Most Popular Genres"
+                              Style="{DynamicResource MaterialDesignGroupBox}">
+                        <lvc:CartesianChart Grid.Row="6"
+                                            Grid.Column="0"
+                                            Grid.ColumnSpan="5"
+                                            Series="{Binding Tags.SeriesCollection}"
+                                            XAxes="{Binding Tags.XAxes}">
+                            <lvc:CartesianChart.Style>
+                                <Style TargetType="{x:Type lvc:CartesianChart}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsLoading}" Value="true">
+                                            <Setter Property="Opacity" Value="0.5" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsLoading}" Value="false">
+                                            <Setter Property="Opacity" Value="1" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </lvc:CartesianChart.Style>
+                        </lvc:CartesianChart>
+                    </GroupBox>
+
+                    <!--  Artists  -->
+                    <GroupBox Grid.Row="6"
+                              Height="300"
+                              Margin="16"
+                              Padding="16"
+                              materialDesign:ShadowAssist.ShadowDepth="Depth3"
+                              BorderThickness="0"
+                              DockPanel.Dock="Top"
+                              Header="Top 15 Latest Artists"
+                              Style="{DynamicResource MaterialDesignGroupBox}">
+                        <DataGrid materialDesign:ScrollViewerAssist.IsAutoHideEnabled="true"
+                                  AutoGenerateColumns="False"
+                                  CanUserSortColumns="False"
+                                  IsReadOnly="True"
+                                  ItemsSource="{Binding Releases.Tracks}"
+                                  SelectionMode="Single"
+                                  SelectionUnit="FullRow">
+                            <DataGrid.Columns>
+                                <DataGridTemplateColumn>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Image Width="30"
+                                                   Height="30"
+                                                   Source="{Binding ImageUrl}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTextColumn Binding="{Binding Title}" Header="Title" />
+                                <DataGridTextColumn Binding="{Binding Version}" />
+                                <DataGridTextColumn Width="*"
+                                                    Binding="{Binding ArtistsTitle}"
+                                                    Header="Artist" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </GroupBox>
+                </Grid>
+            </ScrollViewer>
 
             <!--  Download  -->
 
-            <Button Grid.Row="1"
+            <Button Grid.Row="0"
                     Grid.Column="1"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Bottom"
@@ -208,7 +301,7 @@
                 <Button.ToolTip>
                     <TextBlock Margin="8,0,0,0" VerticalAlignment="Center">
                         <Run Text="Download all" />
-                        <Run Text="{Binding Tracks.Count, Mode=OneWay}" />
+                        <Run Text="{Binding Downloads.Tracks.Count, Mode=OneWay}" />
                         <Run Text="Tracks now" />
                     </TextBlock>
                 </Button.ToolTip>

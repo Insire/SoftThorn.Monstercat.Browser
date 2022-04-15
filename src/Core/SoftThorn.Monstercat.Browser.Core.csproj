@@ -13,6 +13,8 @@
         <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
         <PackageReference Include="MonstercatNet" Version="3.0.9" />
         <PackageReference Include="NAudio.Core" Version="2.0.0" />
+        <PackageReference Include="LiveChartsCore" Version="2.0.0-beta.101" />
+        <PackageReference Include="LiveChartsCore.SkiaSharpView" Version="2.0.0-beta.101" />
     </ItemGroup>
 
 </Project>
