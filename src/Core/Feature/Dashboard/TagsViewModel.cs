@@ -18,15 +18,17 @@ namespace SoftThorn.Monstercat.Browser.Core
     /// <summary>
     /// top 15 tags, sorted by newest release
     /// </summary>
-    public sealed partial class TagsViewModel : ObservableObject, IDisposable
+    public sealed class TagsViewModel : ObservableObject, IDisposable
     {
         private readonly IDisposable _subscription;
         private readonly ObservableCollectionExtended<ISeries> _seriesCollection;
+
         private bool _disposedValue;
 
         public ReadOnlyObservableCollection<ISeries> SeriesCollection { get; }
 
         public Axis[] XAxes { get; }
+        public Axis[] YAxes { get; }
 
         public TagsViewModel(SynchronizationContext synchronizationContext, TrackRepository trackRepository)
         {
@@ -34,6 +36,14 @@ namespace SoftThorn.Monstercat.Browser.Core
             SeriesCollection = new ReadOnlyObservableCollection<ISeries>(_seriesCollection);
 
             XAxes = new[]
+            {
+                new Axis
+                {
+                    IsVisible = false,
+                }
+            };
+
+            YAxes = new[]
             {
                 new Axis
                 {
@@ -56,8 +66,8 @@ namespace SoftThorn.Monstercat.Browser.Core
                 {
                     Name = p.Key,
                     Values = new[] { p.Value.Count },
-                    MaxBarWidth = 24,
                     Fill = new SolidColorPaint(SKColor.Parse("#FF673AB7")),
+                    MaxBarWidth = 24,
                 })
                 .ObserveOn(synchronizationContext)
                 .Bind(_seriesCollection)

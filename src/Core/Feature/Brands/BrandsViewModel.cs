@@ -12,19 +12,25 @@ using System.Threading;
 namespace SoftThorn.Monstercat.Browser.Core
 {
     /// <summary>
-    /// tracks and releases by newest
+    /// top 15 tracks by brand, sorted by newest
     /// </summary>
-    public sealed class ReleasesViewModel : ObservableObject, IDisposable
+    public sealed partial class BrandViewModel<T> : ObservableObject, IDisposable
+        where T : Brand, new()
     {
+        private readonly Brand _brand;
         private readonly IDisposable _subscription;
         private readonly ObservableCollectionExtended<ReleaseViewModel> _releases;
 
         private bool _disposedValue;
 
+        [ObservableProperty]
+        private ReleaseViewModel? _latestRelease;
+
         public ReadOnlyObservableCollection<ReleaseViewModel> Releases { get; }
 
-        public ReleasesViewModel(SynchronizationContext synchronizationContext, TrackRepository trackRepository)
+        public BrandViewModel(SynchronizationContext synchronizationContext, TrackRepository trackRepository)
         {
+            _brand = new T();
             _releases = new ObservableCollectionExtended<ReleaseViewModel>();
             Releases = new ReadOnlyObservableCollection<ReleaseViewModel>(_releases);
 
@@ -32,6 +38,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                 .ConnectTracks()
                 .ObserveOn(TaskPoolScheduler.Default)
                 .DistinctUntilChanged()
+                .Filter(p => p.Value.Brand.Equals(_brand.Name, StringComparison.InvariantCultureIgnoreCase))
                 .Group(p => p.Value.Release.Id)
                 .Transform(group =>
                 {
@@ -82,9 +89,18 @@ namespace SoftThorn.Monstercat.Browser.Core
                 .Sort(SortExpressionComparer<ReleaseViewModel>
                     .Descending(p => p.ReleaseDate)
                     .ThenByAscending(p => p.Title))
+                .Do(p =>
+                {
+                    var vm = p.SortedItems.FirstOrDefault().Value;
+                    if (vm != null)
+                        _latestRelease = vm;
+                })
                 .ObserveOn(synchronizationContext)
                 .Bind(_releases)
-                .Subscribe();
+                .Subscribe(_ =>
+                {
+                    OnPropertyChanged(nameof(LatestRelease));
+                });
         }
 
         private void Dispose(bool disposing)

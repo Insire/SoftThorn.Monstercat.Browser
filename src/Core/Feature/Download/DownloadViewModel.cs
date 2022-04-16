@@ -18,8 +18,7 @@ using System.Threading.Tasks;
 
 namespace SoftThorn.Monstercat.Browser.Core
 {
-    [ObservableObject]
-    public sealed partial class DownloadViewModel : IDisposable
+    public sealed partial class DownloadViewModel : ObservableObject, IDisposable
     {
         private readonly CompositeDisposable _subscription;
         private readonly IMonstercatApi _api;
@@ -79,7 +78,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                 .ConnectTracks()
                 .ObserveOn(TaskPoolScheduler.Default)
                 .DistinctUntilChanged()
-                .TransformMany(p => p.Value.Tags, p => p)
+                .TransformMany(p => p.Value.Tags ?? Enumerable.Empty<string>(), p => p)
                 .SortBy(p => p)
                 .Transform(p => new TagViewModel() { Value = p, IsSelected = false });
 

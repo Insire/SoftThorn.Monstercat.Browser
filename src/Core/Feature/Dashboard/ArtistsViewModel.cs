@@ -1,15 +1,11 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using LiveChartsCore;
-using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace SoftThorn.Monstercat.Browser.Core
 {
     /// <summary>
     /// top 15 artists, sorted by newest release
     /// </summary>
-    [ObservableObject]
-    public sealed partial class ArtistsViewModel : IDashBoardEntryViewModel
+    public sealed partial class ArtistsViewModel : ObservableObject
     {
-        public ObservableCollection<ISeries> SeriesCollection { get; }
     }
 }

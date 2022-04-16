@@ -8,8 +8,7 @@ using System.Threading.Tasks;
 
 namespace SoftThorn.Monstercat.Browser.Core
 {
-    [ObservableObject]
-    public sealed partial class ShellViewModel
+    public sealed partial class ShellViewModel : ObservableObject
     {
         private readonly TrackRepository _trackRepository;
         private readonly IPlaybackService _playbackService;
@@ -28,13 +27,22 @@ namespace SoftThorn.Monstercat.Browser.Core
 
         public ProgressContainer<Percentage> Progress { get; }
 
+        public BrandViewModel<Silk> Silk { get; }
+
+        public BrandViewModel<Uncaged> Uncaged { get; }
+
+        public BrandViewModel<Instinct> Instinct { get; }
+
         public ShellViewModel(ReleasesViewModel releases,
                               TagsViewModel tags,
                               TrackRepository trackRepository,
                               IPlaybackService playbackService,
                               DownloadViewModel downloadViewModel,
                               LoginViewModel login,
-                              ProgressContainer<Percentage> progress)
+                              ProgressContainer<Percentage> progress,
+                              BrandViewModel<Silk> silk,
+                              BrandViewModel<Uncaged> uncaged,
+                              BrandViewModel<Instinct> instinct)
         {
             Releases = releases ?? throw new ArgumentNullException(nameof(releases));
             Tags = tags ?? throw new ArgumentNullException(nameof(tags));
@@ -43,6 +51,9 @@ namespace SoftThorn.Monstercat.Browser.Core
             Downloads = downloadViewModel ?? throw new ArgumentNullException(nameof(downloadViewModel));
             Login = login ?? throw new ArgumentNullException(nameof(login));
             Progress = progress ?? throw new ArgumentNullException(nameof(progress));
+            Silk = silk ?? throw new ArgumentNullException(nameof(silk));
+            Uncaged = uncaged ?? throw new ArgumentNullException(nameof(uncaged));
+            Instinct = instinct ?? throw new ArgumentNullException(nameof(instinct));
         }
 
         [ICommand(AllowConcurrentExecutions = false, CanExecute = nameof(CanPlay))]

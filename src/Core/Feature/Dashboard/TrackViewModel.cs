@@ -4,8 +4,7 @@ using System.Collections.ObjectModel;
 
 namespace SoftThorn.Monstercat.Browser.Core
 {
-    [ObservableObject]
-    public sealed partial class TrackViewModel
+    public sealed partial class TrackViewModel : ObservableObject
     {
         [ObservableProperty]
         private Guid _id;

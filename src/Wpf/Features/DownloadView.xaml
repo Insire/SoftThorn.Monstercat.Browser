@@ -189,7 +189,7 @@
                                 <StackPanel Grid.Column="1" Margin="8,0,0,0">
                                     <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}" Text="{Binding Title}" />
                                     <TextBlock Text="{Binding ArtistsTitle}" Style="{StaticResource MaterialDesignBody2TextBlock}" />
-                                    <TextBlock Text="{Binding Version}" Style="{StaticResource MaterialDesignCaptionTextBlock}" />
+                                    <TextBlock Text="{Binding Brand}" Style="{StaticResource MaterialDesignCaptionTextBlock}" />
                                 </StackPanel>
                             </Grid>
                         </Border>

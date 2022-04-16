@@ -49,9 +49,11 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             container.Register<LoginViewModel>(Reuse.Singleton);
             container.Register<ReleasesViewModel>(Reuse.Singleton);
             container.Register<TagsViewModel>(Reuse.Singleton);
-            container.Register<BrandsViewModel>(Reuse.Singleton);
             container.Register<GenresViewModel>(Reuse.Singleton);
             container.Register<ArtistsViewModel>(Reuse.Singleton);
+            container.Register<BrandViewModel<Instinct>>(Reuse.Singleton);
+            container.Register<BrandViewModel<Uncaged>>(Reuse.Singleton);
+            container.Register<BrandViewModel<Silk>>(Reuse.Singleton);
 
             // services
             container.RegisterInstance<IConfiguration>(configuration);
