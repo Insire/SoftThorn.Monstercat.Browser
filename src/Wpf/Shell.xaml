@@ -104,6 +104,9 @@
                                             <Image Width="30"
                                                    Height="30"
                                                    wpf:ImageLoader.Source="{Binding ImageUrl, Mode=OneTime}"
+                                                   xf:Animations.Primary="{xf:Animate BasedOn={StaticResource FadeIn},
+                                                                                      Event=None}"
+                                                   xf:Animations.PrimaryBinding="{Binding Path=(wpf:ImageLoader.IsLoading), RelativeSource={RelativeSource Self}, Converter={wpf:IsNot}}"
                                                    RenderOptions.BitmapScalingMode="NearestNeighbor"
                                                    RenderOptions.EdgeMode="Aliased"
                                                    SnapsToDevicePixels="True"
@@ -201,6 +204,9 @@
                                             HorizontalAlignment="Stretch"
                                             Background="#FF673AB7">
                                         <Image wpf:ImageLoader.Source="{Binding LatestRelease.ImageUrl, Mode=OneWay}"
+                                               xf:Animations.Primary="{xf:Animate BasedOn={StaticResource FadeIn},
+                                                                                  Event=None}"
+                                               xf:Animations.PrimaryBinding="{Binding Path=(wpf:ImageLoader.IsLoading), RelativeSource={RelativeSource Self}, Converter={wpf:IsNot}}"
                                                RenderOptions.BitmapScalingMode="NearestNeighbor"
                                                RenderOptions.EdgeMode="Aliased"
                                                SnapsToDevicePixels="True" />
@@ -247,6 +253,9 @@
                                             HorizontalAlignment="Stretch"
                                             Background="#FF673AB7">
                                         <Image wpf:ImageLoader.Source="{Binding LatestRelease.ImageUrl, Mode=OneWay}"
+                                               xf:Animations.Primary="{xf:Animate BasedOn={StaticResource FadeIn},
+                                                                                  Event=None}"
+                                               xf:Animations.PrimaryBinding="{Binding Path=(wpf:ImageLoader.IsLoading), RelativeSource={RelativeSource Self}, Converter={wpf:IsNot}}"
                                                RenderOptions.BitmapScalingMode="NearestNeighbor"
                                                RenderOptions.EdgeMode="Aliased"
                                                SnapsToDevicePixels="True" />
@@ -293,6 +302,9 @@
                                             HorizontalAlignment="Stretch"
                                             Background="#FF673AB7">
                                         <Image wpf:ImageLoader.Source="{Binding LatestRelease.ImageUrl, Mode=OneWay}"
+                                               xf:Animations.Primary="{xf:Animate BasedOn={StaticResource FadeIn},
+                                                                                  Event=None}"
+                                               xf:Animations.PrimaryBinding="{Binding Path=(wpf:ImageLoader.IsLoading), RelativeSource={RelativeSource Self}, Converter={wpf:IsNot}}"
                                                RenderOptions.BitmapScalingMode="NearestNeighbor"
                                                RenderOptions.EdgeMode="Aliased"
                                                SnapsToDevicePixels="True" />
@@ -351,6 +363,8 @@
                                         <DataTemplate>
                                             <Image Width="30"
                                                    Height="30"
+                                                   xf:Animations.Primary="{xf:Animate BasedOn={StaticResource FadeIn},
+                                                                                      Event=Loaded}"
                                                    Source="{Binding ImageUrl}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
