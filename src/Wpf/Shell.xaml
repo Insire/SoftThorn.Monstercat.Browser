@@ -408,8 +408,9 @@
                     VerticalAlignment="Bottom"
                     materialDesign:ButtonProgressAssist.IsIndicatorVisible="{Binding Downloads.IsDownLoading}"
                     materialDesign:ButtonProgressAssist.Value="{Binding Downloads.Progress.Current.Value}"
-                    Click="Download_Click"
-                    Style="{StaticResource MaterialDesignFloatingActionAccentButton}">
+                    xf:Animations.Primary="{xf:Animate BasedOn={StaticResource FadeIn},
+                                                       Event=Visibility}"
+                    Click="Download_Click">
                 <Button.ToolTip>
                     <TextBlock Margin="8,0,0,0" VerticalAlignment="Center">
                         <Run Text="Download all" />
@@ -419,6 +420,19 @@
                 </Button.ToolTip>
 
                 <iconpacks:PackIconFontAwesome Kind="DownloadSolid" />
+
+                <Button.Style>
+                    <Style BasedOn="{StaticResource MaterialDesignFloatingActionAccentButton}" TargetType="{x:Type Button}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsLoading}" Value="true">
+                                <Setter Property="Visibility" Value="Hidden" />
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding IsLoading}" Value="false">
+                                <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
             </Button>
 
             <!--  Progress  -->
