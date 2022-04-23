@@ -20,10 +20,6 @@
         x:Class="SoftThorn.Monstercat.Browser.Avalonia.Shell"
         Title="SoftThorn.Monstercat.Browser.Avalonia">
 
-    <Window.Resources>
-        <local:ReleaseIdToBitmapValueConverter x:Key="ReleaseIdToBitmapValueConverter" />
-    </Window.Resources>
-
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -42,7 +38,7 @@
                      Grid.Row="0"
                      Grid.Column="1"
                      Padding="32,16">
-            <TextBox Text="{Binding TextFilter}" Watermark="Filter" />
+            <!--<TextBox Text="{Binding TextFilter}" Watermark="Filter" />-->
         </styles:Card>
 
         <ScrollViewer VerticalAlignment="Stretch"
@@ -51,7 +47,7 @@
                       Grid.Column="1"
                       VerticalScrollBarVisibility="Hidden"
                       HorizontalScrollBarVisibility="Disabled">
-            <ItemsRepeater Items="{Binding Tracks}">
+            <ItemsRepeater Items="{Binding Releases.Releases}">
                 <ItemsRepeater.ItemTemplate>
                     <DataTemplate DataType="{x:Type core:TrackViewModel}">
                         <styles:Card Margin="16" Padding="32">
@@ -148,7 +144,7 @@
             <ToolTip.Tip>
                 <StackPanel Margin="8,0,0,0" Orientation="Horizontal">
                     <TextBlock Text="Download all " />
-                    <TextBlock Text="{Binding Tracks.Count, Mode=OneWay}" />
+                    <TextBlock Text="{Binding Releases.Releases.Count, Mode=OneWay}" />
                     <TextBlock Text=" Tracks now" />
                 </StackPanel>
             </ToolTip.Tip>

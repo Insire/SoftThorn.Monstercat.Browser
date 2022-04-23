@@ -1,72 +1,44 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using Gress;
-using Microsoft.Extensions.Configuration;
+using DryIoc;
 using SoftThorn.Monstercat.Browser.Core;
-using SoftThorn.MonstercatNet;
-using System;
-using System.Net.Http;
-using System.Reactive.Disposables;
 using System.Threading;
 
 namespace SoftThorn.Monstercat.Browser.Avalonia
 {
     public class App : Application
     {
-        private readonly HttpClient _apiHttpClient;
-        private readonly IMonstercatApi _api;
-
-        private readonly HttpClient _cdnHttpClient;
-        private readonly IMonstercatCdnService _cdn;
-
-        private readonly PlaybackService _playbackService;
-        private readonly IConfiguration _configuration;
-
-        private CompositeDisposable? _subscription;
-
-        public App()
-        {
-            _apiHttpClient = new HttpClient().UseMonstercatApiV2();
-            _api = MonstercatApi.Create(_apiHttpClient);
-
-            _cdnHttpClient = new HttpClient().UseMonstercatCdn();
-            _cdn = MonstercatCdn.Create(_cdnHttpClient);
-
-            _configuration = new ConfigurationBuilder()
-                .AddCommandLine(Environment.GetCommandLineArgs())
-                .AddEnvironmentVariables()
-                .AddUserSecrets<Shell>()
-                .Build();
-
-            _playbackService = new PlaybackService();
-        }
+        private IContainer? _container;
 
         public override void Initialize()
         {
             AvaloniaXamlLoader.Load(this);
         }
 
-        public override void OnFrameworkInitializationCompleted()
+        public override async void OnFrameworkInitializationCompleted()
         {
-            var loginViewModel = new LoginViewModel(_api, _configuration);
-            var synchronizationContext = SynchronizationContext.Current!;
-            var progress = new ProgressContainer<Percentage>();
-            var dispatcherProgress = new DispatcherProgress<Percentage>(synchronizationContext, (p) => progress.Report(p), TimeSpan.FromMilliseconds(250));
-            var trackRepository = new TrackRepository(dispatcherProgress, _api);
-            var downloadViewModel = new DownloadViewModel(SynchronizationContext.Current!, _api, trackRepository);
-            var shellViewModel = new ShellViewModel(synchronizationContext, trackRepository, _playbackService, downloadViewModel, loginViewModel, progress);
+            var container = _container = CompositionRoot.Get();
 
-            _subscription = new CompositeDisposable(dispatcherProgress, trackRepository, downloadViewModel, shellViewModel);
+            var shell = container.Resolve<Shell>();
+            var shellViewModel = container.Resolve<ShellViewModel>();
+            shell.Show();
+
+            await shellViewModel.TryLogin(null, CancellationToken.None);
+            await shellViewModel.Refresh();
 
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
+                desktop.Exit += Desktop_Exit;
                 desktop.MainWindow = new Shell(shellViewModel);
             }
 
             base.OnFrameworkInitializationCompleted();
         }
 
-        // TODO dispose _subscription
+        private void Desktop_Exit(object? sender, ControlledApplicationLifetimeExitEventArgs e)
+        {
+            _container?.Dispose();
+        }
     }
 }
