@@ -5,11 +5,12 @@
                          xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                          xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
                          xmlns:mahControls="http://metro.mahapps.com/winfx/xaml/controls"
+                         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
                          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                          xmlns:wpf="clr-namespace:SoftThorn.Monstercat.Browser.Wpf"
-                         Title="AboutView"
+                         Title="About"
                          Width="800"
-                         Height="450"
+                         Height="820"
                          d:DataContext="{d:DesignInstance Type=core:AboutViewModel,
                                                           IsDesignTimeCreatable=False}"
                          Background="{DynamicResource MaterialDesignPaper}"
@@ -26,11 +27,18 @@
                          WindowTitleBrush="#FF673AB7"
                          mc:Ignorable="d">
 
-    <DockPanel Margin="8">
-        <TabControl>
-            <TabItem Header="About">
-                <DockPanel HorizontalAlignment="Center">
+    <materialDesign:TransitioningContent>
+        <materialDesign:TransitioningContent.OpeningEffects>
+            <materialDesign:TransitionEffect Kind="FadeIn" />
+            <materialDesign:TransitionEffect Kind="SlideInFromBottom" />
+        </materialDesign:TransitioningContent.OpeningEffects>
 
+        <DockPanel>
+            <materialDesign:Card Margin="16"
+                                 Padding="16"
+                                 materialDesign:ShadowAssist.ShadowDepth="Depth3"
+                                 DockPanel.Dock="Top">
+                <DockPanel>
                     <TextBlock Margin="0,0,0,16"
                                DockPanel.Dock="Bottom"
                                TextAlignment="Center">
@@ -46,7 +54,7 @@
                         </Hyperlink>
                     </TextBlock>
 
-                    <TextBlock TextAlignment="Center">
+                    <TextBlock DockPanel.Dock="Top" TextAlignment="Center">
                         <Run FontSize="24"
                              FontWeight="DemiBold"
                              Text="{Binding Product, Mode=OneWay}" />
@@ -54,11 +62,14 @@
                         <Run FontSize="14" Text="{Binding AssemblyVersionString, StringFormat={}v{0}, Mode=OneWay}" />
                     </TextBlock>
                 </DockPanel>
-            </TabItem>
+            </materialDesign:Card>
 
-            <TabItem Header="Dependencies">
+            <materialDesign:Card Margin="16"
+                                 Padding="16"
+                                 materialDesign:ShadowAssist.ShadowDepth="Depth3">
+
                 <DataGrid ItemsSource="{Binding Packages}" />
-            </TabItem>
-        </TabControl>
-    </DockPanel>
+            </materialDesign:Card>
+        </DockPanel>
+    </materialDesign:TransitioningContent>
 </mahControls:MetroWindow>
