@@ -1,6 +1,7 @@
 using Microsoft.IO;
 using SoftThorn.Monstercat.Browser.Core;
 using System;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
@@ -12,7 +13,12 @@ namespace SoftThorn.Monstercat.Browser.Wpf
     {
         public static RecyclableMemoryStreamManager Manager { get; set; } = new RecyclableMemoryStreamManager();
         public static IImageFactory<BitmapSource> ImageFactory { get; set; } = new ImageFactory();
-        public static IAsyncImageLoader<BitmapSource> AsyncImageLoader { get; set; } = new RamCachedWebImageLoader<BitmapSource>(Manager, ImageFactory);
+        public static IAsyncImageLoader<BitmapSource> AsyncImageLoader { get; set; } = new DiskCachedWebImageLoader<BitmapSource>(Manager, ImageFactory, GetCacheDirectory(), createFolder: true);
+
+        private static string GetCacheDirectory()
+        {
+            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.InternetCache), "SoftThorn.Monstercat.Browser.Wpf");
+        }
 
         public static readonly DependencyProperty SourceProperty = DependencyProperty.RegisterAttached(
             "Source",

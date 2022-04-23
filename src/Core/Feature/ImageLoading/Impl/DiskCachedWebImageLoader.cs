@@ -17,16 +17,26 @@ namespace SoftThorn.Monstercat.Browser.Core
     {
         private readonly string _cacheFolder;
 
-        public DiskCachedWebImageLoader(RecyclableMemoryStreamManager streamManager, IImageFactory<T> imageFactory, string cacheFolder = "Cache/Images/")
+        public DiskCachedWebImageLoader(RecyclableMemoryStreamManager streamManager, IImageFactory<T> imageFactory, string cacheFolder = "Cache/Images/", bool createFolder = false)
             : base(streamManager, imageFactory)
         {
             _cacheFolder = cacheFolder;
+
+            if (createFolder)
+            {
+                Directory.CreateDirectory(cacheFolder);
+            }
         }
 
-        public DiskCachedWebImageLoader(HttpClient httpClient, RecyclableMemoryStreamManager streamManager, IImageFactory<T> imageFactory, bool disposeHttpClient, string cacheFolder = "Cache/Images/")
+        public DiskCachedWebImageLoader(HttpClient httpClient, RecyclableMemoryStreamManager streamManager, IImageFactory<T> imageFactory, bool disposeHttpClient, string cacheFolder = "Cache/Images/", bool createFolder = false)
             : base(httpClient, streamManager, imageFactory, disposeHttpClient)
         {
             _cacheFolder = cacheFolder;
+
+            if (createFolder)
+            {
+                Directory.CreateDirectory(cacheFolder);
+            }
         }
 
         /// <inheritdoc />
