@@ -6,14 +6,30 @@
         <Nullable>enable</Nullable>
         <UseWPF>true</UseWPF>
         <UserSecretsId>d5c3400a-7aaf-4593-b3fa-63ce86917618</UserSecretsId>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+        <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+        <PublishTrimmed>false</PublishTrimmed>
+        <PublishReadyToRun>true</PublishReadyToRun>
+        <PublishSingleFile Condition="'$(Configuration)' == 'Release'">true</PublishSingleFile>
+        <RuntimeIdentifier>win10-x64</RuntimeIdentifier>
+        <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
+        <ApplicationIcon>..\..\assets\icons\Material-Play.ico</ApplicationIcon>
     </PropertyGroup>
+
+    <ItemGroup>
+      <Content Include="..\..\assets\icons\Material-Play.ico" />
+    </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Core\SoftThorn.Monstercat.Browser.Core.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="DryIoc.dll" Version="5.0.0" />
+        <EmbeddedResource Include="..\licenses.json" Link="Properties\licenses.json" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="DryIoc.dll" Version="5.0.1" />
         <PackageReference Include="NAudio" Version="2.0.1" />
 
         <PackageReference Include="Jot" Version="2.1.13" />
@@ -29,6 +45,11 @@
 
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
         <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
+
+        <PackageReference Include="Nerdbank.GitVersioning" Version="3.4.255">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
 
 </Project>

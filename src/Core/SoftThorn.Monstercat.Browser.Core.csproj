@@ -18,6 +18,8 @@
         <PackageReference Include="LiveChartsCore.SkiaSharpView" Version="2.0.0-beta.101" />
 
         <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="2.2.0" />
+
+        <PackageReference Include="System.Text.Json" Version="6.0.3" />
     </ItemGroup>
 
 </Project>

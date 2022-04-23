@@ -1,0 +1,64 @@
+<mahControls:MetroWindow x:Class="SoftThorn.Monstercat.Browser.Wpf.AboutView"
+                         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                         xmlns:core="clr-namespace:SoftThorn.Monstercat.Browser.Core;assembly=SoftThorn.Monstercat.Browser.Core"
+                         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+                         xmlns:mahControls="http://metro.mahapps.com/winfx/xaml/controls"
+                         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                         xmlns:wpf="clr-namespace:SoftThorn.Monstercat.Browser.Wpf"
+                         Title="AboutView"
+                         Width="800"
+                         Height="450"
+                         d:DataContext="{d:DesignInstance Type=core:AboutViewModel,
+                                                          IsDesignTimeCreatable=False}"
+                         Background="{DynamicResource MaterialDesignPaper}"
+                         BorderBrush="#FF673AB7"
+                         FontFamily="{DynamicResource MaterialDesignFont}"
+                         GlowBrush="{DynamicResource PrimaryHueMidBrush}"
+                         TextElement.FontSize="13"
+                         TextElement.FontWeight="Regular"
+                         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+                         TextOptions.TextFormattingMode="Ideal"
+                         TextOptions.TextRenderingMode="Auto"
+                         TitleCharacterCasing="Normal"
+                         WindowStartupLocation="CenterOwner"
+                         WindowTitleBrush="#FF673AB7"
+                         mc:Ignorable="d">
+
+    <DockPanel Margin="8">
+        <TabControl>
+            <TabItem Header="About">
+                <DockPanel HorizontalAlignment="Center">
+
+                    <TextBlock Margin="0,0,0,16"
+                               DockPanel.Dock="Bottom"
+                               TextAlignment="Center">
+                        <Run Text="Author: Peter Vietense" />
+                        <LineBreak />
+                        <Run Text="{Binding Copyright, Mode=OneWay}" />
+                        <LineBreak />
+                        <Hyperlink NavigateUri="{Binding ProjectUrl, Mode=OneWay}">
+                            <i:Interaction.Behaviors>
+                                <wpf:LaunchNavigateUriAsNewProcessBehavior />
+                            </i:Interaction.Behaviors>
+                            <Run Text="{Binding ProjectUrl, Mode=OneWay}" />
+                        </Hyperlink>
+                    </TextBlock>
+
+                    <TextBlock TextAlignment="Center">
+                        <Run FontSize="24"
+                             FontWeight="DemiBold"
+                             Text="{Binding Product, Mode=OneWay}" />
+                        <LineBreak />
+                        <Run FontSize="14" Text="{Binding AssemblyVersionString, StringFormat={}v{0}, Mode=OneWay}" />
+                    </TextBlock>
+                </DockPanel>
+            </TabItem>
+
+            <TabItem Header="Dependencies">
+                <DataGrid ItemsSource="{Binding Packages}" />
+            </TabItem>
+        </TabControl>
+    </DockPanel>
+</mahControls:MetroWindow>

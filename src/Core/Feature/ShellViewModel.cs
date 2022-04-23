@@ -17,6 +17,10 @@ namespace SoftThorn.Monstercat.Browser.Core
         [AlsoNotifyCanExecuteFor(nameof(RefreshCommand))]
         private bool _isLoading;
 
+        public string Title { get; }
+
+        public AboutViewModel About { get; }
+
         public DownloadViewModel Downloads { get; }
 
         public LoginViewModel Login { get; }
@@ -33,7 +37,8 @@ namespace SoftThorn.Monstercat.Browser.Core
 
         public BrandViewModel<Instinct> Instinct { get; }
 
-        public ShellViewModel(ReleasesViewModel releases,
+        public ShellViewModel(AboutViewModel about,
+                              ReleasesViewModel releases,
                               TagsViewModel tags,
                               TrackRepository trackRepository,
                               IPlaybackService playbackService,
@@ -44,6 +49,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                               BrandViewModel<Uncaged> uncaged,
                               BrandViewModel<Instinct> instinct)
         {
+            About = about ?? throw new ArgumentNullException(nameof(about));
             Releases = releases ?? throw new ArgumentNullException(nameof(releases));
             Tags = tags ?? throw new ArgumentNullException(nameof(tags));
             _trackRepository = trackRepository ?? throw new ArgumentNullException(nameof(trackRepository));
@@ -54,6 +60,8 @@ namespace SoftThorn.Monstercat.Browser.Core
             Silk = silk ?? throw new ArgumentNullException(nameof(silk));
             Uncaged = uncaged ?? throw new ArgumentNullException(nameof(uncaged));
             Instinct = instinct ?? throw new ArgumentNullException(nameof(instinct));
+
+            Title = $"v{About.AssemblyVersionString} SoftThorn.Monstercat.Browser.Wpf ";
         }
 
         [ICommand(AllowConcurrentExecutions = false, CanExecute = nameof(CanPlay))]

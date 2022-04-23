@@ -59,6 +59,16 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             _shellViewModel.Downloads.SelectFolderProxy = null;
         }
 
+        private async void About_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            var wnd = new AboutView(_shellViewModel.About)
+            {
+                Owner = this,
+            };
+
+            wnd.ShowDialog();
+        }
+
         private void ShowLoginDialog()
         {
             var loginView = new LoginView(_shellViewModel.Login)

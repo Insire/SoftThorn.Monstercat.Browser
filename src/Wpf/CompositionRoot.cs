@@ -7,6 +7,7 @@ using SoftThorn.Monstercat.Browser.Core;
 using SoftThorn.MonstercatNet;
 using System;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
@@ -40,10 +41,13 @@ namespace SoftThorn.Monstercat.Browser.Wpf
 
             var container = new Container();
 
+            container.Use(Assembly.GetAssembly(typeof(CompositionRoot)));
+
             // views
             container.Register<Shell>(Reuse.Singleton);
 
             // viewmodels
+            container.Register<AboutViewModel>(Reuse.Singleton);
             container.Register<DownloadViewModel>(Reuse.Singleton);
             container.Register<ShellViewModel>(Reuse.Singleton);
             container.Register<LoginViewModel>(Reuse.Singleton);
