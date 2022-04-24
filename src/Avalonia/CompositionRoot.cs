@@ -28,7 +28,7 @@ namespace SoftThorn.Monstercat.Browser.Avalonia
             container.Use(Assembly.GetAssembly(typeof(CompositionRoot)));
 
             // views
-            container.Register<Shell>(Reuse.Singleton);
+            container.Register<Shell>(Reuse.Singleton, made: Made.Of(() => new Shell(Arg.Of<ShellViewModel>())));
 
             // viewmodels
             container.Register<AboutViewModel>(Reuse.Singleton);
