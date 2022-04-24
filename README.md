@@ -14,11 +14,11 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/insire/SoftThorn.Monstercat.Browser/badge)](https://www.codefactor.io/repository/github/insire/SoftThorn.Monstercat.Browser)
 [![codecov](https://codecov.io/gh/Insire/SoftThorn.Monstercat.Browser/branch/master/graph/badge.svg)](https://codecov.io/gh/Insire/SoftThorn.Monstercat.Browser)
 
-The SoftThorn.Monstercat.Browser app (or SMB app for short) is my approach for downloading music from monstercat in a convenient way. It is also my playground for trying our different XAML frontends in my spare time.
+The SoftThorn.Monstercat.Browser app (or SMB app for short) is my approach for downloading music from [monstercat](https://www.monstercat.com/) in a convenient way. It is also my playground for trying our different XAML frontends in my spare time.
 
 ## Features
 
-- Browse the latest tracks and releases from monstercat.com
+- Browse the latest tracks and releases from [monstercat](https://www.monstercat.com/)
 - Download any/all of their music to your local device (You need an active Gold Subscription for that!)
 
 ### Planned
@@ -44,7 +44,7 @@ The SoftThorn.Monstercat.Browser app (or SMB app for short) is my approach for d
 
 ## Showcase
 
-[![Animation showcasing app usage](/assets/screenshots/workflow.gif)]
+![Animation showcasing app usage](/assets/screenshots/workflow.gif)]
 
 ## Build Requirements
 
