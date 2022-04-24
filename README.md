@@ -1,8 +1,5 @@
-#
-
 <div align="center">
   <br />
-
   <a href="https://github.com/Insire/SoftThorn.Monstercat.Browser">
     <img alt="SoftThorn.Monstercat.Browser" src="./assets/icons/Material-Play.svg" >
   </a>
@@ -44,6 +41,10 @@ The SoftThorn.Monstercat.Browser app (or SMB app for short) is my approach for d
   - Playback View (the UI)
   - Add PlaybackButtons to each section in the Shell (UX: quickly add music to the playback queue)
   - playlist storage
+
+## Showcase
+
+[![Animation showcasing app usage](/assets/screenshots/workflow.gif)]
 
 ## Build Requirements
 
