@@ -12,18 +12,21 @@ namespace Build
     {
         public override void Run(BuildContext context)
         {
-            var bin = new DirectoryPath(BuildContext.ResultsPath);
-
-            var files = context.FileSystem
-                .GetDirectory(bin)
-                .GetFiles("*", SearchScope.Current)
-                .Select(p => p.Path);
-
-            context.ZipCompress(bin, bin.CombineWithFilePath(new FilePath($".\\SoftThorn.Monstercat.Browser_{context.GitVersion.SemVer2}.zip")), files);
-
-            foreach (var file in files)
+            foreach (var project in context.Projects)
             {
-                context.DeleteFile(file);
+                var bin = project.BinaryDirectory;
+
+                var files = context.FileSystem
+                    .GetDirectory(bin)
+                    .GetFiles("*", SearchScope.Current)
+                    .Select(p => p.Path);
+
+                context.ZipCompress(bin, bin.CombineWithFilePath(new FilePath($".\\SoftThorn.Monstercat.Browser.{project.Name}_{context.GitVersion.SemVer2}.zip")), files);
+
+                foreach (var file in files)
+                {
+                    context.DeleteFile(file);
+                }
             }
         }
     }

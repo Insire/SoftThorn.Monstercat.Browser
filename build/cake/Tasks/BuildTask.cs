@@ -13,24 +13,27 @@ namespace Build
     {
         public override void Run(BuildContext context)
         {
-            var settings = new ProcessSettings()
-                .UseWorkingDirectory(".")
-                .WithArguments(builder => builder
-                    .Append("publish")
-                    .AppendQuoted(BuildContext.SolutionPath)
-                    .Append("--nologo")
-                    .Append($"-c {BuildContext.BuildConfiguration}")
-                    .Append("-r win-x64")
-                    .Append($"--output \"{BuildContext.ResultsPath}\"")
-                    .Append("--self-contained true")
-                    .Append("-p:IncludeAllContentForSelfExtract=true")
-                    .Append("-p:PublishSingleFile=true")
-                    .Append("-p:PublishTrimmed=false")
-                    .Append("-p:PublishReadyToRun=false")
-                    .Append("-p:PublicRelease=true") // Nerdbank.GitVersioning - omit git commit ID
-                );
+            foreach (var project in context.Projects)
+            {
+                var settings = new ProcessSettings()
+                    .UseWorkingDirectory(".")
+                    .WithArguments(builder => builder
+                        .Append("publish")
+                        .AppendQuoted(project.ProjectFilePath.FullPath)
+                        .Append("--nologo")
+                        .Append($"-c {BuildContext.BuildConfiguration}")
+                        .Append("-r win-x64")
+                        .Append($"--output \"{project.BinaryDirectory.FullPath}\"")
+                        .Append("--self-contained true")
+                        .Append("-p:IncludeAllContentForSelfExtract=true")
+                        .Append("-p:PublishSingleFile=true")
+                        .Append("-p:PublishTrimmed=false")
+                        .Append("-p:PublishReadyToRun=false")
+                        .Append("-p:PublicRelease=true") // Nerdbank.GitVersioning - omit git commit ID
+                    );
 
-            context.StartProcess("dotnet", settings);
+                context.StartProcess("dotnet", settings);
+            }
         }
     }
 }

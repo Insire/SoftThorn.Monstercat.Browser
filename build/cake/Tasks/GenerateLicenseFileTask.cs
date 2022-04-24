@@ -41,15 +41,18 @@ namespace Build
 
             void Run()
             {
-                var settings = new ProcessSettings()
+                foreach (var project in context.Projects)
+                {
+                    var settings = new ProcessSettings()
                     .UseWorkingDirectory(".")
                     .WithArguments(builder => builder
-                        .AppendSwitchQuoted("-i", BuildContext.ProjectFolderPath)
+                        .AppendSwitchQuoted("-i", project.ProjectDirectory.FullPath)
                         .Append("-j")
-                        .AppendSwitchQuoted("-f", BuildContext.LicenseFilePath)
+                        .AppendSwitchQuoted("-f", project.ProjectDirectory.FullPath)
                     );
 
-                context.StartProcess(DotnetToolName, settings);
+                    context.StartProcess(DotnetToolName, settings);
+                }
             }
         }
     }
