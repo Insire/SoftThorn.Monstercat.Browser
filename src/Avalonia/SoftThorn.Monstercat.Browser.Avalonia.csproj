@@ -11,12 +11,12 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="0.10.13" />
-        <PackageReference Include="Avalonia.Desktop" Version="0.10.13" />
+        <PackageReference Include="Avalonia" Version="0.10.15" />
+        <PackageReference Include="Avalonia.Desktop" Version="0.10.15" />
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="0.10.13" />
+        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="0.10.15" />
         
-        <PackageReference Include="Material.Avalonia" Version="2.5.1" />
+        <PackageReference Include="Material.Avalonia" Version="3.0.0-rc0.90-nightly" />
         <PackageReference Include="Material.Icons.Avalonia" Version="1.0.2" />
         
         <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="6.0.0" />
@@ -25,9 +25,9 @@
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
         <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
 
-        <PackageReference Include="DryIoc.dll" Version="5.0.1" />
+        <PackageReference Include="DryIoc.dll" Version="5.1.0" />
 
-        <PackageReference Include="Nerdbank.GitVersioning" Version="3.4.255">
+        <PackageReference Include="Nerdbank.GitVersioning" Version="3.5.107">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
