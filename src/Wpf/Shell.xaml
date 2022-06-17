@@ -35,7 +35,7 @@
 
     <mahControls:MetroWindow.RightWindowCommands>
         <mahControls:WindowCommands ShowLastSeparator="False">
-            <Button ToolTip="About">
+            <Button Click="Settings_Click" ToolTip="Settings">
                 <iconpacks:FontAwesome Kind="WrenchSolid" />
             </Button>
 
@@ -88,8 +88,15 @@
                               materialDesign:ShadowAssist.ShadowDepth="Depth3"
                               BorderThickness="0"
                               DockPanel.Dock="Top"
-                              Header="Newest Releases"
                               Style="{DynamicResource MaterialDesignGroupBox}">
+                        <GroupBox.Header>
+                            <TextBlock Foreground="{DynamicResource MaterialDesignDarkForeground}">
+                                <Run Text="Top" />
+                                <Run Text="{Binding Releases.Releases.Count, FallbackValue=0, Mode=OneWay}" />
+                                <Run Text="Newest Releases" />
+                            </TextBlock>
+                        </GroupBox.Header>
+
                         <DataGrid AutoGenerateColumns="False"
                                   CanUserSortColumns="False"
                                   IsReadOnly="True"
@@ -143,8 +150,14 @@
                               materialDesign:ShadowAssist.ShadowDepth="Depth3"
                               BorderThickness="0"
                               DockPanel.Dock="Top"
-                              Header="Top 15 Most Popular Tags"
                               Style="{DynamicResource MaterialDesignGroupBox}">
+                        <GroupBox.Header>
+                            <TextBlock Foreground="{DynamicResource MaterialDesignDarkForeground}">
+                                <Run Text="Top" />
+                                <Run Text="{Binding Tags.SeriesCollection.Count, FallbackValue=0, Mode=OneWay}" />
+                                <Run Text="Most Popular Tags" />
+                            </TextBlock>
+                        </GroupBox.Header>
                         <Grid>
                             <lvc:CartesianChart xf:Animations.Primary="{xf:Animate BasedOn={StaticResource FadeIn},
                                                                                    Event=Visibility}"
@@ -358,16 +371,23 @@
                               materialDesign:ShadowAssist.ShadowDepth="Depth3"
                               BorderThickness="0"
                               DockPanel.Dock="Top"
-                              Header="Latest Artists"
                               Style="{DynamicResource MaterialDesignGroupBox}">
+                        <GroupBox.Header>
+                            <TextBlock Foreground="{DynamicResource MaterialDesignDarkForeground}">
+                                <Run Text="Top" />
+                                <Run Text="{Binding Artists.Artists.Count, FallbackValue=0, Mode=OneWay}" />
+                                <Run Text="Latest Artists" />
+                            </TextBlock>
+                        </GroupBox.Header>
+
                         <DataGrid materialDesign:ScrollViewerAssist.IsAutoHideEnabled="true"
-                                  AutoGenerateColumns="False"
+                                  AutoGenerateColumns="true"
                                   CanUserSortColumns="False"
                                   IsReadOnly="True"
-                                  ItemsSource="{Binding Releases.Releases}"
+                                  ItemsSource="{Binding Artists.Artists}"
                                   SelectionMode="Single"
                                   SelectionUnit="FullRow">
-                            <DataGrid.Columns>
+                            <!--<DataGrid.Columns>
                                 <DataGridTemplateColumn>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
@@ -386,7 +406,23 @@
                                                     Header="Artist" />
 
                                 <DataGridTextColumn Binding="{Binding Tracks.Count}" Header="Tracks" />
-                            </DataGrid.Columns>
+                            </DataGrid.Columns>-->
+
+                            <DataGrid.RowDetailsTemplate>
+                                <DataTemplate DataType="{x:Type core:ArtistViewModel}">
+                                    <ItemsControl ItemsSource="{Binding Tracks}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate DataType="{x:Type core:TrackViewModel}">
+                                                <StackPanel Orientation="Horizontal">
+
+                                                    <TextBlock Text="{Binding Title}" />
+                                                    <TextBlock Text="{Binding ArtistsTitle}" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </DataTemplate>
+                            </DataGrid.RowDetailsTemplate>
                         </DataGrid>
                     </GroupBox>
 
@@ -398,15 +434,21 @@
                               materialDesign:ShadowAssist.ShadowDepth="Depth3"
                               BorderThickness="0"
                               DockPanel.Dock="Top"
-                              Header="Top 15 Most Popular Genres"
                               Style="{DynamicResource MaterialDesignGroupBox}">
+                        <GroupBox.Header>
+                            <TextBlock Foreground="{DynamicResource MaterialDesignDarkForeground}">
+                                <Run Text="Top" />
+                                <Run Text="{Binding Genres.SeriesCollection.Count, FallbackValue=0, Mode=OneWay}" />
+                                <Run Text="Most Popular Genres" />
+                            </TextBlock>
+                        </GroupBox.Header>
                         <lvc:CartesianChart Grid.Row="6"
                                             Grid.Column="0"
                                             Grid.ColumnSpan="5"
                                             xf:Animations.Primary="{xf:Animate BasedOn={StaticResource FadeIn},
                                                                                Event=Visibility}"
-                                            Series="{Binding Tags.SeriesCollection}"
-                                            XAxes="{Binding Tags.XAxes}">
+                                            Series="{Binding Genres.SeriesCollection}"
+                                            XAxes="{Binding Genres.XAxes}">
                             <lvc:CartesianChart.Style>
                                 <Style TargetType="{x:Type lvc:CartesianChart}">
                                     <Style.Triggers>
@@ -425,23 +467,17 @@
             </ScrollViewer>
 
             <!--  Download  -->
-
             <Button Grid.Row="0"
                     Grid.Column="1"
+                    Margin="0,0,8,8"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Bottom"
                     materialDesign:ButtonProgressAssist.IsIndicatorVisible="{Binding Downloads.IsDownLoading}"
                     materialDesign:ButtonProgressAssist.Value="{Binding Downloads.Progress.Current.Value}"
                     xf:Animations.Primary="{xf:Animate BasedOn={StaticResource FadeIn},
                                                        Event=Visibility}"
-                    Click="Download_Click">
-                <Button.ToolTip>
-                    <TextBlock Margin="8,0,0,0" VerticalAlignment="Center">
-                        <Run Text="Download all" />
-                        <Run Text="{Binding Downloads.Tracks.Count, Mode=OneWay}" />
-                        <Run Text="Tracks now" />
-                    </TextBlock>
-                </Button.ToolTip>
+                    Click="Download_Click"
+                    ToolTip="Download all Tracks now">
 
                 <iconpacks:PackIconFontAwesome Kind="DownloadSolid" />
 
@@ -460,7 +496,6 @@
             </Button>
 
             <!--  Progress  -->
-
             <ContentControl Grid.Row="3" Grid.ColumnSpan="3">
                 <ProgressBar Maximum="100">
                     <i:Interaction.Behaviors>

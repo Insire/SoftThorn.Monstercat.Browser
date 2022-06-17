@@ -1,3 +1,5 @@
+using Akavache;
+using CommunityToolkit.Mvvm.Messaging;
 using DryIoc;
 using Gress;
 using Jot;
@@ -47,10 +49,13 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             container.Register<Shell>(Reuse.Singleton);
 
             // viewmodels
+            container.Register<LoginViewModel>(Reuse.Transient);
+            container.Register<SearchViewModel>(Reuse.Transient);
+
             container.Register<AboutViewModel>(Reuse.Singleton);
+            container.Register<SettingsViewModel>(Reuse.Singleton);
             container.Register<DownloadViewModel>(Reuse.Singleton);
             container.Register<ShellViewModel>(Reuse.Singleton);
-            container.Register<LoginViewModel>(Reuse.Singleton);
             container.Register<ReleasesViewModel>(Reuse.Singleton);
             container.Register<TagsViewModel>(Reuse.Singleton);
             container.Register<GenresViewModel>(Reuse.Singleton);
@@ -64,12 +69,18 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             container.RegisterInstance(_api);
             container.RegisterInstance(_tracker);
             container.RegisterInstance(playbackTimer);
+            container.RegisterInstance<IMessenger>(WeakReferenceMessenger.Default);
             container.RegisterInstance(SynchronizationContext.Current!);
             container.Register<TrackRepository>(Reuse.Singleton);
+            container.Register<SearchViewModelFactory>(Reuse.Singleton);
+            container.Register<SettingsService>(Reuse.Singleton);
             container.Register<DispatcherProgress<Percentage>>(Reuse.Singleton, made: Made.Of(_ => ServiceInfo.Of<DispatcherProgressFactory<Percentage>>(), f => f.Create()));
             container.Register<IPlaybackService, PlaybackService>(Reuse.Singleton);
             container.Register<ProgressContainer<Percentage>>(Reuse.Singleton);
             container.Register<DispatcherProgressFactory<Percentage>>(Reuse.Singleton);
+            container.Register<WindowService>(Reuse.Singleton);
+            container.RegisterInstance(BlobCache.Secure);
+            container.RegisterInstance(BlobCache.UserAccount);
 
             return container;
         }

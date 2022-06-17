@@ -1,33 +1,44 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Gress;
 using SoftThorn.MonstercatNet;
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace SoftThorn.Monstercat.Browser.Core
 {
-    public sealed partial class ShellViewModel : ObservableObject
+    public sealed partial class ShellViewModel : ObservableRecipient
     {
         private readonly TrackRepository _trackRepository;
         private readonly IPlaybackService _playbackService;
 
         [ObservableProperty]
-        [AlsoNotifyCanExecuteFor(nameof(RefreshCommand))]
+        [NotifyCanExecuteChangedFor(nameof(RefreshCommand))]
         private bool _isLoading;
 
+        private bool _isLoggedIn;
+        public bool IsLoggedIn
+        {
+            get { return _isLoggedIn; }
+            private set { SetProperty(ref _isLoggedIn, value); }
+        }
+
         public string Title { get; }
+
+        public SettingsViewModel Settings { get; }
 
         public AboutViewModel About { get; }
 
         public DownloadViewModel Downloads { get; }
 
-        public LoginViewModel Login { get; }
-
         public ReleasesViewModel Releases { get; }
 
+        public GenresViewModel Genres { get; }
+
         public TagsViewModel Tags { get; }
+
+        public ArtistsViewModel Artists { get; }
 
         public ProgressContainer<Percentage> Progress { get; }
 
@@ -37,54 +48,67 @@ namespace SoftThorn.Monstercat.Browser.Core
 
         public BrandViewModel<Instinct> Instinct { get; }
 
-        public ShellViewModel(AboutViewModel about,
-                              ReleasesViewModel releases,
-                              TagsViewModel tags,
-                              TrackRepository trackRepository,
-                              IPlaybackService playbackService,
-                              DownloadViewModel downloadViewModel,
-                              LoginViewModel login,
-                              ProgressContainer<Percentage> progress,
-                              BrandViewModel<Silk> silk,
-                              BrandViewModel<Uncaged> uncaged,
-                              BrandViewModel<Instinct> instinct)
+        public ShellViewModel(
+            AboutViewModel about,
+            SettingsViewModel settings,
+            ReleasesViewModel releases,
+            TagsViewModel tags,
+            GenresViewModel genres,
+            ArtistsViewModel artists,
+            TrackRepository trackRepository,
+            IPlaybackService playbackService,
+            DownloadViewModel downloadViewModel,
+            ProgressContainer<Percentage> progress,
+            BrandViewModel<Silk> silk,
+            BrandViewModel<Uncaged> uncaged,
+            BrandViewModel<Instinct> instinct,
+            IMessenger messenger)
+            : base(messenger)
         {
             About = about ?? throw new ArgumentNullException(nameof(about));
+            Settings = settings ?? throw new ArgumentNullException(nameof(settings));
             Releases = releases ?? throw new ArgumentNullException(nameof(releases));
             Tags = tags ?? throw new ArgumentNullException(nameof(tags));
+            Genres = genres ?? throw new ArgumentNullException(nameof(genres));
+            Artists = artists ?? throw new ArgumentNullException(nameof(artists));
             _trackRepository = trackRepository ?? throw new ArgumentNullException(nameof(trackRepository));
             _playbackService = playbackService ?? throw new ArgumentNullException(nameof(playbackService));
             Downloads = downloadViewModel ?? throw new ArgumentNullException(nameof(downloadViewModel));
-            Login = login ?? throw new ArgumentNullException(nameof(login));
             Progress = progress ?? throw new ArgumentNullException(nameof(progress));
             Silk = silk ?? throw new ArgumentNullException(nameof(silk));
             Uncaged = uncaged ?? throw new ArgumentNullException(nameof(uncaged));
             Instinct = instinct ?? throw new ArgumentNullException(nameof(instinct));
 
             Title = $"v{About.AssemblyVersionString} SoftThorn.Monstercat.Browser.Wpf ";
+
+            // messages
+            messenger.Register<ShellViewModel, LoginChangedMessage>(this, (r, m) =>
+            {
+                r.IsLoggedIn = m.IsLoggedIn;
+            });
         }
 
-        [ICommand(AllowConcurrentExecutions = false, CanExecute = nameof(CanPlay))]
-        public async Task Play(object? args)
+        [RelayCommand(AllowConcurrentExecutions = false, CanExecute = nameof(CanPlay))]
+        public async Task Play(object args)
         {
             if (args is TrackViewModel track)
             {
                 var request = new TrackStreamRequest()
                 {
                     TrackId = track.Id,
-                    ReleaseId = track.ReleaseId,
+                    ReleaseId = track.Release.Id,
                 };
 
                 await _playbackService.Play(request);
             }
         }
 
-        private bool CanPlay(object? args)
+        private bool CanPlay(object args)
         {
             return args is TrackViewModel;
         }
 
-        [ICommand(AllowConcurrentExecutions = false)]
+        [RelayCommand(AllowConcurrentExecutions = false)]
         public async Task Refresh()
         {
             IsLoading = true;
@@ -96,26 +120,6 @@ namespace SoftThorn.Monstercat.Browser.Core
             {
                 IsLoading = false;
             }
-        }
-
-        public async Task<bool> TryLogin(Action? handleLoginValidationErrors, CancellationToken token)
-        {
-            if (Login.IsLoggedIn)
-            {
-                return Login.IsLoggedIn;
-            }
-
-            Login.Validate();
-            if (Login.HasErrors)
-            {
-                handleLoginValidationErrors?.Invoke();
-            }
-            else
-            {
-                await Login.Login(token);
-            }
-
-            return Login.IsLoggedIn;
         }
     }
 }

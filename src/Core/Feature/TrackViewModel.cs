@@ -7,10 +7,10 @@ namespace SoftThorn.Monstercat.Browser.Core
     public sealed partial class TrackViewModel : ObservableObject
     {
         [ObservableProperty]
-        private Guid _id;
+        private string _key = default!;
 
         [ObservableProperty]
-        private Guid _releaseId;
+        private Guid _id;
 
         [ObservableProperty]
         private string _catalogId = default!;
@@ -53,6 +53,9 @@ namespace SoftThorn.Monstercat.Browser.Core
 
         [ObservableProperty]
         private ObservableCollection<string> _tags = default!;
+
+        [ObservableProperty]
+        private ReleaseViewModel _release = default!;
 
         public Uri? ImageUrl { get; init; }
     }

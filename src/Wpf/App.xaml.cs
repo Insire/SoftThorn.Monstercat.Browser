@@ -10,17 +10,29 @@ namespace SoftThorn.Monstercat.Browser.Wpf
     {
         private IContainer? _container;
 
+        public App()
+        {
+            Akavache.Registrations.Start("SoftThorn.Monstercat.Browser.Wpf");
+        }
+
         protected override async void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 
             var container = _container = CompositionRoot.Get();
 
-            var shell = container.Resolve<Shell>();
+            var settingsViewModel = container.Resolve<SettingsViewModel>();
+            // the shellviewmodel has to exist, so that loading the settings updates its own and all of its dependencies initial state
             var shellViewModel = container.Resolve<ShellViewModel>();
+
+            await settingsViewModel.Load();
+
+            var shell = container.Resolve<Shell>();
             shell.Show();
 
-            await shellViewModel.TryLogin(null, CancellationToken.None);
+            var loginViewModel = container.Resolve<LoginViewModel>();
+            await loginViewModel.TryLogin(null, CancellationToken.None);
+
             await shellViewModel.Refresh();
         }
 
@@ -28,6 +40,8 @@ namespace SoftThorn.Monstercat.Browser.Wpf
         {
             var tracker = _container?.Resolve<Tracker>();
             tracker?.PersistAll();
+
+            Akavache.BlobCache.Shutdown().Wait();
 
             _container?.Dispose();
 

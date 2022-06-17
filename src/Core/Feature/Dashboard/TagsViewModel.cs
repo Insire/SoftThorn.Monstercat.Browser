@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
 using DynamicData;
 using DynamicData.Binding;
 using LiveChartsCore;
@@ -9,20 +10,19 @@ using SoftThorn.MonstercatNet;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading;
 
 namespace SoftThorn.Monstercat.Browser.Core
 {
     /// <summary>
-    /// top 15 tags, sorted by newest release
+    /// top x tags, sorted by newest release
     /// </summary>
-    public sealed class TagsViewModel : ObservableObject, IDisposable
+    public sealed class TagsViewModel : ObservableRecipient, IDisposable
     {
-        private readonly IDisposable _subscription;
         private readonly ObservableCollectionExtended<ISeries> _seriesCollection;
 
+        private IDisposable? _subscription;
         private bool _disposedValue;
 
         public ReadOnlyObservableCollection<ISeries> SeriesCollection { get; }
@@ -30,7 +30,8 @@ namespace SoftThorn.Monstercat.Browser.Core
         public Axis[] XAxes { get; }
         public Axis[] YAxes { get; }
 
-        public TagsViewModel(SynchronizationContext synchronizationContext, TrackRepository trackRepository)
+        public TagsViewModel(SynchronizationContext synchronizationContext, TrackRepository trackRepository, IMessenger messenger)
+            : base(messenger)
         {
             _seriesCollection = new ObservableCollectionExtended<ISeries>();
             SeriesCollection = new ReadOnlyObservableCollection<ISeries>(_seriesCollection);
@@ -51,27 +52,35 @@ namespace SoftThorn.Monstercat.Browser.Core
                 }
             };
 
-            _subscription = trackRepository
-                .ConnectTags()
-                .ObserveOn(TaskPoolScheduler.Default)
-                .DistinctUntilChanged()
-                .Sort(SortExpressionComparer<KeyValuePair<string, List<Track>>>
-                    .Ascending(p => p.Value.Count)
-                    .ThenByAscending(p => p.Key))
-                .Filter(tag => !tag.Key.Equals("silkinitialbulkimport", StringComparison.InvariantCultureIgnoreCase)
-                             && !tag.Key.Equals("nocontentid", StringComparison.InvariantCultureIgnoreCase))
-                .LimitSizeTo(15)
-                .SortBy(p => p.Value.Count, SortDirection.Descending)
-                .Transform(p => (ISeries)new ColumnSeries<int>()
-                {
-                    Name = p.Key,
-                    Values = new[] { p.Value.Count },
-                    Fill = new SolidColorPaint(SKColor.Parse("#FF673AB7")),
-                    MaxBarWidth = 24,
-                })
-                .ObserveOn(synchronizationContext)
-                .Bind(_seriesCollection)
-                .Subscribe();
+            _subscription = CreateSubscription();
+
+            // messages
+            Messenger.Register<TagsViewModel, SettingsChangedMessage>(this, (r, m) =>
+            {
+                r._subscription?.Dispose();
+                r._subscription = CreateSubscription(m.Settings.TagsCount);
+            });
+
+            IDisposable CreateSubscription(int size = 10)
+            {
+                return trackRepository
+                    .ConnectTags()
+                    .Sort(SortExpressionComparer<KeyValuePair<string, List<TrackViewModel>>>
+                        .Ascending(p => p.Value.Count)
+                        .ThenByAscending(p => p.Key))
+                    .LimitSizeTo(size)
+                    .SortBy(p => p.Value.Count, SortDirection.Descending)
+                    .Transform(p => (ISeries)new ColumnSeries<int>()
+                    {
+                        Name = p.Key,
+                        Values = new[] { p.Value.Count },
+                        Fill = new SolidColorPaint(SKColor.Parse("#FF673AB7")),
+                        MaxBarWidth = 24,
+                    })
+                    .ObserveOn(synchronizationContext)
+                    .Bind(_seriesCollection)
+                    .Subscribe();
+            }
         }
 
         private void Dispose(bool disposing)
@@ -80,7 +89,7 @@ namespace SoftThorn.Monstercat.Browser.Core
             {
                 if (disposing)
                 {
-                    _subscription.Dispose();
+                    _subscription?.Dispose();
                 }
 
                 _disposedValue = true;

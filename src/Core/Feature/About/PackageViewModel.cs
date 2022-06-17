@@ -1,31 +1,31 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace SoftThorn.Monstercat.Browser.Core
 {
     public sealed partial class PackageViewModel : ObservableObject
     {
         [ObservableProperty]
-        private string _packageName;
+        private string _packageName = default!;
 
         [ObservableProperty]
-        private string _packageVersion;
+        private string _packageVersion = default!;
 
         [ObservableProperty]
-        private string _packageUrl;
+        private string _packageUrl = default!;
 
         [ObservableProperty]
-        private string _copyright;
+        private string _copyright = default!;
 
         [ObservableProperty]
-        private string[] _authors;
+        private string[] _authors = default!;
 
         [ObservableProperty]
-        private string _description;
+        private string _description = default!;
 
         [ObservableProperty]
-        private string _licenseUrl;
+        private string _licenseUrl = default!;
 
         [ObservableProperty]
-        private string _licenseType;
+        private string _licenseType = default!;
     }
 }

@@ -3,16 +3,16 @@ using System;
 
 namespace SoftThorn.Monstercat.Browser.Wpf
 {
-    public partial class DownloadView
+    public partial class SearchView
     {
-        public DownloadView(DownloadViewModel downloadViewModel)
+        public SearchView(SearchViewModel searchViewModel)
         {
-            if (downloadViewModel is null)
+            if (searchViewModel is null)
             {
-                throw new ArgumentNullException(nameof(downloadViewModel));
+                throw new ArgumentNullException(nameof(searchViewModel));
             }
 
-            DataContext = downloadViewModel;
+            DataContext = searchViewModel;
             InitializeComponent();
         }
 

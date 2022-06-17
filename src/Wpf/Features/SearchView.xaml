@@ -1,4 +1,4 @@
-<mahControls:MetroWindow x:Class="SoftThorn.Monstercat.Browser.Wpf.DownloadView"
+<mahControls:MetroWindow x:Class="SoftThorn.Monstercat.Browser.Wpf.SearchView"
                          xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                          xmlns:core="clr-namespace:SoftThorn.Monstercat.Browser.Core;assembly=SoftThorn.Monstercat.Browser.Core"
@@ -7,12 +7,11 @@
                          xmlns:mahControls="http://metro.mahapps.com/winfx/xaml/controls"
                          xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
                          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-                         xmlns:system="clr-namespace:System;assembly=mscorlib"
                          xmlns:wpf="clr-namespace:SoftThorn.Monstercat.Browser.Wpf"
                          Title="SoftThorn.Monstercat.Browser.Wpf"
                          Width="800"
                          Height="820"
-                         d:DataContext="{d:DesignInstance Type=core:DownloadViewModel,
+                         d:DataContext="{d:DesignInstance Type=core:SearchViewModel,
                                                           IsDesignTimeCreatable=False}"
                          Background="{DynamicResource MaterialDesignPaper}"
                          BorderBrush="#FF673AB7"
@@ -38,8 +37,8 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
-                <RowDefinition Height="8" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="8" />
             </Grid.RowDefinitions>
 
             <Grid.ColumnDefinitions>
@@ -49,7 +48,6 @@
             </Grid.ColumnDefinitions>
 
             <!--  Search  -->
-
             <materialDesign:Card Grid.Row="0"
                                  Grid.Column="1"
                                  Margin="16"
@@ -139,7 +137,6 @@
             </materialDesign:Card>
 
             <!--  Tracks  -->
-
             <ItemsControl Grid.Row="1"
                           Grid.Column="1"
                           Margin="16,0"
@@ -188,8 +185,8 @@
                                        Source="{Binding ImageUrl, Mode=OneTime}" />
                                 <StackPanel Grid.Column="1" Margin="8,0,0,0">
                                     <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}" Text="{Binding Title}" />
-                                    <TextBlock Text="{Binding ArtistsTitle}" Style="{StaticResource MaterialDesignBody2TextBlock}" />
-                                    <TextBlock Text="{Binding Brand}" Style="{StaticResource MaterialDesignCaptionTextBlock}" />
+                                    <TextBlock Style="{StaticResource MaterialDesignBody2TextBlock}" Text="{Binding ArtistsTitle}" />
+                                    <TextBlock Style="{StaticResource MaterialDesignCaptionTextBlock}" Text="{Binding Brand}" />
                                 </StackPanel>
                             </Grid>
                         </Border>
@@ -197,61 +194,23 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
 
-            <!--  Download location  -->
+            <DockPanel Grid.Row="2"
+                       Grid.Column="1"
+                       HorizontalAlignment="Right">
+                <Button Margin="0,8,8,0"
+                        Click="OnCancelClick"
+                        Content="CANCEL"
+                        DockPanel.Dock="Right"
+                        IsCancel="True"
+                        Style="{StaticResource MaterialDesignOutlinedSecondaryButton}" />
 
-            <materialDesign:Card Grid.Row="3"
-                                 Grid.Column="1"
-                                 Margin="16"
-                                 Padding="32,16">
-                <DockPanel>
-                    <DockPanel DockPanel.Dock="Bottom" LastChildFill="False">
-                        <Button Margin="0,8,8,0"
-                                Click="OnCancelClick"
-                                Content="CANCEL"
-                                DockPanel.Dock="Right"
-                                IsCancel="True"
-                                Style="{StaticResource MaterialDesignOutlinedSecondaryButton}">
-                            <Button.CommandParameter>
-                                <system:Boolean>False</system:Boolean>
-                            </Button.CommandParameter>
-                        </Button>
-
-                        <Button Margin="0,8,8,0"
-                                Command="{Binding DownloadCommand}"
-                                Content="ACCEPT"
-                                DockPanel.Dock="Right"
-                                IsDefault="True"
-                                Style="{StaticResource MaterialDesignFlatSecondaryMidBgButton}">
-                            <Button.CommandParameter>
-                                <system:Boolean>True</system:Boolean>
-                            </Button.CommandParameter>
-                        </Button>
-
-                        <Button HorizontalAlignment="Left"
-                                Command="{Binding SelectFolderCommand}"
-                                Content="SELECT"
-                                DockPanel.Dock="Left"
-                                Style="{StaticResource MaterialDesignOutlinedSecondaryDarkButton}" />
-                    </DockPanel>
-
-                    <TextBox Margin="0,8,0,8"
-                             HorizontalAlignment="Stretch"
-                             materialDesign:HintAssist.IsFloating="True"
-                             materialDesign:TextFieldAssist.HasClearButton="True"
-                             materialDesign:TextFieldAssist.LeadingIcon="Folder"
-                             Text="{Binding DownloadPath, UpdateSourceTrigger=PropertyChanged, Delay=250}">
-                        <materialDesign:HintAssist.Hint>
-                            <TextBlock DockPanel.Dock="Top">
-                                <Run Text="Download" />
-                                <Run FontWeight="DemiBold"
-                                     Foreground="{DynamicResource PrimaryHueMidBrush}"
-                                     Text="{Binding Tracks.Count, Mode=OneWay}" />
-                                <Run Text="tracks to this folder" />
-                            </TextBlock>
-                        </materialDesign:HintAssist.Hint>
-                    </TextBox>
-                </DockPanel>
-            </materialDesign:Card>
+                <Button Margin="0,8,8,0"
+                        Command="{Binding DownloadCommand}"
+                        Content="DOWNLOAD"
+                        DockPanel.Dock="Right"
+                        IsDefault="True"
+                        Style="{StaticResource MaterialDesignFlatSecondaryMidBgButton}" />
+            </DockPanel>
         </Grid>
     </materialDesign:TransitioningContent>
 </mahControls:MetroWindow>

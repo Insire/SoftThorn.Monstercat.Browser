@@ -22,9 +22,10 @@ namespace SoftThorn.Monstercat.Browser.Avalonia
 
             var shell = container.Resolve<Shell>();
             var shellViewModel = container.Resolve<ShellViewModel>();
+            var loginViewModel = container.Resolve<LoginViewModel>();
             shell.Show();
 
-            await shellViewModel.TryLogin(null, CancellationToken.None);
+            await loginViewModel.TryLogin(null, CancellationToken.None);
             await shellViewModel.Refresh();
 
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)

@@ -25,18 +25,16 @@ The SoftThorn.Monstercat.Browser app (or SMB app for short) is my approach for d
 
 - Settings View (configure how SMB works)
 - Settings Storage (persist configuration between app restarts)
-  - retain download folder selection
   - clear cache
-  - credential management
   - color selection?
+  - download performance / parallel downloads
+  - Enable AssetSize Configuration (Download the art in the format and size you like)
+  - music format selection
 - Query Latest Artists (finish implementation)
-- Query Most Popular Genres (finish implementation)
 - AutoUpdate via Github releases
-- Enable Asset Download (Download not only the music, but also the art for tracks and releases)
-- Enable AssetSize Configuration (Download the art in the format and size you like)
 - Playback (playback the music right in the app)
   - Qeueu tracks and releases
-- Playlist (manage playback via playlsits)
+- Playlist (manage playback via playlists)
   - Playbackmode (shuffel, one, all, folder)
   - Playback View (the UI)
   - Add PlaybackButtons to each section in the Shell (UX: quickly add music to the playback queue)

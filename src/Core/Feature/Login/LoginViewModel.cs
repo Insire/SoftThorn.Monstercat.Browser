@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Extensions.Configuration;
+using CommunityToolkit.Mvvm.Messaging;
 using SoftThorn.MonstercatNet;
 using System;
 using System.ComponentModel.DataAnnotations;
@@ -9,53 +9,41 @@ using System.Threading.Tasks;
 
 namespace SoftThorn.Monstercat.Browser.Core
 {
+    [ObservableRecipient]
     public sealed partial class LoginViewModel : ObservableValidator
     {
+        private readonly SettingsService _settingsService;
         private readonly IMonstercatApi _api;
-        private readonly ApiCredentials _credentials;
 
         [EmailAddress]
         [Display(Name = "E-Mail")]
         [Required(AllowEmptyStrings = false, ErrorMessage = "This field {0} may not be empty.")]
         [MinLength(6)]
         [ObservableProperty]
-        [AlsoNotifyCanExecuteFor(nameof(LoginCommand))]
-        private string _email;
+        [NotifyCanExecuteChangedFor(nameof(LoginCommand))]
+        private string? _email;
 
         [Display(Name = "Password")]
         [Required(AllowEmptyStrings = false, ErrorMessage = "This field {0} may not be empty.")]
         [MinLength(12)]
         [ObservableProperty]
-        [AlsoNotifyCanExecuteFor(nameof(LoginCommand))]
-        private string _password;
-
-        private bool _isLoggedIn;
-        public bool IsLoggedIn
-        {
-            get { return _isLoggedIn; }
-            private set { SetProperty(ref _isLoggedIn, value); }
-        }
+        [NotifyCanExecuteChangedFor(nameof(LoginCommand))]
+        private string? _password;
 
         public Action? OnLogin { get; set; }
 
-        public LoginViewModel(IMonstercatApi api, IConfiguration configuration)
+        public LoginViewModel(SettingsService settingsService, IMonstercatApi api, IMessenger messenger)
         {
+            _settingsService = settingsService;
             _api = api;
 
-            _email = "";
-            _password = "";
+            Messenger = messenger;
 
-            _credentials = new ApiCredentials();
-            var sectionName = typeof(ApiCredentials).Name;
-            var section = configuration.GetSection(sectionName);
-
-            section.Bind(_credentials);
-
-            _email = _credentials.Email;
-            _password = _credentials.Password;
+            _email = settingsService.Email;
+            _password = settingsService.Password;
         }
 
-        [ICommand(AllowConcurrentExecutions = false, CanExecute = nameof(CanLogin), IncludeCancelCommand = true)]
+        [RelayCommand(AllowConcurrentExecutions = false, CanExecute = nameof(CanLogin), IncludeCancelCommand = true)]
         public async Task Login(CancellationToken token)
         {
             if (HasErrors)
@@ -65,11 +53,25 @@ namespace SoftThorn.Monstercat.Browser.Core
 
             await _api.Login(new ApiCredentials()
             {
-                Email = _email,
-                Password = _password,
+                Email = Email!,
+                Password = Password!,
             }, token);
-            IsLoggedIn = true;
+
+            Messenger.Send(new LoginChangedMessage(this, true));
             OnLogin?.Invoke();
+        }
+
+        public async Task TryLogin(Action? handleLoginValidationErrors, CancellationToken token)
+        {
+            Validate();
+            if (HasErrors)
+            {
+                handleLoginValidationErrors?.Invoke();
+            }
+            else
+            {
+                await Login(token);
+            }
         }
 
         public bool CanLogin()

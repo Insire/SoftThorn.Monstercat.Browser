@@ -68,7 +68,7 @@
                                  Padding="16"
                                  materialDesign:ShadowAssist.ShadowDepth="Depth3">
 
-                <DataGrid ItemsSource="{Binding Packages}" />
+                <DataGrid ItemsSource="{Binding Packages}" IsReadOnly="True"/>
             </materialDesign:Card>
         </DockPanel>
     </materialDesign:TransitioningContent>
