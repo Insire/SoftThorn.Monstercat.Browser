@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using DynamicData;
 using DynamicData.Binding;
+using SoftThorn.MonstercatNet;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -45,6 +46,9 @@ namespace SoftThorn.Monstercat.Browser.Core
 
         [ObservableProperty]
         private int _tagsCount;
+
+        [ObservableProperty]
+        private FileFormat _downloadFileFormat;
 
         public ReadOnlyObservableCollection<TagViewModel> Tags { get; }
 
@@ -128,6 +132,7 @@ namespace SoftThorn.Monstercat.Browser.Core
 
             DownloadTracksPath = _settingsService.DownloadTracksPath;
             DownloadImagesPath = _settingsService.DownloadImagesPath;
+            DownloadFileFormat = _settingsService.DownloadFileFormat;
 
             ArtistsCount = _settingsService.ArtistsCount;
             GenresCount = _settingsService.GenresCount;
@@ -143,6 +148,7 @@ namespace SoftThorn.Monstercat.Browser.Core
 
             _settingsService.DownloadTracksPath = DownloadTracksPath;
             _settingsService.DownloadImagesPath = DownloadImagesPath;
+            _settingsService.DownloadFileFormat = DownloadFileFormat;
 
             _settingsService.ExcludedTags = SelectedTags
                 .Where(p => p.IsSelected)

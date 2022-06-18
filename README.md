@@ -20,17 +20,20 @@ The SoftThorn.Monstercat.Browser app (or SMB app for short) is my approach for d
 
 - Browse the latest tracks and releases from [monstercat](https://www.monstercat.com/)
 - Download any/all of their music to your local device (You need an active Gold Subscription for that!)
+- Settings
+  - Download locations
+  - Download file format
+  - Dashboard configuration
+  - filter/ignore tags
+  - edit monstercat credentials
 
 ### Planned
 
-- Settings View (configure how SMB works)
 - Settings Storage (persist configuration between app restarts)
   - clear cache
   - color selection?
   - download performance / parallel downloads
   - Enable AssetSize Configuration (Download the art in the format and size you like)
-  - music format selection
-- Query Latest Artists (finish implementation)
 - AutoUpdate via Github releases
 - Playback (playback the music right in the app)
   - Qeueu tracks and releases

@@ -6,7 +6,6 @@ using LiveChartsCore;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
 using SkiaSharp;
-using SoftThorn.MonstercatNet;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

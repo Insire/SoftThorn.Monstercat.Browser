@@ -91,14 +91,14 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             {
                 Owner = owner,
             };
-            _shellViewModel.Settings.OnSuccssfulSave += OnSuccssfulSave;
+            _shellViewModel.Settings.OnSuccssfulSave = OnSuccssfulSave;
 
             settingsView.ShowDialog();
             _shellViewModel.Settings.SelectFolderProxy = null;
 
             void OnSuccssfulSave()
             {
-                _shellViewModel.Settings.OnSuccssfulSave -= OnSuccssfulSave;
+                _shellViewModel.Settings.OnSuccssfulSave = null;
                 settingsView.DialogResult = true;
             }
         }

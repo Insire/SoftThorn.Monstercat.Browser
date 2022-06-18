@@ -18,6 +18,7 @@ namespace SoftThorn.Monstercat.Browser.Core
         private readonly DispatcherProgress<Percentage> _progressService;
 
         private string? _downloadTracksPath;
+        private FileFormat _downloadFileFormat;
 
         [ObservableProperty]
         private bool _isDownLoading;
@@ -36,6 +37,7 @@ namespace SoftThorn.Monstercat.Browser.Core
             messenger.Register<DownloadViewModel, SettingsChangedMessage>(this, (r, m) =>
             {
                 r._downloadTracksPath = m.Settings.DownloadTracksPath;
+                r._downloadFileFormat = m.Settings.DownloadFileFormat;
             });
 
             messenger.Register<DownloadViewModel, DownloadTracksMessage>(this, async (r, m) =>
@@ -102,7 +104,7 @@ namespace SoftThorn.Monstercat.Browser.Core
 
                             using var stream = await _api.DownloadTrackAsStream(new TrackDownloadRequest()
                             {
-                                Format = FileFormat.flac,
+                                Format = _downloadFileFormat,
                                 ReleaseId = item.Release.Id,
                                 TrackId = item.Id,
                             });

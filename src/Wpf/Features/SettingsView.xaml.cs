@@ -16,10 +16,5 @@ namespace SoftThorn.Monstercat.Browser.Wpf
 
             InitializeComponent();
         }
-
-        private void OnCancelClick(object sender, System.Windows.RoutedEventArgs e)
-        {
-            DialogResult = false;
-        }
     }
 }

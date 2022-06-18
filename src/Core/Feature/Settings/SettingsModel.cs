@@ -1,3 +1,4 @@
+using SoftThorn.MonstercatNet;
 using System;
 
 namespace SoftThorn.Monstercat.Browser.Core
@@ -7,6 +8,8 @@ namespace SoftThorn.Monstercat.Browser.Core
         public string? DownloadTracksPath { get; init; }
 
         public string? DownloadImagesPath { get; init; }
+
+        public FileFormat DownloadFileFormat { get; init; }
 
         public string[] ExcludedTags { get; init; } = Array.Empty<string>();
 

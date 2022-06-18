@@ -44,6 +44,8 @@ namespace SoftThorn.Monstercat.Browser.Core
         /// </summary>
         public string? DownloadImagesPath { get; set; }
 
+        public FileFormat DownloadFileFormat { get; set; }
+
         // login settings
         /// <summary>
         /// E-Mail for your monstercat account
@@ -96,6 +98,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                     ReleasesCount = 10,
                     DownloadImagesPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.InternetCache), "SoftThorn.Monstercat.Browser.Wpf"),
                     DownloadTracksPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "SoftThorn.Monstercat.Browser.Wpf"),
+                    DownloadFileFormat = FileFormat.flac,
                     ExcludedTags = new[]
                     {
                         "and",
@@ -167,6 +170,7 @@ namespace SoftThorn.Monstercat.Browser.Core
             var settings = await LoadSettings();
             DownloadTracksPath = settings.DownloadTracksPath;
             DownloadImagesPath = settings.DownloadImagesPath;
+            DownloadFileFormat = settings.DownloadFileFormat;
 
             ExcludedTags = settings.ExcludedTags;
 
@@ -205,6 +209,7 @@ namespace SoftThorn.Monstercat.Browser.Core
             {
                 DownloadTracksPath = DownloadTracksPath,
                 DownloadImagesPath = DownloadImagesPath,
+                DownloadFileFormat = DownloadFileFormat,
 
                 ExcludedTags = ExcludedTags,
 
