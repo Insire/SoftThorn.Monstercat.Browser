@@ -54,6 +54,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                 Version = track.Version,
                 Tags = track.CreateTags(),
                 ImageUrl = track.Release.GetSmallCoverArtUri(),
+                Release = track.Release.ToViewModel(),
             };
         }
 
@@ -76,11 +77,11 @@ namespace SoftThorn.Monstercat.Browser.Core
             };
         }
 
-        public static ArtistViewModel ToViewModel(this Artist artist)
+        public static ArtistViewModel ToViewModel(this TrackArtist artist)
         {
             return new ArtistViewModel()
             {
-                Id = artist.ArtistId,
+                Id = artist.Id,
                 Name = artist.Name,
                 Uri = artist.Uri,
                 Tracks = new ObservableCollectionExtended<TrackViewModel>(),

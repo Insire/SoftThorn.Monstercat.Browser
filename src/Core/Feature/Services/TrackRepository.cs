@@ -72,7 +72,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                 .Connect()
                 .ObserveOn(TaskPoolScheduler.Default)
                 .DistinctUntilChanged()
-                .SortBy(p => p.Key);
+                .SortBy(p => p.Key, DynamicData.Binding.SortDirection.Descending, SortOptimisations.ComparesImmutableValuesOnly);
         }
 
         public IObservable<IChangeSet<ArtistViewModel, Guid>> ConnectArtists()
@@ -81,7 +81,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                 .Connect()
                 .ObserveOn(TaskPoolScheduler.Default)
                 .DistinctUntilChanged()
-                .SortBy(p => p.Name);
+                .SortBy(p => p.LatestReleaseDate, DynamicData.Binding.SortDirection.Ascending, SortOptimisations.ComparesImmutableValuesOnly);
         }
 
         public IObservable<IChangeSet<KeyValuePair<string, List<TrackViewModel>>, string>> ConnectTags()
@@ -92,7 +92,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                 .DistinctUntilChanged()
                 .AutoRefreshOnObservable(_ => _excludedTags.Connect())
                 .Filter(tag => !_excludedTags.Lookup(tag.Key).HasValue)
-                .SortBy(p => p.Key);
+                .SortBy(p => p.Key, DynamicData.Binding.SortDirection.Descending, SortOptimisations.ComparesImmutableValuesOnly);
         }
 
         public IObservable<IChangeSet<TagViewModel, string>> ConnectFilteredTagViewModels()
@@ -103,7 +103,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                 .DistinctUntilChanged()
                 .AutoRefreshOnObservable(_ => _excludedTags.Connect())
                 .Filter(tag => !_excludedTags.Lookup(tag.Key).HasValue)
-                .SortBy(p => p.Key)
+                .SortBy(p => p.Key, DynamicData.Binding.SortDirection.Descending, SortOptimisations.ComparesImmutableValuesOnly)
                 .Transform(p => new TagViewModel() { Value = p.Key, IsSelected = false })
             ;
         }
@@ -114,7 +114,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                 .Connect()
                 .ObserveOn(TaskPoolScheduler.Default)
                 .DistinctUntilChanged()
-                .SortBy(p => p.Key)
+                .SortBy(p => p.Key, DynamicData.Binding.SortDirection.Descending, SortOptimisations.ComparesImmutableValuesOnly)
                 .Transform(p => new TagViewModel() { Value = p.Key, IsSelected = _excludedTagValues.Contains(p.Key) })
             ;
         }
@@ -198,7 +198,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                             }
 
                             // release
-                            var rleaseViewModel = releases.AddOrUpdate(track.Release.Id, track.Release.ToViewModel(), (_, old) => old);
+                            var rleaseViewModel = releases.AddOrUpdate(track.Release.Id, trackViewModel.Release, (_, old) => old);
                             tracksByRelease.AddOrUpdate(track.Release.Id, new ConcurrentStack<TrackViewModel>(new[] { trackViewModel }), (_, stack) =>
                             {
                                 stack.Push(trackViewModel);
@@ -224,13 +224,13 @@ namespace SoftThorn.Monstercat.Browser.Core
                                 for (var i = 0; i < track.Artists.Length; i++)
                                 {
                                     var artist = track.Artists[i];
-                                    tracksByArtist.AddOrUpdate(artist.ArtistId, new ConcurrentStack<TrackViewModel>(new[] { trackViewModel }), (_, stack) =>
+                                    tracksByArtist.AddOrUpdate(artist.Id, new ConcurrentStack<TrackViewModel>(new[] { trackViewModel }), (_, stack) =>
                                     {
                                         stack.Push(trackViewModel);
                                         return stack;
                                     });
 
-                                    artists.AddOrUpdate(artist.ArtistId, artist.ToViewModel(), (_, old) => old);
+                                    artists.AddOrUpdate(artist.Id, artist.ToViewModel(), (_, old) => old);
                                 }
                             }
 
@@ -248,8 +248,10 @@ namespace SoftThorn.Monstercat.Browser.Core
 
             foreach (var artist in artists)
             {
-                var artistTracks = tracksByArtist[artist.Key];
+                var artistTracks = tracksByArtist[artist.Key].OrderByDescending(p => p.ReleaseDate).ToArray();
+
                 artist.Value.Tracks.AddRange(artistTracks);
+                artist.Value.LatestReleaseDate = artistTracks.FirstOrDefault()?.ReleaseDate ?? DateTime.MinValue;
             }
 
             _artistCache.AddOrUpdate(artists.Values);

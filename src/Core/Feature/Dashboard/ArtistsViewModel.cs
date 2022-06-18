@@ -38,9 +38,6 @@ namespace SoftThorn.Monstercat.Browser.Core
             {
                 return trackRepository
                     .ConnectArtists()
-                    .Sort(SortExpressionComparer<ArtistViewModel>
-                        .Descending(p => p.LatestReleaseDate)
-                        .ThenByAscending(p => p.Id))
                     .LimitSizeTo(size)
                     .ObserveOn(synchronizationContext)
                     .Bind(_artists)

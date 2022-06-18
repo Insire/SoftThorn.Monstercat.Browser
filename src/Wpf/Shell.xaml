@@ -381,14 +381,14 @@
                         </GroupBox.Header>
 
                         <DataGrid materialDesign:ScrollViewerAssist.IsAutoHideEnabled="true"
-                                  AutoGenerateColumns="true"
+                                  AutoGenerateColumns="False"
                                   CanUserSortColumns="False"
                                   IsReadOnly="True"
                                   ItemsSource="{Binding Artists.Artists}"
                                   SelectionMode="Single"
                                   SelectionUnit="FullRow">
-                            <!--<DataGrid.Columns>
-                                <DataGridTemplateColumn>
+                            <DataGrid.Columns>
+                                <!--<DataGridTemplateColumn>
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <Image Width="30"
@@ -398,31 +398,14 @@
                                                    Source="{Binding ImageUrl}" />
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                                <DataGridTextColumn Binding="{Binding Title}" Header="Title" />
-                                <DataGridTextColumn Binding="{Binding Version}" />
+                                </DataGridTemplateColumn>-->
                                 <DataGridTextColumn Width="*"
-                                                    Binding="{Binding ArtistsTitle}"
+                                                    Binding="{Binding Name}"
                                                     Header="Artist" />
 
+                                <DataGridTextColumn Binding="{Binding LatestReleaseDate, StringFormat='{}{0:dd MMMM yyyy}'}" Header="Latest Release Date" />
                                 <DataGridTextColumn Binding="{Binding Tracks.Count}" Header="Tracks" />
-                            </DataGrid.Columns>-->
-
-                            <DataGrid.RowDetailsTemplate>
-                                <DataTemplate DataType="{x:Type core:ArtistViewModel}">
-                                    <ItemsControl ItemsSource="{Binding Tracks}">
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate DataType="{x:Type core:TrackViewModel}">
-                                                <StackPanel Orientation="Horizontal">
-
-                                                    <TextBlock Text="{Binding Title}" />
-                                                    <TextBlock Text="{Binding ArtistsTitle}" />
-                                                </StackPanel>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
-                                </DataTemplate>
-                            </DataGrid.RowDetailsTemplate>
+                            </DataGrid.Columns>
                         </DataGrid>
                     </GroupBox>
 
