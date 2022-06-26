@@ -30,6 +30,9 @@ namespace SoftThorn.Monstercat.Browser.Core
         private string? _email;
 
         [ObservableProperty]
+        private int _parallelDownloads;
+
+        [ObservableProperty]
         private string? _downloadTracksPath;
 
         [ObservableProperty]
@@ -50,6 +53,7 @@ namespace SoftThorn.Monstercat.Browser.Core
         [ObservableProperty]
         private FileFormat _downloadFileFormat;
 
+        public int MaxParallelDownloads { get; } = Environment.ProcessorCount;
         public ReadOnlyObservableCollection<TagViewModel> Tags { get; }
 
         public ReadOnlyObservableCollection<TagViewModel> SelectedTags { get; }
@@ -133,6 +137,7 @@ namespace SoftThorn.Monstercat.Browser.Core
             DownloadTracksPath = _settingsService.DownloadTracksPath;
             DownloadImagesPath = _settingsService.DownloadImagesPath;
             DownloadFileFormat = _settingsService.DownloadFileFormat;
+            ParallelDownloads = _settingsService.ParallelDownloads;
 
             ArtistsCount = _settingsService.ArtistsCount;
             GenresCount = _settingsService.GenresCount;
@@ -149,6 +154,7 @@ namespace SoftThorn.Monstercat.Browser.Core
             _settingsService.DownloadTracksPath = DownloadTracksPath;
             _settingsService.DownloadImagesPath = DownloadImagesPath;
             _settingsService.DownloadFileFormat = DownloadFileFormat;
+            _settingsService.ParallelDownloads = ParallelDownloads;
 
             _settingsService.ExcludedTags = SelectedTags
                 .Where(p => p.IsSelected)

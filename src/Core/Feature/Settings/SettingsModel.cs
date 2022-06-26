@@ -11,6 +11,8 @@ namespace SoftThorn.Monstercat.Browser.Core
 
         public FileFormat DownloadFileFormat { get; init; }
 
+        public int ParallelDownloads { get; init; }
+
         public string[] ExcludedTags { get; init; } = Array.Empty<string>();
 
         public int ArtistsCount { get; init; }

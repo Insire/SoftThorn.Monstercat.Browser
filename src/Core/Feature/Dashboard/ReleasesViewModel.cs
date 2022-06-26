@@ -2,10 +2,8 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using DynamicData;
 using DynamicData.Binding;
-using SoftThorn.MonstercatNet;
 using System;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Reactive.Linq;
 using System.Threading;
 

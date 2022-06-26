@@ -46,6 +46,8 @@ namespace SoftThorn.Monstercat.Browser.Core
 
         public FileFormat DownloadFileFormat { get; set; }
 
+        public int ParallelDownloads { get; set; }
+
         // login settings
         /// <summary>
         /// E-Mail for your monstercat account
@@ -98,6 +100,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                     ReleasesCount = 10,
                     DownloadImagesPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.InternetCache), "SoftThorn.Monstercat.Browser.Wpf"),
                     DownloadTracksPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "SoftThorn.Monstercat.Browser.Wpf"),
+                    ParallelDownloads = Math.Min(4, Environment.ProcessorCount),
                     DownloadFileFormat = FileFormat.flac,
                     ExcludedTags = new[]
                     {
@@ -168,9 +171,13 @@ namespace SoftThorn.Monstercat.Browser.Core
         public async Task Load()
         {
             var settings = await LoadSettings();
+            CreateDirectory(settings.DownloadTracksPath);
+            CreateDirectory(settings.DownloadImagesPath);
+
             DownloadTracksPath = settings.DownloadTracksPath;
             DownloadImagesPath = settings.DownloadImagesPath;
             DownloadFileFormat = settings.DownloadFileFormat;
+            ParallelDownloads = settings.ParallelDownloads;
 
             ExcludedTags = settings.ExcludedTags;
 
@@ -201,6 +208,16 @@ namespace SoftThorn.Monstercat.Browser.Core
             {
                 Settings = settings,
             });
+
+            static void CreateDirectory(string? directoryPath)
+            {
+                if (string.IsNullOrWhiteSpace(directoryPath))
+                {
+                    return;
+                }
+
+                Directory.CreateDirectory(directoryPath);
+            }
         }
 
         public async Task Save()
@@ -210,6 +227,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                 DownloadTracksPath = DownloadTracksPath,
                 DownloadImagesPath = DownloadImagesPath,
                 DownloadFileFormat = DownloadFileFormat,
+                ParallelDownloads = ParallelDownloads,
 
                 ExcludedTags = ExcludedTags,
 

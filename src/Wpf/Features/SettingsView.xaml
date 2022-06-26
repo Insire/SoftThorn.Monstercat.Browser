@@ -4,7 +4,6 @@
                          xmlns:core="clr-namespace:SoftThorn.Monstercat.Browser.Core;assembly=SoftThorn.Monstercat.Browser.Core"
                          xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                          xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-                         xmlns:iconpacks="clr-namespace:MahApps.Metro.IconPacks;assembly=MahApps.Metro.IconPacks.FontAwesome"
                          xmlns:mahControls="http://metro.mahapps.com/winfx/xaml/controls"
                          xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
                          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -112,6 +111,8 @@
                                 <RowDefinition Height="*" />
                                 <RowDefinition Height="16" />
                                 <RowDefinition Height="*" />
+                                <RowDefinition Height="16" />
+                                <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
 
                             <!--  Tracks  -->
@@ -120,6 +121,7 @@
                                      materialDesign:HintAssist.Hint="Download tracks to this folder"
                                      materialDesign:HintAssist.IsFloating="True"
                                      materialDesign:TextFieldAssist.HasClearButton="True"
+                                     materialDesign:TextFieldAssist.HasLeadingIcon="True"
                                      materialDesign:TextFieldAssist.LeadingIcon="Folder"
                                      Text="{Binding DownloadTracksPath, UpdateSourceTrigger=PropertyChanged, Delay=250}" />
 
@@ -135,6 +137,7 @@
                                      materialDesign:HintAssist.Hint="Download images to this folder"
                                      materialDesign:HintAssist.IsFloating="True"
                                      materialDesign:TextFieldAssist.HasClearButton="True"
+                                     materialDesign:TextFieldAssist.HasLeadingIcon="True"
                                      materialDesign:TextFieldAssist.LeadingIcon="Folder"
                                      Text="{Binding DownloadImagesPath, UpdateSourceTrigger=PropertyChanged, Delay=250}" />
 
@@ -152,6 +155,19 @@
                                       materialDesign:HintAssist.IsFloating="True"
                                       ItemsSource="{Binding Source={wpf:EnumBindingSourceExtension {x:Type monstercatnet:FileFormat}}, Mode=OneTime}"
                                       SelectedItem="{Binding DownloadFileFormat, Mode=TwoWay}" />
+
+
+                            <Slider Grid.Row="6"
+                                    Grid.Column="0"
+                                    Grid.ColumnSpan="3"
+                                    Maximum="{Binding MaxParallelDownloads}"
+                                    Minimum="1"
+                                    Style="{StaticResource MaterialDesignDiscreteSlider}"
+                                    TickFrequency="1"
+                                    TickPlacement="BottomRight"
+                                    ToolTip="Select how many tracks will be downloaded in parallel"
+                                    Value="{Binding ParallelDownloads}" />
+
                         </Grid>
                     </materialDesign:Card>
 

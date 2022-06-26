@@ -5,7 +5,6 @@ using SoftThorn.MonstercatNet;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reactive.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,6 +16,7 @@ namespace SoftThorn.Monstercat.Browser.Core
         private readonly IMonstercatApi _api;
         private readonly DispatcherProgress<Percentage> _progressService;
 
+        private int _parallelDownloads;
         private string? _downloadTracksPath;
         private FileFormat _downloadFileFormat;
 
@@ -38,6 +38,7 @@ namespace SoftThorn.Monstercat.Browser.Core
             {
                 r._downloadTracksPath = m.Settings.DownloadTracksPath;
                 r._downloadFileFormat = m.Settings.DownloadFileFormat;
+                r._parallelDownloads = m.Settings.ParallelDownloads;
             });
 
             messenger.Register<DownloadViewModel, DownloadTracksMessage>(this, async (r, m) =>
@@ -48,6 +49,8 @@ namespace SoftThorn.Monstercat.Browser.Core
 
         private async Task Download(IReadOnlyCollection<TrackViewModel> tracks, CancellationToken token)
         {
+            var parallelDownloads = _parallelDownloads;
+            var fileFormat = _downloadFileFormat;
             var downloadPath = _downloadTracksPath;
             if (string.IsNullOrWhiteSpace(downloadPath))
             {
@@ -66,7 +69,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                 var current = 0;
 
                 var tasks = new List<Task>();
-                foreach (var batch in tracks.Batch(tracks.Count / 4))
+                foreach (var batch in tracks.Batch(tracks.Count / parallelDownloads))
                 {
                     tasks.Add(Task.Run(async () =>
                     {
@@ -78,23 +81,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                                 return;
                             }
 
-                            builder.Append(item.ArtistsTitle);
-                            builder.Append(" - ");
-                            builder.Append(item.Title);
-
-                            if (!string.IsNullOrWhiteSpace(item.Version))
-                            {
-                                builder.Append('(');
-                                builder.Append(item.Version);
-                                builder.Append(')');
-                            }
-
-                            builder.Append(".flac");
-
-                            var fileName = builder.ToString().SanitizeAsFileName();
-                            builder.Clear();
-
-                            var filePath = Path.Combine(downloadPath, fileName!);
+                            var filePath = GetFilePath(builder, item, downloadPath, fileFormat);
                             if (File.Exists(filePath))
                             {
                                 current++;
@@ -130,6 +117,38 @@ namespace SoftThorn.Monstercat.Browser.Core
             {
                 IsDownLoading = false;
             }
+        }
+
+        private static string GetFilePath(StringBuilder builder, TrackViewModel track, string downloadPath, FileFormat fileFormat)
+        {
+            builder.Clear();
+            builder.Append(track.ArtistsTitle);
+            builder.Append(" - ");
+            builder.Append(track.Title);
+
+            if (!string.IsNullOrWhiteSpace(track.Version))
+            {
+                builder.Append('(');
+                builder.Append(track.Version);
+                builder.Append(')');
+            }
+
+            builder.Append(GetFileExtension(fileFormat));
+
+            var fileName = builder.ToString().SanitizeAsFileName();
+
+            return Path.Combine(downloadPath, fileName!);
+        }
+
+        private static string GetFileExtension(FileFormat fileFormat)
+        {
+            return fileFormat switch
+            {
+                FileFormat.flac => ".flac",
+                FileFormat.mp3 => ".mp3",
+                FileFormat.wav => ".wav",
+                _ => throw new NotImplementedException(),
+            };
         }
     }
 }

@@ -32,7 +32,6 @@ The SoftThorn.Monstercat.Browser app (or SMB app for short) is my approach for d
 - Settings Storage (persist configuration between app restarts)
   - clear cache
   - color selection?
-  - download performance / parallel downloads
   - Enable AssetSize Configuration (Download the art in the format and size you like)
 - AutoUpdate via Github releases
 - Playback (playback the music right in the app)
