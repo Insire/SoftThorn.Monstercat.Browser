@@ -19,5 +19,8 @@ namespace SoftThorn.Monstercat.Browser.Core
         private string _uri = default!;
 
         public ObservableCollection<TrackViewModel> Tracks { get; init; } = default!;
+
+        [ObservableProperty]
+        private int _latestReleaseCount= default!;
     }
 }

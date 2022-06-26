@@ -64,11 +64,9 @@ namespace SoftThorn.Monstercat.Browser.Core
             {
                 return trackRepository
                     .ConnectTags()
-                    .Sort(SortExpressionComparer<KeyValuePair<string, List<TrackViewModel>>>
-                        .Ascending(p => p.Value.Count)
-                        .ThenByAscending(p => p.Key))
-                    .LimitSizeTo(size)
-                    .SortBy(p => p.Value.Count, SortDirection.Descending)
+                    .Top(SortExpressionComparer<KeyValuePair<string, List<TrackViewModel>>>
+                        .Descending(p => p.Value.Count)
+                        .ThenByAscending(p => p.Key), size)
                     .Transform(p => (ISeries)new ColumnSeries<int>()
                     {
                         Name = p.Key,

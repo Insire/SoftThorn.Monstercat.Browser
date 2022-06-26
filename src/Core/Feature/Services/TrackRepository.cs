@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.Messaging;
 using DynamicData;
+using DynamicData.Binding;
 using Gress;
 using SoftThorn.MonstercatNet;
 using System;
@@ -72,7 +73,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                 .Connect()
                 .ObserveOn(TaskPoolScheduler.Default)
                 .DistinctUntilChanged()
-                .SortBy(p => p.Key, DynamicData.Binding.SortDirection.Descending, SortOptimisations.ComparesImmutableValuesOnly);
+                .SortBy(p => p.Key, SortDirection.Descending, SortOptimisations.ComparesImmutableValuesOnly);
         }
 
         public IObservable<IChangeSet<ArtistViewModel, Guid>> ConnectArtists()
@@ -81,7 +82,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                 .Connect()
                 .ObserveOn(TaskPoolScheduler.Default)
                 .DistinctUntilChanged()
-                .SortBy(p => p.LatestReleaseDate, DynamicData.Binding.SortDirection.Ascending, SortOptimisations.ComparesImmutableValuesOnly);
+                .SortBy(p => p.LatestReleaseDate, SortDirection.Ascending, SortOptimisations.ComparesImmutableValuesOnly);
         }
 
         public IObservable<IChangeSet<KeyValuePair<string, List<TrackViewModel>>, string>> ConnectTags()
@@ -92,7 +93,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                 .DistinctUntilChanged()
                 .AutoRefreshOnObservable(_ => _excludedTags.Connect())
                 .Filter(tag => !_excludedTags.Lookup(tag.Key).HasValue)
-                .SortBy(p => p.Key, DynamicData.Binding.SortDirection.Descending, SortOptimisations.ComparesImmutableValuesOnly);
+                .SortBy(p => p.Key, SortDirection.Descending, SortOptimisations.ComparesImmutableValuesOnly);
         }
 
         public IObservable<IChangeSet<TagViewModel, string>> ConnectFilteredTagViewModels()
@@ -103,7 +104,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                 .DistinctUntilChanged()
                 .AutoRefreshOnObservable(_ => _excludedTags.Connect())
                 .Filter(tag => !_excludedTags.Lookup(tag.Key).HasValue)
-                .SortBy(p => p.Key, DynamicData.Binding.SortDirection.Descending, SortOptimisations.ComparesImmutableValuesOnly)
+                .SortBy(p => p.Key, SortDirection.Descending, SortOptimisations.ComparesImmutableValuesOnly)
                 .Transform(p => new TagViewModel() { Value = p.Key, IsSelected = false })
             ;
         }
@@ -114,7 +115,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                 .Connect()
                 .ObserveOn(TaskPoolScheduler.Default)
                 .DistinctUntilChanged()
-                .SortBy(p => p.Key, DynamicData.Binding.SortDirection.Descending, SortOptimisations.ComparesImmutableValuesOnly)
+                .SortBy(p => p.Key, SortDirection.Descending, SortOptimisations.ComparesImmutableValuesOnly)
                 .Transform(p => new TagViewModel() { Value = p.Key, IsSelected = _excludedTagValues.Contains(p.Key) })
             ;
         }
@@ -252,6 +253,7 @@ namespace SoftThorn.Monstercat.Browser.Core
 
                 artist.Value.Tracks.AddRange(artistTracks);
                 artist.Value.LatestReleaseDate = artistTracks.FirstOrDefault()?.ReleaseDate ?? DateTime.MinValue;
+                artist.Value.LatestReleaseCount = artistTracks.Count(p => p.ReleaseDate == artist.Value.LatestReleaseDate);
             }
 
             _artistCache.AddOrUpdate(artists.Values);

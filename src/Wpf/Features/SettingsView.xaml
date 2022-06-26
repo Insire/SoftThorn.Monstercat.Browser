@@ -220,7 +220,7 @@
                                                          DockPanel.Dock="Left"
                                                          Foreground="{DynamicResource MaterialDesignCheckBoxOff}"
                                                          Kind="Tag" />
-                                <TextBlock DockPanel.Dock="Top" Text="{Binding ReleasesCount, StringFormat='{}Show {0} most popular tags'}" />
+                                <TextBlock DockPanel.Dock="Top" Text="{Binding TagsCount, StringFormat='{}Show {0} most popular tags'}" />
 
                                 <Slider Margin="0,8,0,0"
                                         Maximum="50"
@@ -240,7 +240,7 @@
                                                          Foreground="{DynamicResource MaterialDesignCheckBoxOff}"
                                                          Kind="Person" />
 
-                                <TextBlock DockPanel.Dock="Top" Text="{Binding ReleasesCount, StringFormat='{}Show {0} latest artists'}" />
+                                <TextBlock DockPanel.Dock="Top" Text="{Binding ArtistsCount, StringFormat='{}Show {0} latest artists'}" />
 
                                 <Slider Margin="0,8,0,0"
                                         Maximum="50"
@@ -259,7 +259,7 @@
                                                          DockPanel.Dock="Left"
                                                          Foreground="{DynamicResource MaterialDesignCheckBoxOff}"
                                                          Kind="Folder" />
-                                <TextBlock DockPanel.Dock="Top" Text="{Binding ReleasesCount, StringFormat='{}Show {0} most popular genres'}" />
+                                <TextBlock DockPanel.Dock="Top" Text="{Binding GenresCount, StringFormat='{}Show {0} most popular genres'}" />
 
                                 <Slider Margin="0,8,0,0"
                                         Maximum="50"

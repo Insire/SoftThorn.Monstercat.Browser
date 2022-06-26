@@ -387,24 +387,26 @@
                                   ItemsSource="{Binding Artists.Artists}"
                                   SelectionMode="Single"
                                   SelectionUnit="FullRow">
+                            <DataGrid.Resources>
+                                <DataTemplate x:Key="ImageColumnTemplate" DataType="{x:Type core:ArtistViewModel}">
+                                    <Image Width="30"
+                                           Height="30"
+                                           wpf:ImageLoader.Source="{Binding Uri, Mode=OneTime}"
+                                           xf:Animations.Primary="{xf:Animate BasedOn={StaticResource FadeIn},
+                                                                              Event=None}"
+                                           xf:Animations.PrimaryBinding="{Binding Path=(wpf:ImageLoader.IsLoading), RelativeSource={RelativeSource Self}, Converter={wpf:IsNot}}"
+                                           ToolTip="{Binding Uri, Mode=OneTime}" />
+                                </DataTemplate>
+                            </DataGrid.Resources>
                             <DataGrid.Columns>
-                                <!--<DataGridTemplateColumn>
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <Image Width="30"
-                                                   Height="30"
-                                                   xf:Animations.Primary="{xf:Animate BasedOn={StaticResource FadeIn},
-                                                                                      Event=Loaded}"
-                                                   Source="{Binding ImageUrl}" />
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>-->
+                                <DataGridTemplateColumn CellTemplate="{StaticResource ImageColumnTemplate}" />
                                 <DataGridTextColumn Width="*"
                                                     Binding="{Binding Name}"
                                                     Header="Artist" />
 
                                 <DataGridTextColumn Binding="{Binding LatestReleaseDate, StringFormat='{}{0:dd MMMM yyyy}'}" Header="Latest Release Date" />
-                                <DataGridTextColumn Binding="{Binding Tracks.Count}" Header="Tracks" />
+                                <DataGridTextColumn Binding="{Binding LatestReleaseCount}" Header="Tracks" />
+                                <DataGridTextColumn Binding="{Binding Tracks.Count}" Header="Total Tracks" />
                             </DataGrid.Columns>
                         </DataGrid>
                     </GroupBox>

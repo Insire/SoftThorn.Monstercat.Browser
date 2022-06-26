@@ -83,7 +83,7 @@ namespace SoftThorn.Monstercat.Browser.Core
             {
                 Id = artist.Id,
                 Name = artist.Name,
-                Uri = artist.Uri,
+                Uri = artist.GetSmallArtistPhotoUri().ToString(),
                 Tracks = new ObservableCollectionExtended<TrackViewModel>(),
             };
         }

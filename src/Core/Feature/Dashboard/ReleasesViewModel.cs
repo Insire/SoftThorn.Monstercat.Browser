@@ -40,10 +40,9 @@ namespace SoftThorn.Monstercat.Browser.Core
             {
                 return trackRepository
                     .ConnectReleases()
-                    .Sort(SortExpressionComparer<ReleaseViewModel>
+                    .Top(SortExpressionComparer<ReleaseViewModel>
                         .Descending(p => p.ReleaseDate)
-                        .ThenByAscending(p => p.Title))
-                    .LimitSizeTo(size)
+                        .ThenByAscending(p => p.Title), size)
                     .ObserveOn(synchronizationContext)
                     .Bind(_releases)
                     .Subscribe();
