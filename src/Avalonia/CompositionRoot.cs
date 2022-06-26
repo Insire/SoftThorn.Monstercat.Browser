@@ -1,3 +1,5 @@
+using Akavache;
+using CommunityToolkit.Mvvm.Messaging;
 using DryIoc;
 using Gress;
 using Microsoft.Extensions.Configuration;
@@ -31,10 +33,13 @@ namespace SoftThorn.Monstercat.Browser.Avalonia
             container.Register<Shell>(Reuse.Singleton, made: Made.Of(() => new Shell(Arg.Of<ShellViewModel>())));
 
             // viewmodels
+            container.Register<LoginViewModel>(Reuse.Transient);
+            container.Register<SearchViewModel>(Reuse.Transient);
+
             container.Register<AboutViewModel>(Reuse.Singleton);
+            container.Register<SettingsViewModel>(Reuse.Singleton);
             container.Register<DownloadViewModel>(Reuse.Singleton);
             container.Register<ShellViewModel>(Reuse.Singleton);
-            container.Register<LoginViewModel>(Reuse.Singleton);
             container.Register<ReleasesViewModel>(Reuse.Singleton);
             container.Register<TagsViewModel>(Reuse.Singleton);
             container.Register<GenresViewModel>(Reuse.Singleton);
@@ -46,12 +51,18 @@ namespace SoftThorn.Monstercat.Browser.Avalonia
             // services
             container.RegisterInstance<IConfiguration>(configuration);
             container.RegisterInstance(_api);
+            container.RegisterInstance<IMessenger>(WeakReferenceMessenger.Default);
             container.RegisterInstance(SynchronizationContext.Current!);
             container.Register<TrackRepository>(Reuse.Singleton);
+            container.Register<SearchViewModelFactory>(Reuse.Singleton);
+            container.Register<SettingsService>(Reuse.Singleton);
             container.Register<DispatcherProgress<Percentage>>(Reuse.Singleton, made: Made.Of(_ => ServiceInfo.Of<DispatcherProgressFactory<Percentage>>(), f => f.Create()));
             container.Register<IPlaybackService, PlaybackService>(Reuse.Singleton);
             container.Register<ProgressContainer<Percentage>>(Reuse.Singleton);
             container.Register<DispatcherProgressFactory<Percentage>>(Reuse.Singleton);
+            //container.Register<WindowService>(Reuse.Singleton);
+            container.RegisterInstance(BlobCache.Secure);
+            container.RegisterInstance(BlobCache.UserAccount);
 
             return container;
         }
