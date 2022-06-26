@@ -168,6 +168,16 @@ namespace SoftThorn.Monstercat.Browser.Core
             await _blobCache.InsertObject(nameof(SettingsModel), credentials);
         }
 
+        public async Task ResetSettings()
+        {
+            await _blobCache.Invalidate(nameof(SettingsModel));
+        }
+
+        public async Task ResetCredentials()
+        {
+            await _secureBlobCache.Invalidate(nameof(MonstercatCredentialsModel));
+        }
+
         public async Task Load()
         {
             var settings = await LoadSettings();

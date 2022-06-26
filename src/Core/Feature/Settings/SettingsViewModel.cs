@@ -207,6 +207,20 @@ namespace SoftThorn.Monstercat.Browser.Core
             DownloadImagesPath = Folder;
         }
 
+        [RelayCommand]
+        private async Task ResetSettings()
+        {
+            await _settingsService.ResetSettings();
+            await Load();
+        }
+
+        [RelayCommand]
+        private async Task ResetCredentials()
+        {
+            await _settingsService.ResetCredentials();
+            await Load();
+        }
+
         private void Dispose(bool disposing)
         {
             if (!_disposedValue)

@@ -67,10 +67,14 @@
                                       Mode="Dark">
                 <DockPanel>
                     <materialDesign:PopupBox DockPanel.Dock="Right" PlacementMode="BottomAndAlignRightEdges">
-                        <ListBox>
-                            <ListBoxItem Content="Reset to default" />
-                            <ListBoxItem Content="update credentials" />
-                        </ListBox>
+                        <ItemsControl>
+                            <Button Command="{Binding ResetSettingsCommand}"
+                                    Content="Reset to default"
+                                    Style="{StaticResource MaterialDesignPopupBoxButton}" />
+                            <Button Command="{Binding ResetCredentialsCommand}"
+                                    Content="update credentials"
+                                    Style="{StaticResource MaterialDesignPopupBoxButton}" />
+                        </ItemsControl>
                     </materialDesign:PopupBox>
 
                     <StackPanel Orientation="Horizontal">
