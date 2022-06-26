@@ -11,7 +11,7 @@ namespace Build
                 .UseContext<BuildContext>()
                 .UseWorkingDirectory("../../")
                 .SetToolPath("../")
-                .InstallTool(new Uri("nuget:?package=GitVersion.CommandLine&version=5.10.1"))
+                .InstallTool(new Uri("nuget:?package=GitVersion.CommandLine&version=5.10.3"))
                 .Run(args);
         }
     }
