@@ -30,7 +30,6 @@ The SoftThorn.Monstercat.Browser app (or SMB app for short) is my approach for d
 ### Planned
 
 - Settings Storage (persist configuration between app restarts)
-  - clear cache
   - color selection?
   - Enable AssetSize Configuration (Download the art in the format and size you like)
 - AutoUpdate via Github releases

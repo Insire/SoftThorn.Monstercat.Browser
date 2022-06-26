@@ -96,50 +96,70 @@
                                 <Run Text="Newest Releases" />
                             </TextBlock>
                         </GroupBox.Header>
+                        <Grid>
 
-                        <DataGrid AutoGenerateColumns="False"
-                                  CanUserSortColumns="False"
-                                  IsReadOnly="True"
-                                  ItemsSource="{Binding Releases.Releases}"
-                                  ScrollViewer.VerticalScrollBarVisibility="Hidden"
-                                  SelectionMode="Single"
-                                  SelectionUnit="FullRow">
-                            <DataGrid.RowStyle>
-                                <Style BasedOn="{StaticResource MaterialDesignDataGridRow}" TargetType="{x:Type DataGridRow}">
-                                    <Setter Property="ToolTip">
-                                        <Setter.Value>
-                                            <TextBlock Text="{Binding ReleaseDate, StringFormat='{}Release date: {0:dd MMMM yyyy}'}" />
-                                        </Setter.Value>
-                                    </Setter>
-                                </Style>
-                            </DataGrid.RowStyle>
+                            <DataGrid AutoGenerateColumns="False"
+                                      CanUserSortColumns="False"
+                                      IsReadOnly="True"
+                                      ItemsSource="{Binding Releases.Releases}"
+                                      ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                                      SelectionMode="Single"
+                                      SelectionUnit="FullRow">
+                                <DataGrid.RowStyle>
+                                    <Style BasedOn="{StaticResource MaterialDesignDataGridRow}" TargetType="{x:Type DataGridRow}">
+                                        <Setter Property="ToolTip">
+                                            <Setter.Value>
+                                                <TextBlock Text="{Binding ReleaseDate, StringFormat='{}Release date: {0:dd MMMM yyyy}'}" />
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </DataGrid.RowStyle>
 
-                            <DataGrid.Columns>
-                                <DataGridTemplateColumn>
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <Image Width="30"
-                                                   Height="30"
-                                                   wpf:ImageLoader.Source="{Binding ImageUrl, Mode=OneTime}"
-                                                   xf:Animations.Primary="{xf:Animate BasedOn={StaticResource FadeIn},
-                                                                                      Event=None}"
-                                                   xf:Animations.PrimaryBinding="{Binding Path=(wpf:ImageLoader.IsLoading), RelativeSource={RelativeSource Self}, Converter={wpf:IsNot}}"
-                                                   RenderOptions.BitmapScalingMode="NearestNeighbor"
-                                                   RenderOptions.EdgeMode="Aliased"
-                                                   SnapsToDevicePixels="True"
-                                                   ToolTip="{Binding ImageUrl, Mode=OneTime}" />
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                                <DataGridTextColumn Binding="{Binding Title}" Header="Title" />
-                                <DataGridTextColumn Binding="{Binding Version}" />
-                                <DataGridTextColumn Width="*"
-                                                    Binding="{Binding ArtistsTitle}"
-                                                    Header="Artist" />
+                                <DataGrid.Columns>
+                                    <DataGridTemplateColumn>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Image Width="30"
+                                                       Height="30"
+                                                       wpf:ImageLoader.Source="{Binding ImageUrl, Mode=OneTime}"
+                                                       xf:Animations.Primary="{xf:Animate BasedOn={StaticResource FadeIn},
+                                                                                          Event=None}"
+                                                       xf:Animations.PrimaryBinding="{Binding Path=(wpf:ImageLoader.IsLoading), RelativeSource={RelativeSource Self}, Converter={wpf:IsNot}}"
+                                                       RenderOptions.BitmapScalingMode="NearestNeighbor"
+                                                       RenderOptions.EdgeMode="Aliased"
+                                                       SnapsToDevicePixels="True"
+                                                       ToolTip="{Binding ImageUrl, Mode=OneTime}" />
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTextColumn Binding="{Binding Title}" Header="Title" />
+                                    <DataGridTextColumn Binding="{Binding Version}" />
+                                    <DataGridTextColumn Width="*"
+                                                        Binding="{Binding ArtistsTitle}"
+                                                        Header="Artist" />
 
-                                <DataGridTextColumn Binding="{Binding Tracks.Count}" Header="Tracks" />
-                            </DataGrid.Columns>
-                        </DataGrid>
+                                    <DataGridTextColumn Binding="{Binding Tracks.Count}" Header="Tracks" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+
+                            <ProgressBar xf:Animations.Primary="{xf:Animate BasedOn={StaticResource FadeIn},
+                                                                            Event=Visibility}"
+                                         IsIndeterminate="True"
+                                         Value="0">
+                                <ProgressBar.Style>
+                                    <Style BasedOn="{StaticResource MaterialDesignCircularProgressBar}" TargetType="{x:Type ProgressBar}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsLoading}" Value="false">
+                                                <Setter Property="Visibility" Value="Hidden" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsLoading}" Value="true">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ProgressBar.Style>
+                            </ProgressBar>
+                        </Grid>
                     </GroupBox>
 
                     <!--  Popular Tags  -->
@@ -380,35 +400,57 @@
                             </TextBlock>
                         </GroupBox.Header>
 
-                        <DataGrid materialDesign:ScrollViewerAssist.IsAutoHideEnabled="true"
-                                  AutoGenerateColumns="False"
-                                  CanUserSortColumns="False"
-                                  IsReadOnly="True"
-                                  ItemsSource="{Binding Artists.Artists}"
-                                  SelectionMode="Single"
-                                  SelectionUnit="FullRow">
-                            <DataGrid.Resources>
-                                <DataTemplate x:Key="ImageColumnTemplate" DataType="{x:Type core:ArtistViewModel}">
-                                    <Image Width="30"
-                                           Height="30"
-                                           wpf:ImageLoader.Source="{Binding Uri, Mode=OneTime}"
-                                           xf:Animations.Primary="{xf:Animate BasedOn={StaticResource FadeIn},
-                                                                              Event=None}"
-                                           xf:Animations.PrimaryBinding="{Binding Path=(wpf:ImageLoader.IsLoading), RelativeSource={RelativeSource Self}, Converter={wpf:IsNot}}"
-                                           ToolTip="{Binding Uri, Mode=OneTime}" />
-                                </DataTemplate>
-                            </DataGrid.Resources>
-                            <DataGrid.Columns>
-                                <DataGridTemplateColumn CellTemplate="{StaticResource ImageColumnTemplate}" />
-                                <DataGridTextColumn Width="*"
-                                                    Binding="{Binding Name}"
-                                                    Header="Artist" />
+                        <Grid>
+                            <DataGrid materialDesign:ScrollViewerAssist.IsAutoHideEnabled="true"
+                                      AutoGenerateColumns="False"
+                                      CanUserSortColumns="False"
+                                      IsReadOnly="True"
+                                      ItemsSource="{Binding Artists.Artists}"
+                                      SelectionMode="Single"
+                                      SelectionUnit="FullRow">
+                                <DataGrid.Resources>
+                                    <DataTemplate x:Key="ImageColumnTemplate" DataType="{x:Type core:ArtistViewModel}">
+                                        <Image Width="30"
+                                               Height="30"
+                                               wpf:ImageLoader.Source="{Binding Uri, Mode=OneTime}"
+                                               xf:Animations.Primary="{xf:Animate BasedOn={StaticResource FadeIn},
+                                                                                  Event=None}"
+                                               xf:Animations.PrimaryBinding="{Binding Path=(wpf:ImageLoader.IsLoading), RelativeSource={RelativeSource Self}, Converter={wpf:IsNot}}"
+                                               ToolTip="{Binding Uri, Mode=OneTime}" />
+                                    </DataTemplate>
+                                </DataGrid.Resources>
 
-                                <DataGridTextColumn Binding="{Binding LatestReleaseDate, StringFormat='{}{0:dd MMMM yyyy}'}" Header="Latest Release Date" />
-                                <DataGridTextColumn Binding="{Binding LatestReleaseCount}" Header="Tracks" />
-                                <DataGridTextColumn Binding="{Binding Tracks.Count}" Header="Total Tracks" />
-                            </DataGrid.Columns>
-                        </DataGrid>
+                                <DataGrid.Columns>
+                                    <DataGridTemplateColumn CellTemplate="{StaticResource ImageColumnTemplate}" />
+                                    <DataGridTextColumn Width="*"
+                                                        Binding="{Binding Name}"
+                                                        Header="Artist" />
+
+                                    <DataGridTextColumn Binding="{Binding LatestReleaseDate, StringFormat='{}{0:dd MMMM yyyy}'}" Header="Latest Release Date" />
+                                    <DataGridTextColumn Binding="{Binding LatestReleaseCount}" Header="Tracks" />
+                                    <DataGridTextColumn Binding="{Binding Tracks.Count}" Header="Total Tracks" />
+                                </DataGrid.Columns>
+                            </DataGrid>
+
+                            <ProgressBar xf:Animations.Primary="{xf:Animate BasedOn={StaticResource FadeIn},
+                                                                            Event=Visibility}"
+                                         IsIndeterminate="True"
+                                         Value="0">
+                                <ProgressBar.Style>
+                                    <Style BasedOn="{StaticResource MaterialDesignCircularProgressBar}" TargetType="{x:Type ProgressBar}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsLoading}" Value="false">
+                                                <Setter Property="Visibility" Value="Hidden" />
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding IsLoading}" Value="true">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ProgressBar.Style>
+                            </ProgressBar>
+                        </Grid>
+
                     </GroupBox>
 
                     <!--  Genres  -->
