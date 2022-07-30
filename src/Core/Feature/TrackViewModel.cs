@@ -19,7 +19,7 @@ namespace SoftThorn.Monstercat.Browser.Core
         private string _artistsTitle = default!;
 
         [ObservableProperty]
-        private DateTime _debutDate;
+        private DateTime? _debutDate;
 
         [ObservableProperty]
         private DateTime _releaseDate;
