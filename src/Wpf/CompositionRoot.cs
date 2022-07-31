@@ -51,17 +51,18 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             container.Register<Shell>(Reuse.Singleton);
 
             // viewmodels
+            container.Register<ShellViewModel>(Reuse.Singleton);
             container.Register<LoginViewModel>(Reuse.Transient);
             container.Register<SearchViewModel>(Reuse.Transient);
 
             container.Register<AboutViewModel>(Reuse.Singleton);
             container.Register<SettingsViewModel>(Reuse.Singleton);
             container.Register<DownloadViewModel>(Reuse.Singleton);
-            container.Register<ShellViewModel>(Reuse.Singleton);
             container.Register<ReleasesViewModel>(Reuse.Singleton);
             container.Register<TagsViewModel>(Reuse.Singleton);
             container.Register<GenresViewModel>(Reuse.Singleton);
             container.Register<ArtistsViewModel>(Reuse.Singleton);
+
             container.Register<BrandViewModel<Instinct>>(Reuse.Singleton);
             container.Register<BrandViewModel<Uncaged>>(Reuse.Singleton);
             container.Register<BrandViewModel<Silk>>(Reuse.Singleton);
@@ -86,7 +87,7 @@ namespace SoftThorn.Monstercat.Browser.Wpf
 
             // logging
             var log = new LoggerConfiguration()
-                .MinimumLevel.Is(LogEventLevel.Verbose)
+                .MinimumLevel.Is(LogEventLevel.Debug)
                 .Enrich.FromLogContext()
                 .Enrich.WithMachineName()
                 .Enrich.WithEnvironmentName()
@@ -95,7 +96,7 @@ namespace SoftThorn.Monstercat.Browser.Wpf
                 .Enrich.WithThreadName()
                 .Enrich.WithProcessId()
                 .Enrich.WithProcessName()
-                .WriteTo.Debug()
+                .WriteTo.Debug(outputTemplate: "[{Timestamp:HH:mm:ss}] [{Level:u3}] {SourceContext} {Message:lj}{NewLine}{Exception}")
                 .CreateLogger();
 
             container.RegisterInstance<ILogger>(log);

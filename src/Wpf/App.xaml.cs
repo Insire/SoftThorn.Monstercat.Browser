@@ -1,7 +1,9 @@
 using DryIoc;
 using Jot;
 using SoftThorn.Monstercat.Browser.Core;
+using System;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace SoftThorn.Monstercat.Browser.Wpf
@@ -19,6 +21,14 @@ namespace SoftThorn.Monstercat.Browser.Wpf
         {
             base.OnStartup(e);
 
+            // exception handling
+            var currentDomain = AppDomain.CurrentDomain;
+            currentDomain.UnhandledException += OnUnhandledException;
+
+            App.Current.Dispatcher.UnhandledException += OnUnhandledException;
+            TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
+
+            // startup
             var container = _container = CompositionRoot.Get();
 
             var settingsViewModel = container.Resolve<SettingsViewModel>();
@@ -48,6 +58,24 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             _container?.Dispose();
 
             base.OnExit(e);
+        }
+
+        private static void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            if (e.ExceptionObject is Exception exception)
+            {
+                Serilog.Log.Error(exception, "AppDomain.CurrentDomain.UnhandledException");
+            }
+        }
+
+        private static void OnUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+        {
+            Serilog.Log.Error(e.Exception, "App.Current.Dispatcher.UnhandledException");
+        }
+
+        private static void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
+        {
+            Serilog.Log.Error(e.Exception, "TaskScheduler.UnobservedTaskException");
         }
     }
 }
