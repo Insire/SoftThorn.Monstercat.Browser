@@ -1,4 +1,5 @@
 using Microsoft.IO;
+using Serilog;
 using System;
 using System.IO;
 using System.Net.Http;
@@ -18,13 +19,16 @@ namespace SoftThorn.Monstercat.Browser.Core
         protected HttpClient HttpClient { get; }
 
         protected RecyclableMemoryStreamManager StreamManager { get; }
+
         public IImageFactory<T> ImageFactory { get; }
+
+        protected ILogger Log { get; }
 
         /// <summary>
         /// Initializes a new instance with new <see cref="HttpClient"/> instance
         /// </summary>
-        public BaseWebImageLoader(RecyclableMemoryStreamManager streamManager, IImageFactory<T> imageFactory)
-            : this(new HttpClient(), streamManager, imageFactory, true)
+        public BaseWebImageLoader(ILogger log, RecyclableMemoryStreamManager streamManager, IImageFactory<T> imageFactory)
+            : this(log, new HttpClient(), streamManager, imageFactory, true)
         {
         }
 
@@ -33,8 +37,9 @@ namespace SoftThorn.Monstercat.Browser.Core
         /// </summary>
         /// <param name="httpClient">The HttpMessageHandler responsible for processing the HTTP response messages.</param>
         /// <param name="disposeHttpClient">true if the inner handler should be disposed of by Dispose; false if you intend to reuse the HttpClient.</param>
-        public BaseWebImageLoader(HttpClient httpClient, RecyclableMemoryStreamManager streamManager, IImageFactory<T> imageFactory, bool disposeHttpClient)
+        public BaseWebImageLoader(ILogger log, HttpClient httpClient, RecyclableMemoryStreamManager streamManager, IImageFactory<T> imageFactory, bool disposeHttpClient)
         {
+            Log = log;
             HttpClient = httpClient;
             StreamManager = streamManager;
             ImageFactory = imageFactory;
@@ -52,7 +57,7 @@ namespace SoftThorn.Monstercat.Browser.Core
         /// </summary>
         /// <param name="url">Target url</param>
         /// <returns>Bitmap</returns>
-        protected virtual async Task<T?> LoadAsync(Uri? url)
+        protected async Task<T?> LoadAsync(Uri? url)
         {
             var internalOrCachedBitmap = await LoadFromInternalAsync(url) ?? await LoadFromGlobalCache(url);
             if (internalOrCachedBitmap is not null)
@@ -70,24 +75,23 @@ namespace SoftThorn.Monstercat.Browser.Core
 
                 using (externalBytes)
                 {
-                    var bitmap = ImageFactory.From(externalBytes);
+                    var bitmap = await Task.Run(() => ImageFactory.From(externalBytes));
 
                     await SaveToGlobalCache(url, externalBytes);
                     return bitmap;
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                Log.Error(ex, "[LOAD] {Url} failed", url);
                 return null;
             }
         }
 
         /// <summary>
         /// Receives image bytes from an internal source (for example, from the disk).
-        /// This data will be NOT cached globally (because it is assumed that it is already in internal source us and does not require global caching)
+        /// This data will be NOT cached globally (because it is assumed that it is already in internal source and does not require global caching)
         /// </summary>
-        /// <param name="url">Target url</param>
-        /// <returns>Bitmap</returns>
         protected virtual Task<T?> LoadFromInternalAsync(Uri? url)
         {
             if (url?.Scheme.Equals("HTTPS", StringComparison.InvariantCultureIgnoreCase) != false || url.Scheme.Equals("HTTP", StringComparison.InvariantCultureIgnoreCase))
@@ -97,10 +101,12 @@ namespace SoftThorn.Monstercat.Browser.Core
 
             try
             {
-                return Task.FromResult(ImageFactory.From(url))!;
+                Log.Verbose("[LOADINTERNAL] {Url}", url);
+                return Task.Run(() => ImageFactory.From(url))!;
             }
-            catch
+            catch (Exception ex)
             {
+                Log.Error(ex, "[LOADINTERNAL] {Url} failed", url);
                 return Task.FromResult<T?>(null);
             }
         }
@@ -111,28 +117,33 @@ namespace SoftThorn.Monstercat.Browser.Core
         /// </summary>
         /// <param name="url">Target url</param>
         /// <returns>Image bytes</returns>
-        protected virtual async Task<Stream?> LoadDataFromExternalAsync(Uri? url)
+        protected virtual Task<Stream?> LoadDataFromExternalAsync(Uri? url)
         {
             if (url is null)
             {
-                return null;
+                return Task.FromResult<Stream?>(null);
             }
 
             try
             {
-                var resultStream = StreamManager.GetStream();
-
-                using (var stream = await HttpClient.GetStreamAsync(url))
+                return Task.Run<Stream?>(async () =>
                 {
-                    await stream.CopyToAsync(resultStream);
+                    Log.Verbose("[LOADEXTERNAL] for {Url}", url);
+                    var resultStream = StreamManager.GetStream();
 
-                    resultStream.Seek(0, SeekOrigin.Begin);
-                    return resultStream;
-                }
+                    using (var stream = await HttpClient.GetStreamAsync(url))
+                    {
+                        await stream.CopyToAsync(resultStream);
+
+                        resultStream.Seek(0, SeekOrigin.Begin);
+                        return resultStream;
+                    }
+                });
             }
-            catch
+            catch (Exception ex)
             {
-                return null;
+                Log.Error(ex, "[LOADEXTERNAL] {Url} failed", url);
+                return Task.FromResult<Stream?>(null);
             }
         }
 

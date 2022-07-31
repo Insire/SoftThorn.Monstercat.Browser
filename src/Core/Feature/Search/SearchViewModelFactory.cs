@@ -1,5 +1,4 @@
 using CommunityToolkit.Mvvm.Messaging;
-using SoftThorn.MonstercatNet;
 using System;
 using System.Collections.Generic;
 using System.Linq;

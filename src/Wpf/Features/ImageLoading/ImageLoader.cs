@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IO;
 using SoftThorn.Monstercat.Browser.Core;
 using System;
@@ -13,7 +14,7 @@ namespace SoftThorn.Monstercat.Browser.Wpf
     {
         public static RecyclableMemoryStreamManager Manager { get; set; } = new RecyclableMemoryStreamManager();
         public static IImageFactory<BitmapSource> ImageFactory { get; set; } = new ImageFactory();
-        public static IAsyncImageLoader<BitmapSource> AsyncImageLoader { get; set; } = new DiskCachedWebImageLoader<BitmapSource>(Manager, ImageFactory, GetCacheDirectory(), createFolder: true);
+        public static Lazy<IAsyncImageLoader<BitmapSource>> AsyncImageLoader { get; set; } = new Lazy<IAsyncImageLoader<BitmapSource>>(() => new DiskCachedWebImageLoader<BitmapSource>(Serilog.Log.Logger, new MemoryCache(new MemoryCacheOptions()), Manager, ImageFactory, GetCacheDirectory(), createFolder: true));
 
         private static string GetCacheDirectory()
         {
@@ -85,7 +86,7 @@ namespace SoftThorn.Monstercat.Browser.Wpf
         {
             SetIsLoading(sender, true);
 
-            var bitmap = await AsyncImageLoader.ProvideImageAsync(url);
+            var bitmap = await AsyncImageLoader.Value.ProvideImageAsync(url);
             if (GetSource(sender) != url)
             {
                 return;

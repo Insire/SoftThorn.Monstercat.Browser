@@ -5,6 +5,8 @@ using Gress;
 using Jot;
 using Jot.Storage;
 using Microsoft.Extensions.Configuration;
+using Serilog;
+using Serilog.Events;
 using SoftThorn.Monstercat.Browser.Core;
 using SoftThorn.MonstercatNet;
 using System;
@@ -81,6 +83,23 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             container.Register<WindowService>(Reuse.Singleton);
             container.RegisterInstance(BlobCache.Secure);
             container.RegisterInstance(BlobCache.UserAccount);
+
+            // logging
+            var log = new LoggerConfiguration()
+                .MinimumLevel.Is(LogEventLevel.Verbose)
+                .Enrich.FromLogContext()
+                .Enrich.WithMachineName()
+                .Enrich.WithEnvironmentName()
+                .Enrich.WithEnvironmentUserName()
+                .Enrich.WithThreadId()
+                .Enrich.WithThreadName()
+                .Enrich.WithProcessId()
+                .Enrich.WithProcessName()
+                .WriteTo.Debug()
+                .CreateLogger();
+
+            container.RegisterInstance<ILogger>(log);
+            Log.Logger = log;
 
             return container;
         }

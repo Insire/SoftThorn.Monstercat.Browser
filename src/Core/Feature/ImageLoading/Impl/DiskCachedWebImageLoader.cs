@@ -1,4 +1,6 @@
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IO;
+using Serilog;
 using System;
 using System.IO;
 using System.Net.Http;
@@ -17,8 +19,8 @@ namespace SoftThorn.Monstercat.Browser.Core
     {
         private readonly string _cacheFolder;
 
-        public DiskCachedWebImageLoader(RecyclableMemoryStreamManager streamManager, IImageFactory<T> imageFactory, string cacheFolder = "Cache/Images/", bool createFolder = false)
-            : base(streamManager, imageFactory)
+        public DiskCachedWebImageLoader(ILogger log, MemoryCache memoryCache, RecyclableMemoryStreamManager streamManager, IImageFactory<T> imageFactory, string cacheFolder = "Cache/Images/", bool createFolder = false)
+            : base(log.ForContext<DiskCachedWebImageLoader<T>>(), memoryCache, streamManager, imageFactory)
         {
             _cacheFolder = cacheFolder;
 
@@ -28,8 +30,8 @@ namespace SoftThorn.Monstercat.Browser.Core
             }
         }
 
-        public DiskCachedWebImageLoader(HttpClient httpClient, RecyclableMemoryStreamManager streamManager, IImageFactory<T> imageFactory, bool disposeHttpClient, string cacheFolder = "Cache/Images/", bool createFolder = false)
-            : base(httpClient, streamManager, imageFactory, disposeHttpClient)
+        public DiskCachedWebImageLoader(ILogger log, MemoryCache memoryCache, HttpClient httpClient, RecyclableMemoryStreamManager streamManager, IImageFactory<T> imageFactory, bool disposeHttpClient, string cacheFolder = "Cache/Images/", bool createFolder = false)
+            : base(log.ForContext<DiskCachedWebImageLoader<T>>(), httpClient, memoryCache, streamManager, imageFactory, disposeHttpClient)
         {
             _cacheFolder = cacheFolder;
 
@@ -51,10 +53,11 @@ namespace SoftThorn.Monstercat.Browser.Core
             var path = Path.Combine(_cacheFolder, md5);
             if (!File.Exists(path))
             {
+                Log.Verbose("[CACHEMISS] for {Url}", url);
                 return null;
             }
 
-            return ImageFactory.From(path);
+            return await Task.Run(() => ImageFactory.From(path));
         }
 
         protected override async Task SaveToGlobalCache(Uri? url, Stream imageBytes)
@@ -63,15 +66,16 @@ namespace SoftThorn.Monstercat.Browser.Core
             var path = Path.Combine(_cacheFolder, md5);
 
             imageBytes.Seek(0, SeekOrigin.Begin);
+
             using var fileStream = File.OpenWrite(path);
             await imageBytes.CopyToAsync(fileStream);
         }
 
-        protected Task<string> CreateMD5(Uri? input)
+        protected async Task<string> CreateMD5(Uri? input)
         {
             if (input is null)
             {
-                return Task.FromResult(string.Empty);
+                return string.Empty;
             }
 
             using var resultStream = StreamManager.GetStream();
@@ -79,16 +83,16 @@ namespace SoftThorn.Monstercat.Browser.Core
             resultStream.Write(bytes, 0, bytes.Length);
             resultStream.Seek(0, SeekOrigin.Begin);
 
-            return Calculate(resultStream);
+            return await Calculate(resultStream);
+        }
 
-            static async Task<string> Calculate(Stream data)
+        private static async Task<string> Calculate(Stream data)
+        {
+            using (var instance = MD5.Create())
             {
-                using (var instance = MD5.Create())
-                {
-                    var hashBytes = await instance.ComputeHashAsync(data).ConfigureAwait(false);
+                var hashBytes = await instance.ComputeHashAsync(data).ConfigureAwait(false);
 
-                    return Convert.ToHexString(hashBytes);
-                }
+                return Convert.ToHexString(hashBytes);
             }
         }
     }

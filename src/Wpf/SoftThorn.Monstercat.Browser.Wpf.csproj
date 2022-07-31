@@ -17,7 +17,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Content Include="..\..\assets\icons\Material-Play.ico" />
+        <Content Include="..\..\assets\icons\Material-Play.ico" />
     </ItemGroup>
 
     <ItemGroup>
@@ -30,8 +30,10 @@
 
     <ItemGroup>
         <PackageReference Include="DryIoc.dll" Version="5.1.0" />
+        <PackageReference Include="Magick.NET-Q8-AnyCPU" Version="11.3.0" />
         <PackageReference Include="NAudio" Version="2.1.0" />
 
+        <!--WPF -->
         <PackageReference Include="Jot" Version="2.1.13" />
         <PackageReference Include="Ookii.Dialogs.Wpf" Version="5.0.1" />
         <PackageReference Include="MahApps.Metro.IconPacks.FontAwesome" Version="4.11.0" />
@@ -39,7 +41,16 @@
         <PackageReference Include="MahApps.Metro" Version="2.4.9" />
         <PackageReference Include="LiveChartsCore.SkiaSharpView.WPF" Version="2.0.0-beta.300" />
         <PackageReference Include="XamlFlair.WPF" Version="1.2.13" />
+        <PackageReference Include="Magick.NET.SystemWindowsMedia" Version="5.1.0" />
 
+        <!--Logging-->
+        <PackageReference Include="Serilog" Version="2.11.0" />
+        <PackageReference Include="Serilog.Sinks.Debug" Version="2.0.0" />
+        <PackageReference Include="Serilog.Enrichers.Environment" Version="2.2.0" />
+        <PackageReference Include="Serilog.Enrichers.Process" Version="2.0.2" />
+        <PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0" />
+
+        <!--Misc-->
         <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="6.0.0" />
         <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="6.0.1" />
 

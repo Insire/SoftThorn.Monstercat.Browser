@@ -43,6 +43,8 @@ namespace SoftThorn.Monstercat.Browser.Wpf
 
             Akavache.BlobCache.Shutdown().Wait();
 
+            Serilog.Log.CloseAndFlush();
+
             _container?.Dispose();
 
             base.OnExit(e);
