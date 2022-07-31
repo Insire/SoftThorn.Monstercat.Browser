@@ -29,7 +29,7 @@ namespace SoftThorn.Monstercat.Browser.Core
         public Axis[] XAxes { get; }
         public Axis[] YAxes { get; }
 
-        public TagsViewModel(SynchronizationContext synchronizationContext, TrackRepository trackRepository, IMessenger messenger)
+        public TagsViewModel(SynchronizationContext synchronizationContext, ITrackRepository trackRepository, IMessenger messenger)
             : base(messenger)
         {
             _seriesCollection = new ObservableCollectionExtended<ISeries>();

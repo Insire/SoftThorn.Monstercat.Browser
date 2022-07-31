@@ -1,10 +1,19 @@
-using SoftThorn.MonstercatNet;
 using System.Threading.Tasks;
 
 namespace SoftThorn.Monstercat.Browser.Core
 {
     public interface IPlaybackService
     {
-        Task Play(TrackStreamRequest request);
+        Task Play(IPlaybackItem request, int volume);
+
+        void Pause();
+
+        void Play();
+
+        StreamingPlaybackState GetPlaybackState();
+
+        int GetVolume();
+
+        void SetVolume(int volume);
     }
 }

@@ -21,7 +21,7 @@ namespace SoftThorn.Monstercat.Browser.Core
 
         public ReadOnlyObservableCollection<ArtistViewModel> Artists { get; }
 
-        public ArtistsViewModel(SynchronizationContext synchronizationContext, TrackRepository trackRepository, IMessenger messenger)
+        public ArtistsViewModel(SynchronizationContext synchronizationContext, ITrackRepository trackRepository, IMessenger messenger)
             : base(messenger)
         {
             _artists = new ObservableCollectionExtended<ArtistViewModel>();

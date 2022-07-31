@@ -35,15 +35,18 @@ namespace SoftThorn.Monstercat.Browser.Avalonia
             // viewmodels
             container.Register<LoginViewModel>(Reuse.Transient);
             container.Register<SearchViewModel>(Reuse.Transient);
+            container.Register<ShellViewModel>(Reuse.Singleton);
 
             container.Register<AboutViewModel>(Reuse.Singleton);
             container.Register<SettingsViewModel>(Reuse.Singleton);
             container.Register<DownloadViewModel>(Reuse.Singleton);
-            container.Register<ShellViewModel>(Reuse.Singleton);
+            container.Register<PlaybackViewModel>(Reuse.Singleton);
+
             container.Register<ReleasesViewModel>(Reuse.Singleton);
             container.Register<TagsViewModel>(Reuse.Singleton);
             container.Register<GenresViewModel>(Reuse.Singleton);
             container.Register<ArtistsViewModel>(Reuse.Singleton);
+
             container.Register<BrandViewModel<Instinct>>(Reuse.Singleton);
             container.Register<BrandViewModel<Uncaged>>(Reuse.Singleton);
             container.Register<BrandViewModel<Silk>>(Reuse.Singleton);

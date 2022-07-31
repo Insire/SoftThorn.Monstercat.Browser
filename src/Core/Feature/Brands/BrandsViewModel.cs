@@ -26,7 +26,7 @@ namespace SoftThorn.Monstercat.Browser.Core
 
         public ReadOnlyObservableCollection<TrackViewModel> Releases { get; }
 
-        public BrandViewModel(SynchronizationContext synchronizationContext, TrackRepository trackRepository)
+        public BrandViewModel(SynchronizationContext synchronizationContext, ITrackRepository trackRepository)
         {
             _brand = new T();
             _releases = new ObservableCollectionExtended<TrackViewModel>();

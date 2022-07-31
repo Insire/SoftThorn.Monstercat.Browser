@@ -65,7 +65,7 @@ namespace SoftThorn.Monstercat.Browser.Core
         public SettingsViewModel(
             SynchronizationContext synchronizationContext,
             SettingsService settingsService,
-            TrackRepository trackRepository,
+            ITrackRepository trackRepository,
             IMessenger messenger)
         {
             if (synchronizationContext is null)

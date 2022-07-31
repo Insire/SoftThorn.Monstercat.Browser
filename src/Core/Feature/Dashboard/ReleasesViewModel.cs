@@ -21,7 +21,7 @@ namespace SoftThorn.Monstercat.Browser.Core
 
         public ReadOnlyObservableCollection<ReleaseViewModel> Releases { get; }
 
-        public ReleasesViewModel(SynchronizationContext synchronizationContext, TrackRepository trackRepository, IMessenger messenger)
+        public ReleasesViewModel(SynchronizationContext synchronizationContext, ITrackRepository trackRepository, IMessenger messenger)
             : base(messenger)
         {
             _releases = new ObservableCollectionExtended<ReleaseViewModel>();

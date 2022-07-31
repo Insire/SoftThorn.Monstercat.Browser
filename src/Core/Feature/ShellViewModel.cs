@@ -2,16 +2,15 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Gress;
-using SoftThorn.MonstercatNet;
 using System;
+using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace SoftThorn.Monstercat.Browser.Core
 {
     public sealed partial class ShellViewModel : ObservableRecipient
     {
-        private readonly TrackRepository _trackRepository;
-        private readonly IPlaybackService _playbackService;
+        private readonly ITrackRepository _trackRepository;
 
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(RefreshCommand))]
@@ -40,6 +39,8 @@ namespace SoftThorn.Monstercat.Browser.Core
 
         public ArtistsViewModel Artists { get; }
 
+        public PlaybackViewModel Playback { get; }
+
         public ProgressContainer<Percentage> Progress { get; }
 
         public BrandViewModel<Silk> Silk { get; }
@@ -48,6 +49,8 @@ namespace SoftThorn.Monstercat.Browser.Core
 
         public BrandViewModel<Instinct> Instinct { get; }
 
+        public IAsyncRelayCommand PlayCommand { get; }
+
         public ShellViewModel(
             AboutViewModel about,
             SettingsViewModel settings,
@@ -55,8 +58,8 @@ namespace SoftThorn.Monstercat.Browser.Core
             TagsViewModel tags,
             GenresViewModel genres,
             ArtistsViewModel artists,
-            TrackRepository trackRepository,
-            IPlaybackService playbackService,
+            ITrackRepository trackRepository,
+            PlaybackViewModel playback,
             DownloadViewModel downloadViewModel,
             ProgressContainer<Percentage> progress,
             BrandViewModel<Silk> silk,
@@ -72,7 +75,7 @@ namespace SoftThorn.Monstercat.Browser.Core
             Genres = genres ?? throw new ArgumentNullException(nameof(genres));
             Artists = artists ?? throw new ArgumentNullException(nameof(artists));
             _trackRepository = trackRepository ?? throw new ArgumentNullException(nameof(trackRepository));
-            _playbackService = playbackService ?? throw new ArgumentNullException(nameof(playbackService));
+            Playback = playback ?? throw new ArgumentNullException(nameof(playback));
             Downloads = downloadViewModel ?? throw new ArgumentNullException(nameof(downloadViewModel));
             Progress = progress ?? throw new ArgumentNullException(nameof(progress));
             Silk = silk ?? throw new ArgumentNullException(nameof(silk));
@@ -86,26 +89,33 @@ namespace SoftThorn.Monstercat.Browser.Core
             {
                 r.IsLoggedIn = m.IsLoggedIn;
             });
+
+            PlayCommand = new AsyncRelayCommand<object?>(Play, CanPlay, AsyncRelayCommandOptions.AllowConcurrentExecutions);
         }
 
-        [RelayCommand(AllowConcurrentExecutions = false, CanExecute = nameof(CanPlay))]
-        public async Task Play(object args)
+        public async Task Play(object? args)
         {
-            if (args is TrackViewModel track)
+            switch (args)
             {
-                var request = new TrackStreamRequest()
-                {
-                    TrackId = track.Id,
-                    ReleaseId = track.Release.Id,
-                };
+                case TrackViewModel track:
+                    await Playback.Add(track);
+                    return;
 
-                await _playbackService.Play(request);
+                case ReleaseViewModel release:
+                    await Playback.Add(release.Tracks);
+                    break;
+
+                case ArtistViewModel artist:
+                    await Playback.Add(artist.Tracks);
+                    break;
             }
         }
 
-        private bool CanPlay(object args)
+        private static bool CanPlay(object? args)
         {
-            return args is TrackViewModel;
+            return args is TrackViewModel
+                || args is ReleaseViewModel
+                || args is ArtistViewModel;
         }
 
         [RelayCommand(AllowConcurrentExecutions = false)]

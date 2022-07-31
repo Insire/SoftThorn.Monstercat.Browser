@@ -11,10 +11,10 @@ namespace SoftThorn.Monstercat.Browser.Core
     public sealed class SearchViewModelFactory
     {
         private readonly SynchronizationContext _synchronizationContext;
-        private readonly TrackRepository _trackRepository;
+        private readonly ITrackRepository _trackRepository;
         private readonly IMessenger _messenger;
 
-        public SearchViewModelFactory(SynchronizationContext synchronizationContext, TrackRepository trackRepository, IMessenger messenger)
+        public SearchViewModelFactory(SynchronizationContext synchronizationContext, ITrackRepository trackRepository, IMessenger messenger)
         {
             _synchronizationContext = synchronizationContext ?? throw new ArgumentNullException(nameof(synchronizationContext));
             _trackRepository = trackRepository ?? throw new ArgumentNullException(nameof(trackRepository));

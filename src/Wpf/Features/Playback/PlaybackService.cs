@@ -1,61 +1,65 @@
+using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging.Messages;
 using NAudio.Wave;
+using Serilog;
 using SoftThorn.Monstercat.Browser.Core;
 using SoftThorn.MonstercatNet;
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Threading;
 
 namespace SoftThorn.Monstercat.Browser.Wpf
 {
     internal sealed class PlaybackService : IPlaybackService
     {
+        private readonly SynchronizationContext _synchronizationContext;
         private readonly DispatcherTimer _timer;
+        private readonly IMessenger _messenger;
+        private readonly ILogger _logger;
         private readonly IMonstercatApi _api;
 
         private volatile StreamingPlaybackState _playbackState;
-        private volatile bool _fullyDownloaded;
+        private volatile bool _fullyProcessed;
+        private volatile IPlaybackItem? _playbackItem;
 
-        private VolumeWaveProvider16? _volumeProvider;
-        private BufferedWaveProvider? _bufferedWaveProvider;
-        private IWavePlayer? _waveOut;
         private CancellationTokenSource? _cancellationTokenSource;
 
-        private bool IsBufferNearlyFull => _bufferedWaveProvider != null
-            && _bufferedWaveProvider.BufferLength - _bufferedWaveProvider.BufferedBytes < _bufferedWaveProvider.WaveFormat.AverageBytesPerSecond / 4;
+        private PlaybackInfrastructure? _playbackInfrastructure;
 
-        private static IMp3FrameDecompressor CreateFrameDecompressor(Mp3Frame frame)
-        {
-            var waveFormat = new Mp3WaveFormat(frame.SampleRate, frame.ChannelMode == ChannelMode.Mono ? 1 : 2, frame.FrameLength, frame.BitRate);
-            return new AcmMp3FrameDecompressor(waveFormat);
-        }
-
-        public PlaybackService(IMonstercatApi api, DispatcherTimer timer)
+        public PlaybackService(SynchronizationContext synchronizationContext, DispatcherTimer timer, IMessenger messenger, ILogger logger, IMonstercatApi api)
         {
             _api = api;
+            _synchronizationContext = synchronizationContext;
             _timer = timer;
+            _messenger = messenger;
+            _logger = logger.ForContext<PlaybackService>();
             _timer.Tick += OnTimerTick;
         }
 
-        public async Task Play(TrackStreamRequest request)
+        public StreamingPlaybackState GetPlaybackState()
+        {
+            return _playbackState;
+        }
+
+        public async Task Play(IPlaybackItem item, int volume)
         {
             switch (_playbackState)
             {
                 case StreamingPlaybackState.Stopped:
                     {
-                        _playbackState = StreamingPlaybackState.Buffering;
-                        _bufferedWaveProvider = null;
+                        SetPlaybackState(StreamingPlaybackState.Buffering);
 
                         _cancellationTokenSource?.Dispose();
-
                         _cancellationTokenSource = new CancellationTokenSource();
 
-                        using (var stream = await _api.StreamTrackAsStream(request))
+                        _logger.Debug("fetching stream");
+                        //using (var stream = await _api.StreamTrackAsStream(item.GetStreamRequest()))
+                        using (var stream = File.OpenRead(@"C:\Users\peter\OneDrive\Desktop\mixkit-crickets-and-insects-in-the-wild-ambience-39.mp3"))
                         {
-                            var task = Task.Run(() => Play(stream, _cancellationTokenSource.Token), _cancellationTokenSource.Token);
+                            _playbackItem = item;
+                            var task = Task.Run(() => PlayBackLoop(stream, volume, _cancellationTokenSource.Token), _cancellationTokenSource.Token);
                             _timer.Start();
                             await task;
                         }
@@ -64,7 +68,7 @@ namespace SoftThorn.Monstercat.Browser.Wpf
                     }
 
                 case StreamingPlaybackState.Paused:
-                    _playbackState = StreamingPlaybackState.Buffering;
+                    SetPlaybackState(StreamingPlaybackState.Buffering);
                     break;
 
                 case StreamingPlaybackState.Playing:
@@ -73,154 +77,144 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             }
         }
 
-        private async Task Play(Stream stream, CancellationToken token)
+        private async Task PlayBackLoop(Stream stream, int volume, CancellationToken token)
         {
-            IMp3FrameDecompressor? decompressor = null;
-            var buffer = new byte[16384 * 4]; // needs to be big enough to hold a decompressed frame
+            _logger.Debug("starting playback");
 
             try
             {
-                using var responseStream = stream;
-
-                var readFullyStream = new ReadFullyStream(responseStream);
-                do
+                using (var readFullyStream = new ReadFullyStream(stream, _logger))
                 {
-                    if (token.IsCancellationRequested)
+                    PlaybackInfrastructure? infrastructure = null;
+                    do
                     {
-                        return;
-                    }
-
-                    if (IsBufferNearlyFull)
-                    {
-                        Debug.WriteLine("Buffer getting full, taking a break");
-                        await Task.Delay(500, token);
-                    }
-                    else
-                    {
-                        Mp3Frame? frame;
-                        try
+                        if (token.IsCancellationRequested)
                         {
-                            frame = Mp3Frame.LoadFromStream(readFullyStream);
+                            return;
                         }
-                        catch (EndOfStreamException)
+
+                        if (infrastructure?.IsBufferNearlyFull() == true)
                         {
-                            _fullyDownloaded = true;
-                            // reached the end of the MP3 file / stream
+                            // pause processing
+                            await Task.Delay(500, token);
+                            continue;
+                        }
+
+                        if (!PlaybackInfrastructure.TryGetMp3Frame(readFullyStream, out var frame))
+                        {
+                            // stop processing
                             break;
                         }
 
-                        if (frame is null)
+                        if (infrastructure is null)
                         {
-                            break;
+                            _playbackInfrastructure = infrastructure = PlaybackInfrastructure.Create(_synchronizationContext, _logger, frame, volume);
                         }
 
-                        if (decompressor is null)
-                        {
-                            // don't think these details matter too much - just help ACM select the right codec
-                            // however, the buffered provider doesn't know what sample rate it is working at
-                            // until we have a frame
-                            decompressor = CreateFrameDecompressor(frame);
-                            _bufferedWaveProvider = new BufferedWaveProvider(decompressor.OutputFormat)
-                            {
-                                BufferDuration = TimeSpan.FromSeconds(20) // allow us to get well ahead of ourselves
-                            };
-                            //this.bufferedWaveProvider.BufferedDuration = 250;
-                        }
-
-                        var decompressed = decompressor.DecompressFrame(frame, buffer, 0);
-                        Debug.WriteLine(string.Format("Decompressed a frame {0}", decompressed));
-                        _bufferedWaveProvider?.AddSamples(buffer, 0, decompressed);
+                        infrastructure.ProcessFrame(frame);
                     }
-                } while (_playbackState != StreamingPlaybackState.Stopped);
+                    while (_playbackState != StreamingPlaybackState.Stopped);
 
-                Debug.WriteLine("Exiting");
-                // was doing this in a finally block, but for some reason
-                // we are hanging on response stream .Dispose so never get there
-                decompressor?.Dispose();
+                    _logger.Debug("stream has finished processeing");
+                }
             }
             finally
             {
-                _bufferedWaveProvider = null;
-                decompressor?.Dispose();
-            }
-        }
-
-        private static IWavePlayer CreateWaveOut()
-        {
-            return new WaveOut();
-        }
-
-        private void OnPlaybackStopped(object? sender, StoppedEventArgs e)
-        {
-            Debug.WriteLine("Playback Stopped");
-            if (e.Exception != null)
-            {
-                MessageBox.Show(string.Format("Playback Error {0}", e.Exception.Message));
+                _fullyProcessed = true;
             }
         }
 
         private void OnTimerTick(object? sender, EventArgs e)
         {
-            if (_playbackState != StreamingPlaybackState.Stopped)
+            if (_playbackInfrastructure == null)
             {
-                if (_waveOut == null && _bufferedWaveProvider != null)
-                {
-                    Debug.WriteLine("Creating WaveOut Device");
+                return;
+            }
 
-                    _waveOut = CreateWaveOut();
-                    _waveOut.PlaybackStopped += OnPlaybackStopped;
-                    _volumeProvider = new VolumeWaveProvider16(_bufferedWaveProvider)
-                    {
-                        Volume = 0.5f
-                    };
-                    _waveOut.Init(_volumeProvider);
-                }
-                else if (_bufferedWaveProvider != null)
+            if (_playbackState != StreamingPlaybackState.Buffering)
+            {
+                switch (_playbackInfrastructure.GetState())
                 {
-                    var bufferedSeconds = _bufferedWaveProvider.BufferedDuration.TotalSeconds;
+                    case PlaybackState.Stopped:
+                        _messenger.Send(new ValueChangedMessage<StreamingPlaybackState>(StreamingPlaybackState.Stopped));
+                        break;
 
-                    // make it stutter less if we buffer up a decent amount before playing
-                    if (bufferedSeconds < 0.5 && _playbackState == StreamingPlaybackState.Playing && !_fullyDownloaded)
-                    {
-                        Pause();
-                    }
-                    else if (bufferedSeconds > 4 && _playbackState == StreamingPlaybackState.Buffering)
-                    {
-                        Play();
-                    }
-                    else if (_fullyDownloaded && bufferedSeconds == 0)
-                    {
-                        Debug.WriteLine("Reached end of stream");
-                        StopPlayback();
-                    }
+                    case PlaybackState.Playing:
+                        _messenger.Send(new ValueChangedMessage<StreamingPlaybackState>(StreamingPlaybackState.Playing));
+                        break;
+
+                    case PlaybackState.Paused:
+                        _messenger.Send(new ValueChangedMessage<StreamingPlaybackState>(StreamingPlaybackState.Paused));
+                        break;
                 }
+            }
+
+            if (_playbackState == StreamingPlaybackState.Stopped || _playbackState == StreamingPlaybackState.Paused)
+            {
+                return;
+            }
+
+            var bufferedSeconds = _playbackInfrastructure.TotalSeconds;
+
+            // make it stutter less if we buffer up a decent amount before playing
+            if (bufferedSeconds < 0.5 && _playbackState == StreamingPlaybackState.Playing && !_fullyProcessed)
+            {
+                _logger.Debug("Pausing to wait for more buffered data");
+                Pause();
+            }
+            else if (bufferedSeconds > 4 && _playbackState == StreamingPlaybackState.Buffering)
+            {
+                Play();
+            }
+            else if (_fullyProcessed && bufferedSeconds == 0)
+            {
+                StopPlayback();
             }
         }
 
-        private void Play()
+        public void Play()
         {
-            _waveOut?.Play();
-            Debug.WriteLine(string.Format("Started playing, waveOut.PlaybackState={0}", _waveOut?.PlaybackState ?? PlaybackState.Stopped));
-            _playbackState = StreamingPlaybackState.Playing;
+            _playbackInfrastructure?.Play();
+            SetPlaybackState(StreamingPlaybackState.Playing);
         }
 
-        private void Pause()
+        public void Pause()
         {
-            _playbackState = StreamingPlaybackState.Buffering;
-            _waveOut?.Pause();
-            Debug.WriteLine(string.Format("Paused to buffer, waveOut.PlaybackState={0}", _waveOut?.PlaybackState ?? PlaybackState.Stopped));
+            _playbackInfrastructure?.Pause();
+            SetPlaybackState(StreamingPlaybackState.Paused);
         }
 
         private void StopPlayback()
         {
-            if (_playbackState != StreamingPlaybackState.Stopped)
+            if (_playbackState == StreamingPlaybackState.Playing)
             {
-                _playbackState = StreamingPlaybackState.Stopped;
+                _playbackInfrastructure?.Dispose();
+                _playbackInfrastructure = null;
 
-                _waveOut?.Stop();
-                _waveOut?.Dispose();
-                _waveOut = null;
+                _playbackItem?.Dispose();
+                _playbackItem = null;
+
+                _timer.Stop();
+                SetPlaybackState(StreamingPlaybackState.Stopped);
             }
+        }
+
+        private void SetPlaybackState(StreamingPlaybackState state)
+        {
+            _playbackState = state;
+
+            _logger.Debug("PlaybackState changed to: {StreamingPlaybackState}", state);
+            _messenger.Send(new ValueChangedMessage<StreamingPlaybackState>(state));
+        }
+
+        public int GetVolume()
+        {
+            return _playbackInfrastructure?.GetVolume() ?? 50;
+        }
+
+        public void SetVolume(int volume)
+        {
+            _playbackInfrastructure?.SetVolume(volume);
         }
     }
 }

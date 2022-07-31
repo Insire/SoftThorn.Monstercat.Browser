@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace SoftThorn.Monstercat.Browser.Core
 {
-    public sealed class TrackRepository : IDisposable
+    public sealed class TrackRepository : IDisposable, ITrackRepository
     {
         private readonly IMonstercatApi _api;
         private readonly SourceCache<KeyValuePair<string, List<TrackViewModel>>, string> _tagCache;
