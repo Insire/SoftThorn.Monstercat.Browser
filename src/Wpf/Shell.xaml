@@ -59,11 +59,12 @@
                         Position="Bottom">
                 <DockPanel Margin="8">
                     <xfc:AnimatedListView xf:Animations.AnimateOnItemsSourceChange="True"
-                                          xf:Animations.AnimateOnLoad="True"
+                                          Background="Transparent"
+                                          BorderThickness="0"
                                           ItemsSource="{Binding Playback.Items}">
                         <xfc:AnimatedListView.ItemContainerStyle>
                             <Style TargetType="{x:Type ListViewItem}">
-                                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                             </Style>
                         </xfc:AnimatedListView.ItemContainerStyle>
                         <ItemsControl.ItemTemplate>
@@ -116,10 +117,14 @@
                                         <TextBlock VerticalAlignment="Center"
                                                    FontSize="16"
                                                    FontWeight="DemiBold"
+                                                   Foreground="Black"
                                                    Text="{Binding Track.Title}" />
-                                        <TextBlock VerticalAlignment="Center" Text="{Binding Track.ArtistsTitle}" />
-                                        <TextBlock VerticalAlignment="Center" Text="{Binding Track.Release.Title}" />
-                                        <TextBlock VerticalAlignment="Center" Text="{Binding IsCurrentlyPlayed}" />
+                                        <TextBlock VerticalAlignment="Center"
+                                                   Foreground="Black"
+                                                   Text="{Binding Track.ArtistsTitle}" />
+                                        <TextBlock VerticalAlignment="Center"
+                                                   Foreground="Black"
+                                                   Text="{Binding Track.Release.Title}" />
                                     </StackPanel>
                                 </DockPanel>
                             </DataTemplate>
@@ -754,7 +759,7 @@
                             Orientation="Vertical"
                             TickFrequency="0.1"
                             TickPlacement="None"
-                            Value="50" />
+                            Value="{Binding Playback.Volume, Mode=TwoWay}" />
                 </materialDesign:PopupBox>
             </Grid>
 

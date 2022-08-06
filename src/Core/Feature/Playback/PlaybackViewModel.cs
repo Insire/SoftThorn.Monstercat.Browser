@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,7 +21,7 @@ namespace SoftThorn.Monstercat.Browser.Core
         private readonly SynchronizationContext _synchronizationContext;
         private readonly IPlaybackService _playbackService;
         private readonly IMessenger _messenger;
-        private readonly IDisposable _subscription;
+        private readonly CompositeDisposable _subscription;
 
         private bool _disposedValue;
         private long _currentSequzence;
@@ -61,7 +62,7 @@ namespace SoftThorn.Monstercat.Browser.Core
         public int Volume
         {
             get { return _volume; }
-            private set { SetProperty(ref _volume, value); }
+            set { SetProperty(ref _volume, value); }
         }
 
         public IObservableCollection<PlaybackItemViewModel> Items { get; }
@@ -80,14 +81,24 @@ namespace SoftThorn.Monstercat.Browser.Core
 
             Items = new ObservableCollectionExtended<PlaybackItemViewModel>();
 
-            _subscription = _sourceCache.Connect()
-                .ObserveOn(TaskPoolScheduler.Default)
-                .DistinctUntilChanged()
-                .SortBy(p => p.Sequence, SortDirection.Ascending, SortOptimisations.ComparesImmutableValuesOnly)
-                .ObserveOn(_synchronizationContext)
-                .Bind(Items)
-                .DisposeMany()
-                .Subscribe();
+            _subscription = new CompositeDisposable(new[]
+            {
+                _sourceCache
+                    .Connect()
+                    .ObserveOn(TaskPoolScheduler.Default)
+                    .DistinctUntilChanged()
+                    .SortBy(p => p.Sequence, SortDirection.Ascending, SortOptimisations.ComparesImmutableValuesOnly)
+                    .ObserveOn(_synchronizationContext)
+                    .Bind(Items)
+                    .DisposeMany()
+                    .Subscribe(),
+
+                this.WhenPropertyChanged(p => p.Volume)
+                    .ObserveOn(TaskPoolScheduler.Default)
+                    .Throttle(TimeSpan.FromMilliseconds(250))
+                    .ObserveOn(_synchronizationContext)
+                    .Subscribe(p => _playbackService.SetVolume(p.Value)),
+            });
         }
 
         public async Task Add(TrackViewModel track)
