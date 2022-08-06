@@ -788,7 +788,8 @@
 
                 <Button Grid.Column="2"
                         Command="{Binding Playback.PreviousCommand}"
-                        Style="{StaticResource SecondaryPlaybackButton}">
+                        Style="{StaticResource SecondaryPlaybackButton}"
+                        ToolTip="Previous">
                     <iconpacks:PackIconFontAwesome Kind="BackwardSolid" />
                 </Button>
 
@@ -804,6 +805,7 @@
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding Playback.PlaybackState}" Value="{x:Static core:StreamingPlaybackState.Playing}">
                                     <Setter Property="Command" Value="{Binding Playback.PauseCommand}" />
+                                    <Setter Property="ToolTip" Value="Pause" />
                                     <Setter Property="Content">
                                         <Setter.Value>
                                             <iconpacks:PackIconFontAwesome Kind="PauseSolid" />
@@ -813,6 +815,7 @@
 
                                 <DataTrigger Binding="{Binding Playback.PlaybackState}" Value="{x:Static core:StreamingPlaybackState.Paused}">
                                     <Setter Property="Command" Value="{Binding Playback.ResumePlayCommand}" />
+                                    <Setter Property="ToolTip" Value="Resume" />
                                     <Setter Property="Content">
                                         <Setter.Value>
                                             <iconpacks:PackIconFontAwesome Kind="PlaySolid" />
@@ -826,7 +829,8 @@
 
                 <Button Grid.Column="6"
                         Command="{Binding Playback.NextCommand}"
-                        Style="{StaticResource SecondaryPlaybackButton}">
+                        Style="{StaticResource SecondaryPlaybackButton}"
+                        ToolTip="Next">
                     <iconpacks:PackIconFontAwesome Kind="ForwardSolid" />
                 </Button>
 
