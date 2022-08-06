@@ -38,7 +38,23 @@ namespace SoftThorn.Monstercat.Browser.Core
         public PlaybackItemViewModel? Current
         {
             get { return _current; }
-            private set { SetProperty(ref _current, value); }
+            private set
+            {
+                var old = _current;
+                if (SetProperty(ref _current, value))
+                {
+                    if (old is not null)
+                    {
+                        old.IsCurrentlyPlayed = false;
+                        _sourceCache.Remove(old);
+                    }
+
+                    if (value is not null)
+                    {
+                        value.IsCurrentlyPlayed = true;
+                    }
+                }
+            }
         }
 
         private int _volume;
@@ -133,6 +149,8 @@ namespace SoftThorn.Monstercat.Browser.Core
                             o.PreviousCommand.NotifyCanExecuteChanged();
                             o.PauseCommand.NotifyCanExecuteChanged();
                         });
+
+                        Current = null;
                     }
                     else
                     {
@@ -144,6 +162,8 @@ namespace SoftThorn.Monstercat.Browser.Core
                             o.PreviousCommand.NotifyCanExecuteChanged();
                             o.PauseCommand.NotifyCanExecuteChanged();
                         });
+
+                        Current = nextEntry;
                     }
                     break;
 
@@ -157,14 +177,15 @@ namespace SoftThorn.Monstercat.Browser.Core
                         o.PreviousCommand.NotifyCanExecuteChanged();
                         o.PauseCommand.NotifyCanExecuteChanged();
                     });
+
                     break;
             }
         }
 
         private async Task Play(PlaybackItemViewModel item)
         {
-            Current = item;
             IsPlaybackAvailable = true;
+            Current = item;
 
             await _playbackService.Play(item, _volume);
         }
@@ -244,6 +265,29 @@ namespace SoftThorn.Monstercat.Browser.Core
             }
 
             return (_current.Sequence - 1) >= 1;
+        }
+
+        [RelayCommand(AllowConcurrentExecutions = false, CanExecute = nameof(CanRemove))]
+        private async Task Remove(object? args)
+        {
+            if (args is PlaybackItemViewModel item)
+            {
+                if (Current is not null)
+                {
+                    var current = Current;
+                    if (current == item || current.Track.Id == item.Track.Id)
+                    {
+                        await Next();
+                    }
+                }
+
+                _sourceCache.Remove(item);
+            }
+        }
+
+        private static bool CanRemove(object? args)
+        {
+            return args is PlaybackItemViewModel;
         }
 
         private void Dispose(bool disposing)

@@ -3,7 +3,7 @@ using SoftThorn.MonstercatNet;
 
 namespace SoftThorn.Monstercat.Browser.Core
 {
-    public sealed class PlaybackItemViewModel : ObservableObject, IPlaybackItem
+    public sealed partial class PlaybackItemViewModel : ObservableObject, IPlaybackItem
     {
         public long Sequence { get; }
 
@@ -15,6 +15,9 @@ namespace SoftThorn.Monstercat.Browser.Core
             get { return _playbackComnpleted; }
             private set { SetProperty(ref _playbackComnpleted, value); }
         }
+
+        [ObservableProperty]
+        private bool _isCurrentlyPlayed;
 
         public PlaybackItemViewModel(long sequence, TrackViewModel track)
         {
