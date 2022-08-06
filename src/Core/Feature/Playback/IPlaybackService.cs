@@ -15,5 +15,7 @@ namespace SoftThorn.Monstercat.Browser.Core
         int GetVolume();
 
         void SetVolume(int volume);
+
+        void Stop();
     }
 }

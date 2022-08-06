@@ -288,7 +288,14 @@ namespace SoftThorn.Monstercat.Browser.Core
                     var current = Current;
                     if (current == item || current.Track.Id == item.Track.Id)
                     {
-                        await Next();
+                        if (CanNext())
+                        {
+                            await Next();
+                        }
+                        else
+                        {
+                            _playbackService.Stop();
+                        }
                     }
                 }
 

@@ -188,6 +188,11 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             SetPlaybackState(StreamingPlaybackState.Paused);
         }
 
+        public void Stop()
+        {
+            StopPlayback();
+        }
+
         private void StopPlayback()
         {
             if (_playbackState == StreamingPlaybackState.Playing)
