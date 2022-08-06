@@ -23,6 +23,13 @@ namespace SoftThorn.Monstercat.Browser.Core
         [ObservableProperty]
         private bool _isDownLoading;
 
+        private int _tracksToDownload;
+        public int TracksToDownload
+        {
+            get { return _tracksToDownload; }
+            private set { SetProperty(ref _tracksToDownload, value); }
+        }
+
         public ProgressContainer<Percentage> Progress { get; }
 
         public DownloadViewModel(SynchronizationContext synchronizationContext, IMonstercatApi api, IMessenger messenger)
@@ -63,6 +70,7 @@ namespace SoftThorn.Monstercat.Browser.Core
             }
 
             IsDownLoading = true;
+            TracksToDownload = tracks.Count;
 
             try
             {
@@ -115,6 +123,7 @@ namespace SoftThorn.Monstercat.Browser.Core
             }
             finally
             {
+                TracksToDownload = 0;
                 IsDownLoading = false;
             }
         }

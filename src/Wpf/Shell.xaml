@@ -15,6 +15,8 @@
                  Title="{Binding Title}"
                  Width="800"
                  Height="820"
+                 MinWidth="800"
+                 MinHeight="820"
                  d:DataContext="{d:DesignInstance Type=core:ShellViewModel,
                                                   IsDesignTimeCreatable=False}"
                  Background="{DynamicResource MaterialDesignPaper}"
@@ -37,48 +39,45 @@
 
     <mah:MetroWindow.RightWindowCommands>
         <mah:WindowCommands ShowLastSeparator="False">
-            <Button Click="Playlist_Click" ToolTip="Playlist">
-                <iconpacks:FontAwesome Kind="ListSolid" />
-            </Button>
 
-            <Button Click="Settings_Click" ToolTip="Settings">
-                <iconpacks:FontAwesome Kind="WrenchSolid" />
-            </Button>
+            <materialDesign:PopupBox x:Name="PlaylistPopup"
+                                     IsEnabled="{Binding Playback.Items.Count, Converter={wpf:GreaterThan 0}}"
+                                     PlacementMode="BottomAndAlignLeftEdges"
+                                     StaysOpen="True"
+                                     ToolTip="Playlist"
+                                     ToolTipService.Placement="Right">
+                <materialDesign:PopupBox.ToggleContent>
+                    <materialDesign:Badged Badge="{Binding Playback.Items.Count}">
+                        <iconpacks:PackIconFontAwesome Foreground="{DynamicResource MaterialDesignPaper}" Kind="ListSolid" />
+                    </materialDesign:Badged>
+                </materialDesign:PopupBox.ToggleContent>
 
-            <Button Click="About_Click" ToolTip="About">
-                <iconpacks:FontAwesome Kind="GlobeSolid" />
-            </Button>
-        </mah:WindowCommands>
-    </mah:MetroWindow.RightWindowCommands>
-
-    <mah:MetroWindow.Flyouts>
-        <mah:FlyoutsControl>
-            <mah:Flyout x:Name="Playlist"
-                        Height="250"
-                        Header="Playlist"
-                        Position="Bottom">
-                <DockPanel Margin="8">
+                <DockPanel MaxHeight="820"
+                           Margin="8"
+                           Background="{DynamicResource MaterialDesignPaper}">
                     <xfc:AnimatedListView xf:Animations.AnimateOnItemsSourceChange="True"
                                           Background="Transparent"
                                           BorderThickness="0"
-                                          ItemsSource="{Binding Playback.Items}">
+                                          ItemsSource="{Binding Playback.Items}"
+                                          ScrollViewer.HorizontalScrollBarVisibility="Hidden">
                         <xfc:AnimatedListView.ItemContainerStyle>
-                            <Style TargetType="{x:Type ListViewItem}">
+                            <Style BasedOn="{StaticResource MaterialDesignListBoxItem}" TargetType="{x:Type ListViewItem}">
                                 <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                             </Style>
                         </xfc:AnimatedListView.ItemContainerStyle>
+
                         <ItemsControl.ItemTemplate>
                             <DataTemplate DataType="{x:Type core:PlaybackItemViewModel}">
-                                <DockPanel Margin="4">
-                                    <Button Command="{Binding Data.RemoveCommand, Source={StaticResource PlaybackViewModelProxy}}"
-                                            CommandParameter="{Binding}"
-                                            DockPanel.Dock="Right">
-                                        <iconpacks:FontAwesome Kind="TrashSolid" />
-                                    </Button>
+                                <Grid Width="300" Margin="4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
 
-                                    <Grid DockPanel.Dock="Left">
-                                        <Image Width="36"
-                                               Height="36"
+                                    <Grid Grid.Column="0">
+                                        <Image Width="48"
+                                               Height="48"
                                                wpf:ImageLoader.Source="{Binding Track.ImageUrl, Mode=OneTime}"
                                                xf:Animations.Primary="{xf:Animate BasedOn={StaticResource FadeIn},
                                                                                   Event=None}"
@@ -88,9 +87,7 @@
                                                SnapsToDevicePixels="True"
                                                ToolTip="{Binding Track.ImageUrl, Mode=OneTime}" />
 
-                                        <Border Width="36"
-                                                Height="36"
-                                                Background="#CCCCCCCC">
+                                        <Border Width="36" Height="36">
                                             <Border.Style>
                                                 <Style TargetType="{x:Type Border}">
                                                     <Style.Triggers>
@@ -113,27 +110,51 @@
                                         </Border>
                                     </Grid>
 
-                                    <StackPanel Margin="8,0">
+                                    <DockPanel Grid.Column="1"
+                                               Margin="8,0"
+                                               LastChildFill="False">
                                         <TextBlock VerticalAlignment="Center"
+                                                   DockPanel.Dock="Top"
                                                    FontSize="16"
                                                    FontWeight="DemiBold"
                                                    Foreground="Black"
-                                                   Text="{Binding Track.Title}" />
+                                                   Text="{Binding Track.Title}"
+                                                   TextTrimming="CharacterEllipsis" />
                                         <TextBlock VerticalAlignment="Center"
+                                                   DockPanel.Dock="Top"
                                                    Foreground="Black"
-                                                   Text="{Binding Track.ArtistsTitle}" />
+                                                   Text="{Binding Track.ArtistsTitle}"
+                                                   TextTrimming="CharacterEllipsis" />
                                         <TextBlock VerticalAlignment="Center"
+                                                   DockPanel.Dock="Top"
                                                    Foreground="Black"
-                                                   Text="{Binding Track.Release.Title}" />
-                                    </StackPanel>
-                                </DockPanel>
+                                                   Text="{Binding Track.Release.Title}"
+                                                   TextTrimming="CharacterEllipsis" />
+                                    </DockPanel>
+
+                                    <Button Grid.Column="2"
+                                            Command="{Binding Data.RemoveCommand, Source={StaticResource PlaybackViewModelProxy}}"
+                                            CommandParameter="{Binding}"
+                                            DockPanel.Dock="Right"
+                                            Style="{StaticResource MaterialDesignIconButton}">
+                                        <iconpacks:FontAwesome Kind="TrashSolid" />
+                                    </Button>
+                                </Grid>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </xfc:AnimatedListView>
                 </DockPanel>
-            </mah:Flyout>
-        </mah:FlyoutsControl>
-    </mah:MetroWindow.Flyouts>
+            </materialDesign:PopupBox>
+
+            <Button Click="Settings_Click" ToolTip="Settings">
+                <iconpacks:FontAwesome Kind="WrenchSolid" />
+            </Button>
+
+            <Button Click="About_Click" ToolTip="About">
+                <iconpacks:FontAwesome Kind="GlobeSolid" />
+            </Button>
+        </mah:WindowCommands>
+    </mah:MetroWindow.RightWindowCommands>
 
     <materialDesign:TransitioningContent>
         <materialDesign:TransitioningContent.OpeningEffects>
@@ -210,8 +231,8 @@
                                     <DataGridTemplateColumn>
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate DataType="{x:Type core:ReleaseViewModel}">
-                                                <Image Width="36"
-                                                       Height="36"
+                                                <Image Width="48"
+                                                       Height="48"
                                                        wpf:ImageLoader.Source="{Binding ImageUrl, Mode=OneTime}"
                                                        xf:Animations.Primary="{xf:Animate BasedOn={StaticResource FadeIn},
                                                                                           Event=None}"
@@ -230,20 +251,19 @@
                                                         Header="Artist" />
 
                                     <DataGridTextColumn Binding="{Binding Tracks.Count}" Header="Tracks" />
-                                    <DataGridTemplateColumn Width="72"
+                                    <DataGridTemplateColumn Width="96"
                                                             CanUserResize="False"
                                                             CanUserSort="False">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate DataType="{x:Type core:ReleaseViewModel}">
-                                                <Button Width="36"
-                                                        Height="36"
-                                                        Command="{Binding Data.PlayCommand, Source={StaticResource ShellViewModelProxy}, IsAsync=True}"
+                                                <Button Command="{Binding Data.PlayCommand, Source={StaticResource ShellViewModelProxy}, IsAsync=True}"
                                                         CommandParameter="{Binding}"
-                                                        Style="{StaticResource MaterialDesignIconForegroundButton}"
+                                                        Style="{StaticResource MaterialDesignIconButton}"
                                                         ToolTip="Play">
 
                                                     <iconpacks:PackIconFontAwesome Width="12"
                                                                                    Height="12"
+                                                                                   Foreground="{DynamicResource PrimaryHueMidBrush}"
                                                                                    Kind="PlaySolid" />
                                                 </Button>
                                             </DataTemplate>
@@ -554,6 +574,7 @@
 
                                                     <iconpacks:PackIconFontAwesome Width="12"
                                                                                    Height="12"
+                                                                                   Foreground="{DynamicResource PrimaryHueMidBrush}"
                                                                                    Kind="PlaySolid" />
                                                 </Button>
                                             </DataTemplate>
@@ -637,8 +658,6 @@
                     Click="Download_Click"
                     ToolTip="Download all Tracks now">
 
-                <iconpacks:PackIconFontAwesome Kind="DownloadSolid" />
-
                 <Button.Style>
                     <Style BasedOn="{StaticResource MaterialDesignFloatingActionAccentButton}" TargetType="{x:Type Button}">
                         <Style.Triggers>
@@ -647,6 +666,26 @@
                             </DataTrigger>
                             <DataTrigger Binding="{Binding IsLoading}" Value="false">
                                 <Setter Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+
+                            <DataTrigger Binding="{Binding Downloads.IsDownLoading}" Value="True">
+                                <Setter Property="Content">
+                                    <Setter.Value>
+                                        <materialDesign:Badged materialDesign:BadgedAssist.IsMiniBadge="True"
+                                                               Badge="{Binding Downloads.TracksToDownload}"
+                                                               BadgeBackground="{DynamicResource SecondaryHueLightBrush}">
+                                            <iconpacks:PackIconFontAwesome Kind="DownloadSolid" />
+                                        </materialDesign:Badged>
+                                    </Setter.Value>
+                                </Setter>
+                            </DataTrigger>
+
+                            <DataTrigger Binding="{Binding Downloads.IsDownLoading}" Value="False">
+                                <Setter Property="Content">
+                                    <Setter.Value>
+                                        <iconpacks:PackIconFontAwesome Kind="DownloadSolid" />
+                                    </Setter.Value>
+                                </Setter>
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>

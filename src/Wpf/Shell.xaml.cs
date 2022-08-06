@@ -41,7 +41,8 @@ namespace SoftThorn.Monstercat.Browser.Wpf
 
         private void Playlist_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            Playlist.IsOpen = !Playlist.IsOpen;
+            //Playlist.IsOpen = !Playlist.IsOpen;
+            PlaylistPopup.IsPopupOpen = !PlaylistPopup.IsPopupOpen;
         }
     }
 }
