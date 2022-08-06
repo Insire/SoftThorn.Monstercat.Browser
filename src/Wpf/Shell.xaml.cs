@@ -26,7 +26,7 @@ namespace SoftThorn.Monstercat.Browser.Wpf
 
         private async void Download_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            await _windowService.ShowSearchView(this);
+            await _windowService.ShowSearchView<Silk>(this, null);
         }
 
         private void About_Click(object sender, System.Windows.RoutedEventArgs e)
@@ -41,8 +41,22 @@ namespace SoftThorn.Monstercat.Browser.Wpf
 
         private void Playlist_Click(object sender, System.Windows.RoutedEventArgs e)
         {
-            //Playlist.IsOpen = !Playlist.IsOpen;
             PlaylistPopup.IsPopupOpen = !PlaylistPopup.IsPopupOpen;
+        }
+
+        private async void DownloadSilk_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            await _windowService.ShowSearchView(this, _shellViewModel.Silk);
+        }
+
+        private async void DownloadInstinct_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            await _windowService.ShowSearchView(this, _shellViewModel.Instinct);
+        }
+
+        private async void DownloadUncaged_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            await _windowService.ShowSearchView(this, _shellViewModel.Uncaged);
         }
     }
 }

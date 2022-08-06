@@ -33,5 +33,13 @@ namespace SoftThorn.Monstercat.Browser.Core
 
             return new SearchViewModel(_synchronizationContext, _messenger, tracks.Select(p => p.Current).ToArray(), tags.Select(p => p.Current).ToArray());
         }
+
+        public async Task<SearchViewModel> CreateFromBrand<TBrand>(BrandViewModel<TBrand> brandViewModel)
+            where TBrand : Brand, new()
+        {
+            var tags = await _trackRepository.ConnectFilteredTagViewModels().FirstOrDefaultAsync();
+
+            return new SearchViewModel(_synchronizationContext, _messenger, brandViewModel.Releases.ToArray(), tags.Select(p => p.Current).ToArray());
+        }
     }
 }

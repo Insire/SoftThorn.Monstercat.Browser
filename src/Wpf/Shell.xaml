@@ -40,6 +40,7 @@
     <mah:MetroWindow.RightWindowCommands>
         <mah:WindowCommands ShowLastSeparator="False">
 
+            <!--  Playlist  -->
             <materialDesign:PopupBox x:Name="PlaylistPopup"
                                      IsEnabled="{Binding Playback.Items.Count, Converter={wpf:GreaterThan 0}}"
                                      PlacementMode="BottomAndAlignLeftEdges"
@@ -398,13 +399,31 @@
                                                Grid.RowSpan="2"
                                                Fill="{DynamicResource MaterialDesignLightBackground}" />
 
-                                    <Button Grid.Row="0"
-                                            Margin="0,0,16,-20"
-                                            HorizontalAlignment="Right"
-                                            VerticalAlignment="Bottom"
-                                            Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}">
-                                        <materialDesign:PackIcon Kind="Star" />
-                                    </Button>
+                                    <materialDesign:PopupBox Grid.Row="0"
+                                                             Margin="0,0,16,-20"
+                                                             HorizontalAlignment="Right"
+                                                             VerticalAlignment="Bottom"
+                                                             PlacementMode="TopAndAlignCentres"
+                                                             PopupMode="MouseOver"
+                                                             Style="{StaticResource MaterialDesignMultiFloatingActionAccentPopupBox}"
+                                                             ToolTipService.Placement="Right">
+                                        <StackPanel>
+                                            <Button Margin="4"
+                                                    Click="DownloadUncaged_Click"
+                                                    Style="{StaticResource MaterialDesignFloatingActionMiniSecondaryLightButton}"
+                                                    ToolTip="Download all UNCAGED tracks">
+                                                <iconpacks:PackIconFontAwesome Kind="DownloadSolid" />
+                                            </Button>
+
+                                            <Button Margin="4"
+                                                    Command="{Binding Data.PlayCommand, Source={StaticResource ShellViewModelProxy}}"
+                                                    CommandParameter="{Binding}"
+                                                    Style="{StaticResource MaterialDesignFloatingActionMiniSecondaryLightButton}"
+                                                    ToolTip="Play all SILK tracks">
+                                                <iconpacks:PackIconFontAwesome Kind="PlaySolid" />
+                                            </Button>
+                                        </StackPanel>
+                                    </materialDesign:PopupBox>
 
                                     <TextBlock Grid.Row="1"
                                                Margin="8,24,0,0"
@@ -447,13 +466,31 @@
                                                Grid.RowSpan="2"
                                                Fill="{DynamicResource MaterialDesignLightBackground}" />
 
-                                    <Button Grid.Row="0"
-                                            Margin="0,0,16,-20"
-                                            HorizontalAlignment="Right"
-                                            VerticalAlignment="Bottom"
-                                            Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}">
-                                        <materialDesign:PackIcon Kind="Star" />
-                                    </Button>
+                                    <materialDesign:PopupBox Grid.Row="0"
+                                                             Margin="0,0,16,-20"
+                                                             HorizontalAlignment="Right"
+                                                             VerticalAlignment="Bottom"
+                                                             PlacementMode="TopAndAlignCentres"
+                                                             PopupMode="MouseOver"
+                                                             Style="{StaticResource MaterialDesignMultiFloatingActionAccentPopupBox}"
+                                                             ToolTipService.Placement="Right">
+                                        <StackPanel>
+                                            <Button Margin="4"
+                                                    Click="DownloadInstinct_Click"
+                                                    Style="{StaticResource MaterialDesignFloatingActionMiniSecondaryLightButton}"
+                                                    ToolTip="Download all INSTINCT tracks">
+                                                <iconpacks:PackIconFontAwesome Kind="DownloadSolid" />
+                                            </Button>
+
+                                            <Button Margin="4"
+                                                    Command="{Binding Data.PlayCommand, Source={StaticResource ShellViewModelProxy}}"
+                                                    CommandParameter="{Binding}"
+                                                    Style="{StaticResource MaterialDesignFloatingActionMiniSecondaryLightButton}"
+                                                    ToolTip="Play all SILK tracks">
+                                                <iconpacks:PackIconFontAwesome Kind="PlaySolid" />
+                                            </Button>
+                                        </StackPanel>
+                                    </materialDesign:PopupBox>
 
                                     <TextBlock Grid.Row="1"
                                                Margin="8,24,0,0"
@@ -496,13 +533,31 @@
                                                Grid.RowSpan="2"
                                                Fill="{DynamicResource MaterialDesignLightBackground}" />
 
-                                    <Button Grid.Row="0"
-                                            Margin="0,0,16,-20"
-                                            HorizontalAlignment="Right"
-                                            VerticalAlignment="Bottom"
-                                            Style="{StaticResource MaterialDesignFloatingActionMiniAccentButton}">
-                                        <materialDesign:PackIcon Kind="Star" />
-                                    </Button>
+                                    <materialDesign:PopupBox Grid.Row="0"
+                                                             Margin="0,0,16,-20"
+                                                             HorizontalAlignment="Right"
+                                                             VerticalAlignment="Bottom"
+                                                             PlacementMode="TopAndAlignCentres"
+                                                             PopupMode="MouseOver"
+                                                             Style="{StaticResource MaterialDesignMultiFloatingActionAccentPopupBox}"
+                                                             ToolTipService.Placement="Right">
+                                        <StackPanel>
+                                            <Button Margin="4"
+                                                    Click="DownloadSilk_Click"
+                                                    Style="{StaticResource MaterialDesignFloatingActionMiniSecondaryLightButton}"
+                                                    ToolTip="Download all SILK tracks">
+                                                <iconpacks:PackIconFontAwesome Kind="DownloadSolid" />
+                                            </Button>
+
+                                            <Button Margin="4"
+                                                    Command="{Binding Data.PlayCommand, Source={StaticResource ShellViewModelProxy}}"
+                                                    CommandParameter="{Binding}"
+                                                    Style="{StaticResource MaterialDesignFloatingActionMiniSecondaryLightButton}"
+                                                    ToolTip="Play all SILK tracks">
+                                                <iconpacks:PackIconFontAwesome Kind="PlaySolid" />
+                                            </Button>
+                                        </StackPanel>
+                                    </materialDesign:PopupBox>
 
                                     <TextBlock Grid.Row="1"
                                                Margin="8,24,0,0"
@@ -540,8 +595,8 @@
                                       SelectionUnit="FullRow">
                                 <DataGrid.Resources>
                                     <DataTemplate x:Key="ImageColumnTemplate" DataType="{x:Type core:ArtistViewModel}">
-                                        <Image Width="30"
-                                               Height="30"
+                                        <Image Width="48"
+                                               Height="48"
                                                wpf:ImageLoader.Source="{Binding Uri, Mode=OneTime}"
                                                xf:Animations.Primary="{xf:Animate BasedOn={StaticResource FadeIn},
                                                                                   Event=None}"
@@ -619,6 +674,7 @@
                                 <Run Text="Most Popular Genres" />
                             </TextBlock>
                         </GroupBox.Header>
+
                         <lvc:CartesianChart Grid.Row="6"
                                             Grid.Column="0"
                                             Grid.ColumnSpan="5"
@@ -736,7 +792,7 @@
                     <iconpacks:PackIconFontAwesome Kind="BackwardSolid" />
                 </Button>
 
-                <Button Grid.Column="4" Command="{Binding Playback.ResumePlayCommand}">
+                <Button Grid.Column="4">
                     <Button.Style>
                         <Style BasedOn="{StaticResource MaterialDesignFloatingActionSecondaryButton}" TargetType="{x:Type Button}">
                             <Setter Property="Content">
@@ -756,7 +812,7 @@
                                 </DataTrigger>
 
                                 <DataTrigger Binding="{Binding Playback.PlaybackState}" Value="{x:Static core:StreamingPlaybackState.Paused}">
-                                    <Setter Property="Command" Value="{Binding Playback.PlayCommand}" />
+                                    <Setter Property="Command" Value="{Binding Playback.ResumePlayCommand}" />
                                     <Setter Property="Content">
                                         <Setter.Value>
                                             <iconpacks:PackIconFontAwesome Kind="PlaySolid" />

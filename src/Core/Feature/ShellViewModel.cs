@@ -3,13 +3,18 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Gress;
 using System;
+using System.Reactive.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SoftThorn.Monstercat.Browser.Core
 {
-    public sealed partial class ShellViewModel : ObservableRecipient
+    public sealed partial class ShellViewModel : ObservableRecipient, IDisposable
     {
         private readonly ITrackRepository _trackRepository;
+        private readonly IDisposable _subscription;
+
+        private bool _disposedValue;
 
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(RefreshCommand))]
@@ -49,6 +54,7 @@ namespace SoftThorn.Monstercat.Browser.Core
         public BrandViewModel<Instinct> Instinct { get; }
 
         public ShellViewModel(
+            SynchronizationContext synchronizationContext,
             AboutViewModel about,
             SettingsViewModel settings,
             ReleasesViewModel releases,
@@ -82,10 +88,14 @@ namespace SoftThorn.Monstercat.Browser.Core
             Title = $"v{About.AssemblyVersionString} SoftThorn.Monstercat.Browser.Wpf ";
 
             // messages
-            messenger.Register<ShellViewModel, LoginChangedMessage>(this, (r, m) =>
-            {
-                r.IsLoggedIn = m.IsLoggedIn;
-            });
+            messenger.Register<ShellViewModel, LoginChangedMessage>(this, (r, m) => r.IsLoggedIn = m.IsLoggedIn);
+
+            _subscription = _trackRepository
+                .ConnectTracks()
+                .Throttle(TimeSpan.FromMilliseconds(500))
+                .ObserveOn(synchronizationContext)
+                .Do(_ => PlayCommand.NotifyCanExecuteChanged())
+                .Subscribe();
         }
 
         [RelayCommand(AllowConcurrentExecutions = false, CanExecute = nameof(CanPlay))]
@@ -104,6 +114,18 @@ namespace SoftThorn.Monstercat.Browser.Core
                 case ArtistViewModel artist:
                     await Playback.Add(artist.Tracks);
                     break;
+
+                case BrandViewModel<Silk> silk:
+                    await Playback.Add(silk.Releases);
+                    break;
+
+                case BrandViewModel<Uncaged> uncaged:
+                    await Playback.Add(uncaged.Releases);
+                    break;
+
+                case BrandViewModel<Instinct> instinct:
+                    await Playback.Add(instinct.Releases);
+                    break;
             }
         }
 
@@ -111,7 +133,10 @@ namespace SoftThorn.Monstercat.Browser.Core
         {
             return args is TrackViewModel
                 || args is ReleaseViewModel
-                || args is ArtistViewModel;
+                || args is ArtistViewModel
+                || args is BrandViewModel<Silk>
+                || args is BrandViewModel<Uncaged>
+                || args is BrandViewModel<Instinct>;
         }
 
         [RelayCommand(AllowConcurrentExecutions = false)]
@@ -126,6 +151,26 @@ namespace SoftThorn.Monstercat.Browser.Core
             {
                 IsLoading = false;
             }
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    _subscription.Dispose();
+                }
+
+                _disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }

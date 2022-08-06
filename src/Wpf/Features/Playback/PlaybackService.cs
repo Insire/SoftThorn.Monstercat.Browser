@@ -36,6 +36,7 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             _messenger = messenger;
             _logger = logger.ForContext<PlaybackService>();
             _timer.Tick += OnTimerTick;
+            _timer.Start();
         }
 
         public StreamingPlaybackState GetPlaybackState()
@@ -55,13 +56,12 @@ namespace SoftThorn.Monstercat.Browser.Wpf
                         _cancellationTokenSource = new CancellationTokenSource();
 
                         _logger.Debug("fetching stream");
-                        //using (var stream = await _api.StreamTrackAsStream(item.GetStreamRequest()))
-                        using (var stream = File.OpenRead(@"C:\Users\peter\OneDrive\Desktop\mixkit-crickets-and-insects-in-the-wild-ambience-39.mp3"))
+
+                        //using (var stream = File.OpenRead(@"C:\Users\peter\OneDrive\Desktop\mixkit-crickets-and-insects-in-the-wild-ambience-39.mp3"))
+                        using (var stream = await _api.StreamTrackAsStream(item.GetStreamRequest()))
                         {
                             _playbackItem = item;
-                            var task = Task.Run(() => PlayBackLoop(stream, volume, _cancellationTokenSource.Token), _cancellationTokenSource.Token);
-                            _timer.Start();
-                            await task;
+                            await Task.Run(() => PlayBackLoop(stream, volume, _cancellationTokenSource.Token), _cancellationTokenSource.Token);
                         }
 
                         break;
@@ -117,6 +117,10 @@ namespace SoftThorn.Monstercat.Browser.Wpf
 
                     _logger.Debug("stream has finished processeing");
                 }
+            }
+            catch (TaskCanceledException)
+            {
+                _logger.Debug("playback has been cancelled");
             }
             finally
             {
@@ -188,13 +192,15 @@ namespace SoftThorn.Monstercat.Browser.Wpf
         {
             if (_playbackState == StreamingPlaybackState.Playing)
             {
+                _cancellationTokenSource?.Cancel();
+                _cancellationTokenSource = null;
+
                 _playbackInfrastructure?.Dispose();
                 _playbackInfrastructure = null;
 
                 _playbackItem?.Dispose();
                 _playbackItem = null;
 
-                _timer.Stop();
                 SetPlaybackState(StreamingPlaybackState.Stopped);
             }
         }

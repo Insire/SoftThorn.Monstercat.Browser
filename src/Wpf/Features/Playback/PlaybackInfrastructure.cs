@@ -183,8 +183,8 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             WaveOut.Stop();
             _logger.Debug("Stopped Playback, waveOut.PlaybackState={PlaybackState}", WaveOut.PlaybackState);
 
-            FrameDecompressor.Dispose();
             WaveOut?.Dispose();
+            FrameDecompressor.Dispose();
         }
     }
 }
