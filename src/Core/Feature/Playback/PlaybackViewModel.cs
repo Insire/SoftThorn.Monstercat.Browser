@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace SoftThorn.Monstercat.Browser.Core
 {
-    public sealed class PlaybackViewModel : ObservableObject, IDisposable
+    public sealed partial class PlaybackViewModel : ObservableObject, IDisposable
     {
         private readonly SourceCache<PlaybackItemViewModel, long> _sourceCache;
         private readonly SynchronizationContext _synchronizationContext;
@@ -24,11 +24,6 @@ namespace SoftThorn.Monstercat.Browser.Core
 
         private bool _disposedValue;
         private long _currentSequzence;
-
-        public IRelayCommand ResumePlayCommand { get; }
-        public IRelayCommand PauseCommand { get; }
-        public IRelayCommand NextCommand { get; }
-        public IRelayCommand PreviousCommand { get; }
 
         public StreamingPlaybackState PlaybackState => _playbackService.GetPlaybackState();
 
@@ -64,11 +59,6 @@ namespace SoftThorn.Monstercat.Browser.Core
 
             _currentSequzence = 1;
             _volume = _playbackService.GetVolume();
-
-            ResumePlayCommand = new RelayCommand(ResumePlay, CanResumePlay);
-            PauseCommand = new RelayCommand(Pause, CanPause);
-            NextCommand = new AsyncRelayCommand(Next, CanNext);
-            PreviousCommand = new RelayCommand(Previous, CanPrevious);
 
             _messenger.Register<PlaybackViewModel, ValueChangedMessage<StreamingPlaybackState>>(this, (r, m) => r.OnStreamingPlaybackStateChanged(m.Value));
 
@@ -184,6 +174,7 @@ namespace SoftThorn.Monstercat.Browser.Core
             return PlaybackState == StreamingPlaybackState.Stopped;
         }
 
+        [RelayCommand(CanExecute = nameof(CanPause))]
         private void Pause()
         {
             if (CanPause())
@@ -197,6 +188,7 @@ namespace SoftThorn.Monstercat.Browser.Core
             return PlaybackState == StreamingPlaybackState.Playing;
         }
 
+        [RelayCommand(CanExecute = nameof(CanResumePlay))]
         private void ResumePlay()
         {
             if (CanResumePlay())
@@ -210,6 +202,7 @@ namespace SoftThorn.Monstercat.Browser.Core
             return PlaybackState == StreamingPlaybackState.Paused;
         }
 
+        [RelayCommand(AllowConcurrentExecutions = false, CanExecute = nameof(CanNext))]
         private async Task Next()
         {
             if (CanNext())
@@ -234,6 +227,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                     .Any();
         }
 
+        [RelayCommand(CanExecute = nameof(CanPrevious))]
         private void Previous()
         {
             if (CanPrevious())

@@ -3,7 +3,6 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Gress;
 using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace SoftThorn.Monstercat.Browser.Core
@@ -49,8 +48,6 @@ namespace SoftThorn.Monstercat.Browser.Core
 
         public BrandViewModel<Instinct> Instinct { get; }
 
-        public IAsyncRelayCommand PlayCommand { get; }
-
         public ShellViewModel(
             AboutViewModel about,
             SettingsViewModel settings,
@@ -89,10 +86,9 @@ namespace SoftThorn.Monstercat.Browser.Core
             {
                 r.IsLoggedIn = m.IsLoggedIn;
             });
-
-            PlayCommand = new AsyncRelayCommand<object?>(Play, CanPlay, AsyncRelayCommandOptions.AllowConcurrentExecutions);
         }
 
+        [RelayCommand(AllowConcurrentExecutions = false, CanExecute = nameof(CanPlay))]
         public async Task Play(object? args)
         {
             switch (args)

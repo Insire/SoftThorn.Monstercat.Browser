@@ -76,7 +76,10 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             container.RegisterInstance(playbackTimer);
             container.RegisterInstance<IMessenger>(WeakReferenceMessenger.Default);
             container.RegisterInstance(SynchronizationContext.Current!);
-            container.Register<ITrackRepository, MockTrackRepository>(Reuse.Singleton);
+
+            //container.Register<ITrackRepository, MockTrackRepository>(Reuse.Singleton);
+            container.Register<ITrackRepository, TrackRepository>(Reuse.Singleton);
+
             container.Register<SearchViewModelFactory>(Reuse.Singleton);
             container.Register<SettingsService>(Reuse.Singleton);
             container.Register<DispatcherProgress<Percentage>>(Reuse.Singleton, made: Made.Of(_ => ServiceInfo.Of<DispatcherProgressFactory<Percentage>>(), f => f.Create()));
