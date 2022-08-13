@@ -1,9 +1,8 @@
 using SoftThorn.MonstercatNet;
-using System;
 
 namespace SoftThorn.Monstercat.Browser.Core
 {
-    public interface IPlaybackItem : IDisposable
+    public interface IPlaybackItem
     {
         TrackStreamRequest GetStreamRequest();
     }

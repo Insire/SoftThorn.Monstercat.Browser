@@ -6,6 +6,7 @@ using SoftThorn.Monstercat.Browser.Core;
 using SoftThorn.MonstercatNet;
 using System;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
@@ -22,11 +23,10 @@ namespace SoftThorn.Monstercat.Browser.Wpf
 
         private volatile StreamingPlaybackState _playbackState;
         private volatile bool _fullyProcessed;
-        private volatile IPlaybackItem? _playbackItem;
 
         private CancellationTokenSource? _cancellationTokenSource;
-
         private PlaybackInfrastructure? _playbackInfrastructure;
+        private Task _playbackLoop;
 
         public PlaybackService(SynchronizationContext synchronizationContext, DispatcherTimer timer, IMessenger messenger, ILogger logger, IMonstercatApi api)
         {
@@ -37,6 +37,8 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             _logger = logger.ForContext<PlaybackService>();
             _timer.Tick += OnTimerTick;
             _timer.Start();
+
+            _playbackLoop = Task.CompletedTask;
         }
 
         public StreamingPlaybackState GetPlaybackState()
@@ -44,36 +46,41 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             return _playbackState;
         }
 
-        public async Task Play(IPlaybackItem item, int volume)
+        public async void Play(IPlaybackItem item, PlaybackIntent intent, int volume)
         {
             switch (_playbackState)
             {
                 case StreamingPlaybackState.Stopped:
-                    {
-                        SetPlaybackState(StreamingPlaybackState.Buffering);
+                    await PlayInternal(item, intent, volume);
 
-                        _cancellationTokenSource?.Dispose();
-                        _cancellationTokenSource = new CancellationTokenSource();
+                    break;
 
-                        _logger.Debug("fetching stream");
-
-                        //using (var stream = File.OpenRead(@"C:\Users\peter\OneDrive\Desktop\mixkit-crickets-and-insects-in-the-wild-ambience-39.mp3"))
-                        using (var stream = await _api.StreamTrackAsStream(item.GetStreamRequest()))
-                        {
-                            _playbackItem = item;
-                            await Task.Run(() => PlayBackLoop(stream, volume, _cancellationTokenSource.Token), _cancellationTokenSource.Token);
-                        }
-
-                        break;
-                    }
-
+                case StreamingPlaybackState.Buffering:
                 case StreamingPlaybackState.Paused:
-                    SetPlaybackState(StreamingPlaybackState.Buffering);
-                    break;
-
                 case StreamingPlaybackState.Playing:
-                    StopPlayback();
+                    var task = _playbackLoop;
+                    StopPlayback(intent);
+                    await task;
+                    await PlayInternal(item, intent, volume);
+
                     break;
+            }
+        }
+
+        private async Task PlayInternal(IPlaybackItem item, PlaybackIntent intent, int volume)
+        {
+            _cancellationTokenSource?.Dispose();
+            _cancellationTokenSource = new CancellationTokenSource();
+
+            _logger.Debug("fetching stream");
+
+            SetPlaybackState(StreamingPlaybackState.Buffering, intent);
+
+            //using (var stream = File.OpenRead(@"C:\Users\peter\OneDrive\Desktop\mixkit-crickets-and-insects-in-the-wild-ambience-39.mp3"))
+            using (var stream = await _api.StreamTrackAsStream(item.GetStreamRequest(), _cancellationTokenSource.Token))
+            {
+                _playbackLoop = Task.Run(() => PlayBackLoop(stream, volume, _cancellationTokenSource.Token), _cancellationTokenSource.Token);
+                await _playbackLoop;
             }
         }
 
@@ -111,6 +118,11 @@ namespace SoftThorn.Monstercat.Browser.Wpf
                             _playbackInfrastructure = infrastructure = PlaybackInfrastructure.Create(_synchronizationContext, _logger, frame, volume);
                         }
 
+                        if (token.IsCancellationRequested)
+                        {
+                            return;
+                        }
+
                         infrastructure.ProcessFrame(frame);
                     }
                     while (_playbackState != StreamingPlaybackState.Stopped);
@@ -135,24 +147,6 @@ namespace SoftThorn.Monstercat.Browser.Wpf
                 return;
             }
 
-            if (_playbackState != StreamingPlaybackState.Buffering)
-            {
-                switch (_playbackInfrastructure.GetState())
-                {
-                    case PlaybackState.Stopped:
-                        _messenger.Send(new ValueChangedMessage<StreamingPlaybackState>(StreamingPlaybackState.Stopped));
-                        break;
-
-                    case PlaybackState.Playing:
-                        _messenger.Send(new ValueChangedMessage<StreamingPlaybackState>(StreamingPlaybackState.Playing));
-                        break;
-
-                    case PlaybackState.Paused:
-                        _messenger.Send(new ValueChangedMessage<StreamingPlaybackState>(StreamingPlaybackState.Paused));
-                        break;
-                }
-            }
-
             if (_playbackState == StreamingPlaybackState.Stopped || _playbackState == StreamingPlaybackState.Paused)
             {
                 return;
@@ -164,36 +158,38 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             if (bufferedSeconds < 0.5 && _playbackState == StreamingPlaybackState.Playing && !_fullyProcessed)
             {
                 _logger.Debug("Pausing to wait for more buffered data");
-                Pause();
+                Pause(PlaybackIntent.Auto);
             }
             else if (bufferedSeconds > 4 && _playbackState == StreamingPlaybackState.Buffering)
             {
-                Play();
+                _logger.Debug("Resume playback - enough data available");
+                Play(PlaybackIntent.Auto);
             }
             else if (_fullyProcessed && bufferedSeconds == 0)
             {
-                StopPlayback();
+                _logger.Debug("Stop playback - track complete");
+                StopPlayback(PlaybackIntent.Auto);
             }
         }
 
-        public void Play()
+        public void Play(PlaybackIntent intent)
         {
             _playbackInfrastructure?.Play();
-            SetPlaybackState(StreamingPlaybackState.Playing);
+            SetPlaybackState(StreamingPlaybackState.Playing, intent);
         }
 
-        public void Pause()
+        public void Pause(PlaybackIntent intent)
         {
             _playbackInfrastructure?.Pause();
-            SetPlaybackState(StreamingPlaybackState.Paused);
+            SetPlaybackState(StreamingPlaybackState.Paused, intent);
         }
 
-        public void Stop()
+        public void Stop(PlaybackIntent intent)
         {
-            StopPlayback();
+            StopPlayback(intent);
         }
 
-        private void StopPlayback()
+        private void StopPlayback(PlaybackIntent intent)
         {
             if (_playbackState == StreamingPlaybackState.Playing)
             {
@@ -203,19 +199,18 @@ namespace SoftThorn.Monstercat.Browser.Wpf
                 _playbackInfrastructure?.Dispose();
                 _playbackInfrastructure = null;
 
-                _playbackItem?.Dispose();
-                _playbackItem = null;
+                SetPlaybackState(StreamingPlaybackState.Stopped, intent);
 
-                SetPlaybackState(StreamingPlaybackState.Stopped);
+                _playbackLoop = Task.CompletedTask;
             }
         }
 
-        private void SetPlaybackState(StreamingPlaybackState state)
+        private void SetPlaybackState(StreamingPlaybackState state, PlaybackIntent intent, [CallerMemberName] string methodName = null!)
         {
             _playbackState = state;
 
-            _logger.Debug("PlaybackState changed to: {StreamingPlaybackState}", state);
-            _messenger.Send(new ValueChangedMessage<StreamingPlaybackState>(state));
+            _logger.Debug("[{Caller}] PlaybackState changed to: {StreamingPlaybackState} by {Intent}", methodName, state, intent);
+            _messenger.Send(new ValueChangedMessage<(StreamingPlaybackState, PlaybackIntent)>((state, intent)));
         }
 
         public int GetVolume()

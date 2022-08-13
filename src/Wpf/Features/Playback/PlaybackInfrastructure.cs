@@ -102,12 +102,7 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             {
             }
 
-            if (frame is null)
-            {
-                return false;
-            }
-
-            return true;
+            return frame is not null;
         }
 
         public void ProcessFrame(Mp3Frame frame)

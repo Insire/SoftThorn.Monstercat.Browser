@@ -98,33 +98,33 @@ namespace SoftThorn.Monstercat.Browser.Core
                 .Subscribe();
         }
 
-        [RelayCommand(AllowConcurrentExecutions = false, CanExecute = nameof(CanPlay))]
-        public async Task Play(object? args)
+        [RelayCommand(CanExecute = nameof(CanPlay))]
+        public void Play(object? args)
         {
             switch (args)
             {
                 case TrackViewModel track:
-                    await Playback.Add(track);
+                    Playback.Add(track);
                     return;
 
                 case ReleaseViewModel release:
-                    await Playback.Add(release.Tracks);
+                    Playback.Add(release.Tracks);
                     break;
 
                 case ArtistViewModel artist:
-                    await Playback.Add(artist.Tracks);
+                    Playback.Add(artist.Tracks);
                     break;
 
                 case BrandViewModel<Silk> silk:
-                    await Playback.Add(silk.Releases);
+                    Playback.Add(silk.Releases);
                     break;
 
                 case BrandViewModel<Uncaged> uncaged:
-                    await Playback.Add(uncaged.Releases);
+                    Playback.Add(uncaged.Releases);
                     break;
 
                 case BrandViewModel<Instinct> instinct:
-                    await Playback.Add(instinct.Releases);
+                    Playback.Add(instinct.Releases);
                     break;
             }
         }

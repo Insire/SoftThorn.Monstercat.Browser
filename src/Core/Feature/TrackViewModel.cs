@@ -1,9 +1,11 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 
 namespace SoftThorn.Monstercat.Browser.Core
 {
+    [DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
     public sealed partial class TrackViewModel : ObservableObject
     {
         [ObservableProperty]
@@ -58,5 +60,10 @@ namespace SoftThorn.Monstercat.Browser.Core
         private ReleaseViewModel _release = default!;
 
         public Uri? ImageUrl { get; init; }
+
+        private string GetDebuggerDisplay()
+        {
+            return $"{Title} by {ArtistsTitle} ({Id})";
+        }
     }
 }

@@ -1,14 +1,12 @@
-using System.Threading.Tasks;
-
 namespace SoftThorn.Monstercat.Browser.Core
 {
     public interface IPlaybackService
     {
-        Task Play(IPlaybackItem request, int volume);
+        void Play(IPlaybackItem request, PlaybackIntent intent, int volume);
 
-        void Pause();
+        void Pause(PlaybackIntent intent);
 
-        void Play();
+        void Play(PlaybackIntent intent);
 
         StreamingPlaybackState GetPlaybackState();
 
@@ -16,6 +14,6 @@ namespace SoftThorn.Monstercat.Browser.Core
 
         void SetVolume(int volume);
 
-        void Stop();
+        void Stop(PlaybackIntent intent);
     }
 }

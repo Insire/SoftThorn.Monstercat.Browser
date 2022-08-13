@@ -33,13 +33,15 @@ The SoftThorn.Monstercat.Browser app (or SMB app for short) is my approach for d
   - color selection?
   - Enable AssetSize Configuration (Download the art in the format and size you like)
 - AutoUpdate via Github releases
-- Playback (playback the music right in the app)
-  - Qeueu tracks and releases
 - Playlist (manage playback via playlists)
   - Playbackmode (shuffel, one, all, folder)
-  - Playback View (the UI)
-  - Add PlaybackButtons to each section in the Shell (UX: quickly add music to the playback queue)
-  - playlist storage
+
+ ### ToDo
+ - Previous button doesnt work
+ - Volume level isnt being saved
+ - adjust style for playlist button?
+ - download button doesnt show intermediate download progress
+ - investigate naudio playback progress
 
 ## Showcase
 

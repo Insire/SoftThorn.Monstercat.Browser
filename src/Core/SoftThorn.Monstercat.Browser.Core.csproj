@@ -10,7 +10,7 @@
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0" />
         <PackageReference Include="DynamicData" Version="7.9.7" />
         <PackageReference Include="Gress" Version="2.0.1" />
-        <PackageReference Include="MonstercatNet" Version="3.0.35" />
+        <PackageReference Include="MonstercatNet" Version="3.0.41" />
         <PackageReference Include="NAudio.Core" Version="2.1.0" />
         
         <PackageReference Include="LiveChartsCore" Version="2.0.0-beta.300" />

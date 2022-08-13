@@ -1,20 +1,15 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using SoftThorn.MonstercatNet;
+using System.Diagnostics;
 
 namespace SoftThorn.Monstercat.Browser.Core
 {
+    [DebuggerDisplay($"{{{nameof(GetDebuggerDisplay)}(),nq}}")]
     public sealed partial class PlaybackItemViewModel : ObservableObject, IPlaybackItem
     {
         public long Sequence { get; }
 
         public TrackViewModel Track { get; }
-
-        private bool _playbackComnpleted;
-        public bool PlaybackCompleted
-        {
-            get { return _playbackComnpleted; }
-            private set { SetProperty(ref _playbackComnpleted, value); }
-        }
 
         [ObservableProperty]
         private bool _isCurrentlyPlayed;
@@ -34,9 +29,9 @@ namespace SoftThorn.Monstercat.Browser.Core
             };
         }
 
-        public void Dispose()
+        private string GetDebuggerDisplay()
         {
-            PlaybackCompleted = true;
+            return $"[{Sequence}] {Track.Title} by {Track.ArtistsTitle}";
         }
     }
 }
