@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using DynamicData;
 using DynamicData.Binding;
 using Gress;
+using SoftThorn.Monstercat.Browser.Core.Feature.Progress;
 using SoftThorn.MonstercatNet;
 using System;
 using System.Collections.Concurrent;
@@ -45,8 +46,8 @@ namespace SoftThorn.Monstercat.Browser.Core
             {
                 r._excludedTags.Edit(list =>
                 {
-                    r._excludedTagValues = m.Settings.ExcludedTags;
-                    list.Load(m.Settings.ExcludedTags.Select(p => new TagViewModel() { Value = p }));
+                    r._excludedTagValues = m.Value.ExcludedTags;
+                    list.Load(m.Value.ExcludedTags.Select(p => new TagViewModel() { Value = p }));
                 });
             });
         }

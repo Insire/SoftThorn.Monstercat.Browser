@@ -141,10 +141,7 @@ namespace SoftThorn.Monstercat.Browser.Core
         [RelayCommand(CanExecute = nameof(CanDownload))]
         private void Download()
         {
-            Messenger.Send(new DownloadTracksMessage()
-            {
-                Tracks = Tracks.Where(p => p.Downloadable).ToArray()
-            });
+            Messenger.Send(new DownloadTracksMessage(Tracks.Where(p => p.Downloadable).ToArray()));
 
             OnDownloadStarted?.Invoke();
         }

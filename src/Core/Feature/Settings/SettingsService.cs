@@ -214,10 +214,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                 Password = credentials.Password;
             }
 
-            _messenger.Send(new SettingsChangedMessage()
-            {
-                Settings = settings,
-            });
+            _messenger.Send(new SettingsChangedMessage(settings));
 
             static void CreateDirectory(string? directoryPath)
             {
@@ -257,10 +254,7 @@ namespace SoftThorn.Monstercat.Browser.Core
 
             await SaveCredentials(credentials);
 
-            _messenger.Send(new SettingsChangedMessage()
-            {
-                Settings = settings,
-            });
+            _messenger.Send(new SettingsChangedMessage(settings));
         }
     }
 }

@@ -1,7 +1,12 @@
+using CommunityToolkit.Mvvm.Messaging.Messages;
+
 namespace SoftThorn.Monstercat.Browser.Core
 {
-    internal sealed class SettingsChangedMessage
+    public sealed class SettingsChangedMessage : ValueChangedMessage<SettingsModel>
     {
-        public SettingsModel Settings { get; init; } = default!;
+        public SettingsChangedMessage(SettingsModel value)
+            : base(value)
+        {
+        }
     }
 }

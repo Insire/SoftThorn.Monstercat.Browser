@@ -1,10 +1,13 @@
-using System;
+using CommunityToolkit.Mvvm.Messaging.Messages;
 using System.Collections.Generic;
 
 namespace SoftThorn.Monstercat.Browser.Core
 {
-    internal sealed class DownloadTracksMessage
+    internal sealed class DownloadTracksMessage : ValueChangedMessage<IReadOnlyCollection<TrackViewModel>>
     {
-        public IReadOnlyCollection<TrackViewModel> Tracks { get; init; } = Array.Empty<TrackViewModel>();
+        public DownloadTracksMessage(IReadOnlyCollection<TrackViewModel> tracks)
+            : base(tracks)
+        {
+        }
     }
 }

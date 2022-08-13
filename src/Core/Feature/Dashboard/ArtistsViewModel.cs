@@ -31,7 +31,7 @@ namespace SoftThorn.Monstercat.Browser.Core
             Messenger.Register<ArtistsViewModel, SettingsChangedMessage>(this, (r, m) =>
             {
                 r._subscription?.Dispose();
-                r._subscription = CreateSubscription(m.Settings.ArtistsCount);
+                r._subscription = CreateSubscription(m.Value.ArtistsCount);
             });
 
             IDisposable CreateSubscription(int size = 10)

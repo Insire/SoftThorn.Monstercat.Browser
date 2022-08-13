@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using Gress;
+using SoftThorn.Monstercat.Browser.Core.Feature.Progress;
 using SoftThorn.MonstercatNet;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,7 @@ namespace SoftThorn.Monstercat.Browser.Core
     public sealed partial class DownloadViewModel : ObservableRecipient
     {
         private readonly IMonstercatApi _api;
+        private readonly DispatcherProgressFactory<Percentage> _dispatcherProgressFactory;
         private readonly DispatcherProgress<Percentage> _progressService;
 
         private int _parallelDownloads;
@@ -32,29 +34,29 @@ namespace SoftThorn.Monstercat.Browser.Core
 
         public ProgressContainer<Percentage> Progress { get; }
 
-        public DownloadViewModel(SynchronizationContext synchronizationContext, IMonstercatApi api, IMessenger messenger)
+        public DownloadViewModel(IMonstercatApi api, IMessenger messenger, DispatcherProgressFactory<Percentage> dispatcherProgressFactory)
             : base(messenger)
         {
             _api = api ?? throw new ArgumentNullException(nameof(api));
-
+            _dispatcherProgressFactory = dispatcherProgressFactory;
             Progress = new ProgressContainer<Percentage>();
-            _progressService = new DispatcherProgress<Percentage>(synchronizationContext, (p) => Progress.Report(p), TimeSpan.FromMilliseconds(250));
+            _progressService = _dispatcherProgressFactory.Create((p) => Progress.Report(p));
 
             // messages
             messenger.Register<DownloadViewModel, SettingsChangedMessage>(this, (r, m) =>
             {
-                r._downloadTracksPath = m.Settings.DownloadTracksPath;
-                r._downloadFileFormat = m.Settings.DownloadFileFormat;
-                r._parallelDownloads = m.Settings.ParallelDownloads;
+                r._downloadTracksPath = m.Value.DownloadTracksPath;
+                r._downloadFileFormat = m.Value.DownloadFileFormat;
+                r._parallelDownloads = m.Value.ParallelDownloads;
             });
 
             messenger.Register<DownloadViewModel, DownloadTracksMessage>(this, async (r, m) =>
             {
-                await r.Download(m.Tracks, CancellationToken.None);
+                await r.Download(m.Value, CancellationToken.None);
             });
         }
 
-        private async Task Download(IReadOnlyCollection<TrackViewModel> tracks, CancellationToken token)
+        public async Task Download(IReadOnlyCollection<TrackViewModel> tracks, CancellationToken token)
         {
             var parallelDownloads = _parallelDownloads;
             var fileFormat = _downloadFileFormat;

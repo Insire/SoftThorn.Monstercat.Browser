@@ -57,7 +57,7 @@ namespace SoftThorn.Monstercat.Browser.Core
             Messenger.Register<GenresViewModel, SettingsChangedMessage>(this, (r, m) =>
             {
                 r._subscription?.Dispose();
-                r._subscription = CreateSubscription(m.Settings.GenresCount);
+                r._subscription = CreateSubscription(m.Value.GenresCount);
             });
 
             IDisposable CreateSubscription(int size = 10)

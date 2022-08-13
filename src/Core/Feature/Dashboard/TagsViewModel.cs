@@ -57,7 +57,7 @@ namespace SoftThorn.Monstercat.Browser.Core
             Messenger.Register<TagsViewModel, SettingsChangedMessage>(this, (r, m) =>
             {
                 r._subscription?.Dispose();
-                r._subscription = CreateSubscription(m.Settings.TagsCount);
+                r._subscription = CreateSubscription(m.Value.TagsCount);
             });
 
             IDisposable CreateSubscription(int size = 10)
