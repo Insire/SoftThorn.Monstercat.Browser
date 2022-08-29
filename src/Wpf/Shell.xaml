@@ -12,6 +12,7 @@
                  xmlns:wpf="clr-namespace:SoftThorn.Monstercat.Browser.Wpf"
                  xmlns:xf="clr-namespace:XamlFlair;assembly=XamlFlair.WPF"
                  xmlns:xfc="clr-namespace:XamlFlair.Controls;assembly=XamlFlair.WPF"
+                 x:Name="rootWindow"
                  Title="{Binding Title}"
                  Width="800"
                  Height="820"
@@ -147,11 +148,11 @@
                 </DockPanel>
             </materialDesign:PopupBox>
 
-            <Button Click="Settings_Click" ToolTip="Settings">
+            <Button Command="{Binding SettingsCommand, ElementName=rootWindow}" ToolTip="Settings">
                 <iconpacks:FontAwesome Kind="WrenchSolid" />
             </Button>
 
-            <Button Click="About_Click" ToolTip="About">
+            <Button Command="{Binding AboutCommand, ElementName=rootWindow}" ToolTip="About">
                 <iconpacks:FontAwesome Kind="GlobeSolid" />
             </Button>
         </mah:WindowCommands>
@@ -163,12 +164,11 @@
             <materialDesign:TransitionEffect Kind="SlideInFromBottom" />
         </materialDesign:TransitioningContent.OpeningEffects>
 
-        <Grid>
+        <Grid Grid.IsSharedSizeScope="True">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="8" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" SharedSizeGroup="ButtonOverlay" />
             </Grid.RowDefinitions>
 
             <Grid.ColumnDefinitions>
@@ -257,16 +257,32 @@
                                                             CanUserSort="False">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate DataType="{x:Type core:ReleaseViewModel}">
-                                                <Button Command="{Binding Data.PlayCommand, Source={StaticResource ShellViewModelProxy}, IsAsync=True}"
-                                                        CommandParameter="{Binding}"
-                                                        Style="{StaticResource MaterialDesignIconButton}"
-                                                        ToolTip="Play">
+                                                <materialDesign:PopupBox PlacementMode="RightAndAlignMiddles"
+                                                                         PopupMode="MouseOver"
+                                                                         ToolTipService.Placement="Right">
 
-                                                    <iconpacks:PackIconFontAwesome Width="12"
-                                                                                   Height="12"
-                                                                                   Foreground="{DynamicResource PrimaryHueMidBrush}"
-                                                                                   Kind="PlaySolid" />
-                                                </Button>
+                                                    <materialDesign:PopupBox.Style>
+                                                        <Style BasedOn="{StaticResource MaterialDesignMultiFloatingActionAccentPopupBox}" TargetType="{x:Type materialDesign:PopupBox}" />
+                                                    </materialDesign:PopupBox.Style>
+
+                                                    <StackPanel>
+                                                        <Button Margin="4"
+                                                                Command="{Binding DownloadReleaseCommand, ElementName=rootWindow}"
+                                                                CommandParameter="{Binding}"
+                                                                Style="{StaticResource MaterialDesignFloatingActionMiniSecondaryLightButton}"
+                                                                ToolTip="Download all tracks">
+                                                            <iconpacks:PackIconFontAwesome Kind="DownloadSolid" />
+                                                        </Button>
+
+                                                        <Button Margin="4"
+                                                                Command="{Binding Data.PlayCommand, Source={StaticResource ShellViewModelProxy}}"
+                                                                CommandParameter="{Binding}"
+                                                                Style="{StaticResource MaterialDesignFloatingActionMiniSecondaryLightButton}"
+                                                                ToolTip="Play all tracks">
+                                                            <iconpacks:PackIconFontAwesome Kind="PlaySolid" />
+                                                        </Button>
+                                                    </StackPanel>
+                                                </materialDesign:PopupBox>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
@@ -409,7 +425,8 @@
                                                              ToolTipService.Placement="Right">
                                         <StackPanel>
                                             <Button Margin="4"
-                                                    Click="DownloadUncaged_Click"
+                                                    Command="{Binding DownloadUncagedCommand, ElementName=rootWindow}"
+                                                    CommandParameter="{Binding}"
                                                     Style="{StaticResource MaterialDesignFloatingActionMiniSecondaryLightButton}"
                                                     ToolTip="Download all UNCAGED tracks">
                                                 <iconpacks:PackIconFontAwesome Kind="DownloadSolid" />
@@ -419,7 +436,7 @@
                                                     Command="{Binding Data.PlayCommand, Source={StaticResource ShellViewModelProxy}}"
                                                     CommandParameter="{Binding}"
                                                     Style="{StaticResource MaterialDesignFloatingActionMiniSecondaryLightButton}"
-                                                    ToolTip="Play all SILK tracks">
+                                                    ToolTip="Play all UNCAGED tracks">
                                                 <iconpacks:PackIconFontAwesome Kind="PlaySolid" />
                                             </Button>
                                         </StackPanel>
@@ -476,7 +493,8 @@
                                                              ToolTipService.Placement="Right">
                                         <StackPanel>
                                             <Button Margin="4"
-                                                    Click="DownloadInstinct_Click"
+                                                    Command="{Binding DownloadInstinctCommand, ElementName=rootWindow}"
+                                                    CommandParameter="{Binding}"
                                                     Style="{StaticResource MaterialDesignFloatingActionMiniSecondaryLightButton}"
                                                     ToolTip="Download all INSTINCT tracks">
                                                 <iconpacks:PackIconFontAwesome Kind="DownloadSolid" />
@@ -486,7 +504,7 @@
                                                     Command="{Binding Data.PlayCommand, Source={StaticResource ShellViewModelProxy}}"
                                                     CommandParameter="{Binding}"
                                                     Style="{StaticResource MaterialDesignFloatingActionMiniSecondaryLightButton}"
-                                                    ToolTip="Play all SILK tracks">
+                                                    ToolTip="Play all INSTINCT tracks">
                                                 <iconpacks:PackIconFontAwesome Kind="PlaySolid" />
                                             </Button>
                                         </StackPanel>
@@ -543,7 +561,8 @@
                                                              ToolTipService.Placement="Right">
                                         <StackPanel>
                                             <Button Margin="4"
-                                                    Click="DownloadSilk_Click"
+                                                    Command="{Binding DownloadSilkCommand, ElementName=rootWindow}"
+                                                    CommandParameter="{Binding}"
                                                     Style="{StaticResource MaterialDesignFloatingActionMiniSecondaryLightButton}"
                                                     ToolTip="Download all SILK tracks">
                                                 <iconpacks:PackIconFontAwesome Kind="DownloadSolid" />
@@ -586,11 +605,11 @@
                         </GroupBox.Header>
 
                         <Grid>
-                            <DataGrid materialDesign:ScrollViewerAssist.IsAutoHideEnabled="true"
-                                      AutoGenerateColumns="False"
+                            <DataGrid AutoGenerateColumns="False"
                                       CanUserSortColumns="False"
                                       IsReadOnly="True"
                                       ItemsSource="{Binding Artists.Artists}"
+                                      ScrollViewer.VerticalScrollBarVisibility="Hidden"
                                       SelectionMode="Single"
                                       SelectionUnit="FullRow">
                                 <DataGrid.Resources>
@@ -615,23 +634,37 @@
                                     <DataGridTextColumn Binding="{Binding LatestReleaseCount}" Header="Tracks" />
                                     <DataGridTextColumn Binding="{Binding Tracks.Count}" Header="Total Tracks" />
 
-                                    <DataGridTemplateColumn Width="72"
+                                    <DataGridTemplateColumn Width="96"
                                                             CanUserResize="False"
                                                             CanUserSort="False">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate DataType="{x:Type core:ArtistViewModel}">
-                                                <Button Width="36"
-                                                        Height="36"
-                                                        Command="{Binding Data.PlayCommand, Source={StaticResource ShellViewModelProxy}, IsAsync=True}"
-                                                        CommandParameter="{Binding}"
-                                                        Style="{StaticResource MaterialDesignIconForegroundButton}"
-                                                        ToolTip="Play">
+                                                <materialDesign:PopupBox PlacementMode="RightAndAlignMiddles"
+                                                                         PopupMode="MouseOver"
+                                                                         ToolTipService.Placement="Right">
 
-                                                    <iconpacks:PackIconFontAwesome Width="12"
-                                                                                   Height="12"
-                                                                                   Foreground="{DynamicResource PrimaryHueMidBrush}"
-                                                                                   Kind="PlaySolid" />
-                                                </Button>
+                                                    <materialDesign:PopupBox.Style>
+                                                        <Style BasedOn="{StaticResource MaterialDesignMultiFloatingActionAccentPopupBox}" TargetType="{x:Type materialDesign:PopupBox}" />
+                                                    </materialDesign:PopupBox.Style>
+
+                                                    <StackPanel>
+                                                        <Button Margin="4"
+                                                                Command="{Binding DownloadArtistCommand, ElementName=rootWindow}"
+                                                                CommandParameter="{Binding}"
+                                                                Style="{StaticResource MaterialDesignFloatingActionMiniSecondaryLightButton}"
+                                                                ToolTip="Download all Artist tracks">
+                                                            <iconpacks:PackIconFontAwesome Kind="DownloadSolid" />
+                                                        </Button>
+
+                                                        <Button Margin="4"
+                                                                Command="{Binding Data.PlayCommand, Source={StaticResource ShellViewModelProxy}}"
+                                                                CommandParameter="{Binding}"
+                                                                Style="{StaticResource MaterialDesignFloatingActionMiniSecondaryLightButton}"
+                                                                ToolTip="Play all SILK tracks">
+                                                            <iconpacks:PackIconFontAwesome Kind="PlaySolid" />
+                                                        </Button>
+                                                    </StackPanel>
+                                                </materialDesign:PopupBox>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
@@ -699,126 +732,172 @@
                 </Grid>
             </ScrollViewer>
 
-            <!--  Download  -->
-            <Button Grid.Row="0"
-                    Grid.RowSpan="3"
-                    Grid.Column="1"
-                    Margin="0,0,8,8"
-                    HorizontalAlignment="Right"
-                    VerticalAlignment="Bottom"
-                    Panel.ZIndex="1"
-                    materialDesign:ButtonProgressAssist.IsIndicatorVisible="{Binding Downloads.IsDownLoading}"
-                    materialDesign:ButtonProgressAssist.Value="{Binding Downloads.Progress.Current.Value}"
-                    xf:Animations.Primary="{xf:Animate BasedOn={StaticResource FadeIn},
-                                                       Event=Visibility}"
-                    Click="Download_Click"
-                    ToolTip="Download all Tracks now">
-
-                <Button.Style>
-                    <Style BasedOn="{StaticResource MaterialDesignFloatingActionAccentButton}" TargetType="{x:Type Button}">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsLoading}" Value="true">
-                                <Setter Property="Visibility" Value="Hidden" />
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding IsLoading}" Value="false">
-                                <Setter Property="Visibility" Value="Visible" />
-                            </DataTrigger>
-
-                            <DataTrigger Binding="{Binding Downloads.IsDownLoading}" Value="True">
-                                <Setter Property="Content">
-                                    <Setter.Value>
-                                        <materialDesign:Badged materialDesign:BadgedAssist.IsMiniBadge="True"
-                                                               Badge="{Binding Downloads.TracksToDownload}"
-                                                               BadgeBackground="{DynamicResource SecondaryHueLightBrush}">
-                                            <iconpacks:PackIconFontAwesome Kind="DownloadSolid" />
-                                        </materialDesign:Badged>
-                                    </Setter.Value>
-                                </Setter>
-                            </DataTrigger>
-
-                            <DataTrigger Binding="{Binding Downloads.IsDownLoading}" Value="False">
-                                <Setter Property="Content">
-                                    <Setter.Value>
-                                        <iconpacks:PackIconFontAwesome Kind="DownloadSolid" />
-                                    </Setter.Value>
-                                </Setter>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Button.Style>
-            </Button>
-
-            <!--  Playback  -->
-            <Grid Grid.Row="2"
+            <!--  Button Overlay  -->
+            <Grid Grid.Row="0"
+                  Grid.RowSpan="3"
                   Grid.Column="1"
-                  Margin="0,0,0,8"
-                  Panel.ZIndex="0">
-                <Grid.Style>
-                    <Style TargetType="{x:Type Grid}">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding Playback.IsPlaybackAvailable}" Value="True">
-                                <Setter Property="Visibility" Value="Visible" />
-                            </DataTrigger>
-                            <DataTrigger Binding="{Binding Playback.IsPlaybackAvailable}" Value="false">
+                  VerticalAlignment="Bottom">
+
+                <!--  Playback  -->
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" SharedSizeGroup="ButtonOverlay" />
+                    </Grid.RowDefinitions>
+
+                    <materialDesign:ColorZone Padding="8"
+                                              materialDesign:ShadowAssist.ShadowDepth="Depth3"
+                                              materialDesign:ShadowAssist.ShadowEdges="Top"
+                                              Mode="Light">
+                        <materialDesign:ColorZone.Style>
+                            <Style TargetType="{x:Type materialDesign:ColorZone}">
                                 <Setter Property="Visibility" Value="Collapsed" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Grid.Style>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Playback.IsPlaybackAvailable}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Playback.IsPlaybackAvailable}" Value="false">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </materialDesign:ColorZone.Style>
 
-                <Grid.Resources>
-                    <Style x:Key="SecondaryPlaybackButton"
-                           BasedOn="{StaticResource MaterialDesignFloatingActionSecondaryLightButton}"
-                           TargetType="{x:Type Button}">
-                        <Setter Property="Height" Value="48" />
-                        <Setter Property="Width" Value="48" />
-                    </Style>
-                </Grid.Resources>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="8" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="8" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="8" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="8" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+                        <Grid>
+                            <Grid.Resources>
+                                <Style x:Key="SecondaryPlaybackButton"
+                                       BasedOn="{StaticResource MaterialDesignFloatingActionSecondaryLightButton}"
+                                       TargetType="{x:Type Button}">
+                                    <Setter Property="Height" Value="48" />
+                                    <Setter Property="Width" Value="48" />
+                                </Style>
+                            </Grid.Resources>
 
-                <Button Grid.Column="2"
-                        Command="{Binding Playback.PreviousCommand}"
-                        Style="{StaticResource SecondaryPlaybackButton}"
-                        ToolTip="Previous">
-                    <iconpacks:PackIconFontAwesome Kind="BackwardSolid" />
-                </Button>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="8" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="8" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="8" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="8" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
 
-                <Button Grid.Column="4">
+                            <Button Grid.Column="2"
+                                    Command="{Binding Playback.PreviousCommand}"
+                                    Style="{StaticResource SecondaryPlaybackButton}"
+                                    ToolTip="Previous">
+                                <iconpacks:PackIconFontAwesome Kind="BackwardSolid" />
+                            </Button>
+
+                            <Button Grid.Column="4">
+                                <Button.Style>
+                                    <Style BasedOn="{StaticResource MaterialDesignFloatingActionSecondaryButton}" TargetType="{x:Type Button}">
+                                        <Setter Property="Content">
+                                            <Setter.Value>
+                                                <iconpacks:PackIconFontAwesome Kind="PlaySolid" />
+                                            </Setter.Value>
+                                        </Setter>
+
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Playback.PlaybackState}" Value="{x:Static core:StreamingPlaybackState.Playing}">
+                                                <Setter Property="Command" Value="{Binding Playback.PauseCommand}" />
+                                                <Setter Property="ToolTip" Value="Pause" />
+                                                <Setter Property="Content">
+                                                    <Setter.Value>
+                                                        <iconpacks:PackIconFontAwesome Kind="PauseSolid" />
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </DataTrigger>
+
+                                            <DataTrigger Binding="{Binding Playback.PlaybackState}" Value="{x:Static core:StreamingPlaybackState.Paused}">
+                                                <Setter Property="Command" Value="{Binding Playback.ResumePlayCommand}" />
+                                                <Setter Property="ToolTip" Value="Resume" />
+                                                <Setter Property="Content">
+                                                    <Setter.Value>
+                                                        <iconpacks:PackIconFontAwesome Kind="PlaySolid" />
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+
+                            <Button Grid.Column="6"
+                                    Command="{Binding Playback.NextCommand}"
+                                    Style="{StaticResource SecondaryPlaybackButton}"
+                                    ToolTip="Next">
+                                <iconpacks:PackIconFontAwesome Kind="ForwardSolid" />
+                            </Button>
+
+                            <materialDesign:PopupBox Width="48"
+                                                     Height="48"
+                                                     Background="{DynamicResource SecondaryHueLightBrush}"
+                                                     PlacementMode="TopAndAlignCentres"
+                                                     PopupMode="MouseOver"
+                                                     Style="{StaticResource MaterialDesignMultiFloatingActionAccentPopupBox}"
+                                                     ToolTip="Volume"
+                                                     ToolTipService.Placement="Right">
+
+                                <materialDesign:PopupBox.ToggleContent>
+                                    <iconpacks:PackIconFontAwesome Kind="VolumeUpSolid" />
+                                </materialDesign:PopupBox.ToggleContent>
+
+                                <materialDesign:PopupBox.ToggleCheckedContent>
+                                    <iconpacks:PackIconFontAwesome Kind="VolumeOffSolid" />
+                                </materialDesign:PopupBox.ToggleCheckedContent>
+
+                                <Slider Height="125"
+                                        Foreground="{DynamicResource SecondaryHueMidBrush}"
+                                        Maximum="100"
+                                        Minimum="0"
+                                        Orientation="Vertical"
+                                        TickFrequency="0.1"
+                                        TickPlacement="None"
+                                        Value="{Binding Playback.Volume, Mode=TwoWay}" />
+                            </materialDesign:PopupBox>
+                        </Grid>
+                    </materialDesign:ColorZone>
+                </Grid>
+
+                <!--  Download  -->
+                <Button Margin="0,0,8,4"
+                        HorizontalAlignment="Right"
+                        materialDesign:ButtonProgressAssist.IsIndicatorVisible="{Binding Downloads.IsDownLoading}"
+                        materialDesign:ButtonProgressAssist.Value="{Binding Downloads.Progress.Current.Value}"
+                        xf:Animations.Primary="{xf:Animate BasedOn={StaticResource FadeIn},
+                                                           Event=Visibility}"
+                        Command="{Binding DownloadAllCommand, ElementName=rootWindow}"
+                        ToolTip="Download all Tracks now">
+
                     <Button.Style>
-                        <Style BasedOn="{StaticResource MaterialDesignFloatingActionSecondaryButton}" TargetType="{x:Type Button}">
-                            <Setter Property="Content">
-                                <Setter.Value>
-                                    <iconpacks:PackIconFontAwesome Kind="PlaySolid" />
-                                </Setter.Value>
-                            </Setter>
-
+                        <Style BasedOn="{StaticResource MaterialDesignFloatingActionAccentButton}" TargetType="{x:Type Button}">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding Playback.PlaybackState}" Value="{x:Static core:StreamingPlaybackState.Playing}">
-                                    <Setter Property="Command" Value="{Binding Playback.PauseCommand}" />
-                                    <Setter Property="ToolTip" Value="Pause" />
+                                <DataTrigger Binding="{Binding IsLoading}" Value="true">
+                                    <Setter Property="Visibility" Value="Hidden" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsLoading}" Value="false">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+
+                                <DataTrigger Binding="{Binding Downloads.IsDownLoading}" Value="True">
                                     <Setter Property="Content">
                                         <Setter.Value>
-                                            <iconpacks:PackIconFontAwesome Kind="PauseSolid" />
+                                            <materialDesign:Badged materialDesign:BadgedAssist.IsMiniBadge="True"
+                                                                   Badge="{Binding Downloads.TracksToDownload}"
+                                                                   BadgeBackground="{DynamicResource SecondaryHueLightBrush}">
+                                                <iconpacks:PackIconFontAwesome Kind="DownloadSolid" />
+                                            </materialDesign:Badged>
                                         </Setter.Value>
                                     </Setter>
                                 </DataTrigger>
 
-                                <DataTrigger Binding="{Binding Playback.PlaybackState}" Value="{x:Static core:StreamingPlaybackState.Paused}">
-                                    <Setter Property="Command" Value="{Binding Playback.ResumePlayCommand}" />
-                                    <Setter Property="ToolTip" Value="Resume" />
+                                <DataTrigger Binding="{Binding Downloads.IsDownLoading}" Value="False">
                                     <Setter Property="Content">
                                         <Setter.Value>
-                                            <iconpacks:PackIconFontAwesome Kind="PlaySolid" />
+                                            <iconpacks:PackIconFontAwesome Kind="DownloadSolid" />
                                         </Setter.Value>
                                     </Setter>
                                 </DataTrigger>
@@ -826,44 +905,12 @@
                         </Style>
                     </Button.Style>
                 </Button>
-
-                <Button Grid.Column="6"
-                        Command="{Binding Playback.NextCommand}"
-                        Style="{StaticResource SecondaryPlaybackButton}"
-                        ToolTip="Next">
-                    <iconpacks:PackIconFontAwesome Kind="ForwardSolid" />
-                </Button>
-
-                <materialDesign:PopupBox Width="48"
-                                         Height="48"
-                                         Background="{DynamicResource SecondaryHueLightBrush}"
-                                         PlacementMode="TopAndAlignCentres"
-                                         PopupMode="MouseOver"
-                                         Style="{StaticResource MaterialDesignMultiFloatingActionAccentPopupBox}"
-                                         ToolTip="Volume"
-                                         ToolTipService.Placement="Right">
-
-                    <materialDesign:PopupBox.ToggleContent>
-                        <iconpacks:PackIconFontAwesome Kind="VolumeUpSolid" />
-                    </materialDesign:PopupBox.ToggleContent>
-
-                    <materialDesign:PopupBox.ToggleCheckedContent>
-                        <iconpacks:PackIconFontAwesome Kind="VolumeOffSolid" />
-                    </materialDesign:PopupBox.ToggleCheckedContent>
-
-                    <Slider Height="125"
-                            Foreground="{DynamicResource SecondaryHueMidBrush}"
-                            Maximum="100"
-                            Minimum="0"
-                            Orientation="Vertical"
-                            TickFrequency="0.1"
-                            TickPlacement="None"
-                            Value="{Binding Playback.Volume, Mode=TwoWay}" />
-                </materialDesign:PopupBox>
             </Grid>
 
             <!--  Progress  -->
-            <ContentControl Grid.Row="3" Grid.ColumnSpan="3">
+            <ContentControl Grid.Row="2"
+                            Grid.ColumnSpan="3"
+                            VerticalAlignment="Bottom">
                 <ProgressBar Maximum="100">
                     <i:Interaction.Behaviors>
                         <wpf:SmoothProgressBehavior Percentage="{Binding Progress.Current.Value, Mode=OneWay}" />

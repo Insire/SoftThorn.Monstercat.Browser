@@ -41,5 +41,19 @@ namespace SoftThorn.Monstercat.Browser.Core
 
             return new SearchViewModel(_synchronizationContext, _messenger, brandViewModel.Releases.ToArray(), tags.Select(p => p.Current).ToArray());
         }
+
+        public async Task<SearchViewModel> CreateFromRelease(ReleaseViewModel release)
+        {
+            var tags = await _trackRepository.ConnectFilteredTagViewModels().FirstOrDefaultAsync();
+
+            return new SearchViewModel(_synchronizationContext, _messenger, release.Tracks.ToArray(), tags.Select(p => p.Current).ToArray());
+        }
+
+        public async Task<SearchViewModel> CreateFromArtist(ArtistViewModel artist)
+        {
+            var tags = await _trackRepository.ConnectFilteredTagViewModels().FirstOrDefaultAsync();
+
+            return new SearchViewModel(_synchronizationContext, _messenger, artist.Tracks.ToArray(), tags.Select(p => p.Current).ToArray());
+        }
     }
 }

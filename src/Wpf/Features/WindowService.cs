@@ -47,7 +47,7 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             loginView.ShowDialog();
         }
 
-        public async Task ShowSearchView<TBrand>(Window owner, BrandViewModel<TBrand>? brandViewModel = null)
+        public async Task ShowSearchView<TBrand>(Window owner, BrandViewModel<TBrand>? brand = null, ReleaseViewModel? release = null, ArtistViewModel? artist = null)
             where TBrand : Brand, new()
         {
             var wasLoggedIn = _shellViewModel.IsLoggedIn;
@@ -63,9 +63,13 @@ namespace SoftThorn.Monstercat.Browser.Wpf
                 await _shellViewModel.Refresh();
             }
 
-            var search = brandViewModel is null
+            var search = brand is null
+                ? release is null
+                ? artist is null
                 ? await _searchViewModelFactory.Create()
-                : await _searchViewModelFactory.CreateFromBrand(brandViewModel);
+                : await _searchViewModelFactory.CreateFromArtist(artist)
+                : await _searchViewModelFactory.CreateFromRelease(release)
+                : await _searchViewModelFactory.CreateFromBrand(brand);
 
             var wnd = new SearchView(search)
             {

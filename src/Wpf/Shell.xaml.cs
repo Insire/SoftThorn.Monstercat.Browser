@@ -1,6 +1,8 @@
+using CommunityToolkit.Mvvm.Input;
 using Jot;
 using SoftThorn.Monstercat.Browser.Core;
 using System;
+using System.Threading.Tasks;
 
 namespace SoftThorn.Monstercat.Browser.Wpf
 {
@@ -24,39 +26,57 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             tracker.Track(this);
         }
 
-        private async void Download_Click(object sender, System.Windows.RoutedEventArgs e)
+        [RelayCommand]
+        private async Task DownloadAll()
         {
             await _windowService.ShowSearchView<Silk>(this, null);
         }
 
-        private void About_Click(object sender, System.Windows.RoutedEventArgs e)
+        [RelayCommand]
+        private async Task DownloadRelease(ReleaseViewModel? release)
+        {
+            await _windowService.ShowSearchView<Silk>(this, release: release);
+        }
+
+        [RelayCommand]
+        private async Task DownloadArtist(ArtistViewModel? artist)
+        {
+            await _windowService.ShowSearchView<Silk>(this, artist: artist);
+        }
+
+        [RelayCommand]
+        private void About()
         {
             _windowService.ShowAbout(this);
         }
 
-        private void Settings_Click(object sender, System.Windows.RoutedEventArgs e)
+        [RelayCommand]
+        private void Settings()
         {
             _windowService.ShowSettings(this);
+        }
+
+        [RelayCommand]
+        private async Task DownloadSilk()
+        {
+            await _windowService.ShowSearchView(this, brand: _shellViewModel.Silk);
+        }
+
+        [RelayCommand]
+        private async Task DownloadInstinct()
+        {
+            await _windowService.ShowSearchView(this, brand: _shellViewModel.Instinct);
+        }
+
+        [RelayCommand]
+        private async Task DownloadUncaged()
+        {
+            await _windowService.ShowSearchView(this, brand: _shellViewModel.Uncaged);
         }
 
         private void Playlist_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             PlaylistPopup.IsPopupOpen = !PlaylistPopup.IsPopupOpen;
-        }
-
-        private async void DownloadSilk_Click(object sender, System.Windows.RoutedEventArgs e)
-        {
-            await _windowService.ShowSearchView(this, _shellViewModel.Silk);
-        }
-
-        private async void DownloadInstinct_Click(object sender, System.Windows.RoutedEventArgs e)
-        {
-            await _windowService.ShowSearchView(this, _shellViewModel.Instinct);
-        }
-
-        private async void DownloadUncaged_Click(object sender, System.Windows.RoutedEventArgs e)
-        {
-            await _windowService.ShowSearchView(this, _shellViewModel.Uncaged);
         }
     }
 }
