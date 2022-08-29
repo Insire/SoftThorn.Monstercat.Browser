@@ -1,19 +1,22 @@
 using Gress;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Threading;
 
 namespace SoftThorn.Monstercat.Browser.Core
 {
-    public sealed class DispatcherProgressFactory<T>
+    public sealed class DispatcherProgressFactory<T> : IDispatcherProgressFactory<T>
     {
         private readonly SynchronizationContext _synchronizationContext;
+        private readonly ILogger _log;
         private readonly ProgressContainer<T> _progress;
         private readonly List<Action<T>> _callbacks;
 
-        public DispatcherProgressFactory(SynchronizationContext synchronizationContext, ProgressContainer<T> progress)
+        public DispatcherProgressFactory(SynchronizationContext synchronizationContext, ILogger log, ProgressContainer<T> progress)
         {
             _synchronizationContext = synchronizationContext ?? throw new ArgumentNullException(nameof(synchronizationContext));
+            _log = log.ForContext<DispatcherProgressFactory<T>>();
             _progress = progress ?? throw new ArgumentNullException(nameof(progress));
             _callbacks = new List<Action<T>>();
         }
@@ -27,11 +30,12 @@ namespace SoftThorn.Monstercat.Browser.Core
         {
             _callbacks.Add(callback);
 
-            return new DispatcherProgress<T>(_synchronizationContext, (p) => callback.Invoke(p), TimeSpan.FromMilliseconds(250), new CallbackDisposeable(callback, _callbacks));
+            return new DispatcherProgress<T>(_synchronizationContext, (p) => Report(p), TimeSpan.FromMilliseconds(250), new CallbackDisposeable(callback, _callbacks));
         }
 
         private void Report(T value)
         {
+            _log.Verbose("Progress changed to {Value}", value);
             _progress.Report(value);
 
             var array = _callbacks.ToArray();

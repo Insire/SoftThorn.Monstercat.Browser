@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SoftThorn.Monstercat.Browser.Cli": {
+      "commandName": "Project",
+      "commandLineArgs": "-e peter.vietense@hotmail.de -p E9j&4gV6&*AMYBkwSV -d \\\\diskstation\\music\\Monstercat"
+    }
+  }
+}

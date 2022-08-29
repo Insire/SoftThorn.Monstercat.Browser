@@ -6,8 +6,6 @@ using Spectre.Console;
 using Spectre.Console.Cli;
 using System.ComponentModel;
 using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
-using System.Threading.Tasks;
 
 namespace SoftThorn.Monstercat.Browser.Cli.Commands
 {
@@ -45,7 +43,6 @@ namespace SoftThorn.Monstercat.Browser.Cli.Commands
                 .Spinner(Spinner.Known.Line)
                 .StartAsync("Preparing download...", async ctx =>
                 {
-                    // Simulate some work
                     ctx.Status = "Loading settings...";
                     await _settingsViewModel.Load();
 
@@ -80,14 +77,10 @@ namespace SoftThorn.Monstercat.Browser.Cli.Commands
                 {
                     var tracksToDownload = new List<TrackViewModel>();
 
-                    // Define tasks
                     var task1 = ctx.AddTask("[green]Fetching tracks[/]", true, 100);
                     var task2 = ctx.AddTask("[green]Downloading tracks[/]", true, 100);
 
-                    using (var progress = _progressFactory.Create((percentage) =>
-                    {
-                        task1.Value = percentage.Value;
-                    }))
+                    using (_progressFactory.Create((percentage) => task1.Value = percentage.Value))
                     {
                         await _shellViewModel.Refresh();
 
@@ -104,12 +97,10 @@ namespace SoftThorn.Monstercat.Browser.Cli.Commands
                         task1.Value = 100;
                     }
 
-                    using (var progress = _progressFactory.Create((percentage) =>
-                    {
-                        task2.Value = percentage.Value;
-                    }))
+                    using (_progressFactory.Create((percentage) => task2.Value = percentage.Value))
                     {
                         await _downloadViewModel.Download(tracksToDownload, CancellationToken.None);
+                        task2.Value = 100;
                     }
                 });
 

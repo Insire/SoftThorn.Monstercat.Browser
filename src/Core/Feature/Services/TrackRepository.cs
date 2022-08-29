@@ -2,7 +2,6 @@ using CommunityToolkit.Mvvm.Messaging;
 using DynamicData;
 using DynamicData.Binding;
 using Gress;
-using SoftThorn.Monstercat.Browser.Core.Feature.Progress;
 using SoftThorn.MonstercatNet;
 using System;
 using System.Collections.Concurrent;

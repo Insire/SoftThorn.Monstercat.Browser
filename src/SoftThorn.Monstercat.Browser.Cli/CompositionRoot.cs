@@ -5,10 +5,10 @@ using Gress;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 using Serilog.Events;
+using Serilog.Sinks.SpectreConsole;
 using SoftThorn.Monstercat.Browser.Cli.Commands;
 using SoftThorn.Monstercat.Browser.Cli.Services;
 using SoftThorn.Monstercat.Browser.Core;
-using SoftThorn.Monstercat.Browser.Core.Feature.Progress;
 using SoftThorn.MonstercatNet;
 using System.Reflection;
 
@@ -82,6 +82,7 @@ namespace SoftThorn.Monstercat.Browser.Cli
                 .Enrich.WithProcessId()
                 .Enrich.WithProcessName()
                 .WriteTo.Debug(outputTemplate: "[{Timestamp:HH:mm:ss}] [{Level:u3}] {SourceContext} {Message:lj}{NewLine}{Exception}")
+                .WriteTo.SpectreConsole("{Timestamp:HH:mm:ss} [{Level:u4}] {Message:lj}{NewLine}{Exception}", minLevel: LogEventLevel.Information)
                 .CreateLogger();
 
             container.RegisterInstance<ILogger>(log);

@@ -56,6 +56,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                 if (disposing)
                 {
                     _subscription?.Dispose();
+                    Messenger.UnregisterAll(this);
                 }
 
                 _disposedValue = true;

@@ -59,12 +59,8 @@ namespace SoftThorn.Monstercat.Browser.Core
             }
         }
 
+        [ObservableProperty]
         private int _volume;
-        public int Volume
-        {
-            get { return _volume; }
-            set { SetProperty(ref _volume, value); }
-        }
 
         public IObservableCollection<PlaybackItemViewModel> Items { get; }
 
