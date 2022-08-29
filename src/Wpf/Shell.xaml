@@ -245,8 +245,10 @@
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
-                                    <DataGridTextColumn Binding="{Binding Title}" Header="Title" />
-                                    <DataGridTextColumn Binding="{Binding Version}" />
+                                    <DataGridTextColumn Width="Auto"
+                                                        Binding="{Binding Title}"
+                                                        Header="Title" />
+                                    <DataGridTextColumn Width="Auto" Binding="{Binding Version}" />
                                     <DataGridTextColumn Width="*"
                                                         Binding="{Binding ArtistsTitle}"
                                                         Header="Artist" />

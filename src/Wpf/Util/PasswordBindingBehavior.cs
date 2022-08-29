@@ -31,7 +31,7 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             AssociatedObject.PasswordChanged += PasswordChanged;
         }
 
-        private void PasswordChanged(object sender, RoutedEventArgs e)
+        private void PasswordChanged(object? sender, RoutedEventArgs e)
         {
             SetCurrentValue(ClearTextPasswordProperty, AssociatedObject.Password);
         }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
@@ -9,9 +9,6 @@ namespace SoftThorn.Monstercat.Browser.Wpf
     /// <summary>
     /// whether a bound number is larger than <see cref="Value"/>
     /// </summary>
-    /// <remarks>
-    /// <c>xmlns:mvvm="http://SoftThorn.MvvmScarletToolkit.com/winfx/xaml/shared"</c>
-    /// </remarks>
     [ValueConversion(typeof(double?), typeof(bool))]
     public sealed class GreaterThan : MarkupExtension, IValueConverter
     {

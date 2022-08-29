@@ -167,14 +167,21 @@
 
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="{x:Type core:TrackViewModel}">
-
                         <Border Padding="8"
                                 BorderBrush="{DynamicResource MaterialDesignDivider}"
                                 BorderThickness="0,0,0,1">
+                            <Border.ToolTip>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding DebutDate, StringFormat='{}Debut: {0:dd MMMM yyyy}'}" />
+                                    <TextBlock Text="{Binding ReleaseDate, StringFormat='{}Release: {0:dd MMMM yyyy}'}" />
+                                    <TextBlock Text="{Binding CatalogId, StringFormat='{}Catalogid: {0}'}" />
+                                </StackPanel>
+                            </Border.ToolTip>
+
                             <Grid>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition SharedSizeGroup="Checkerz" />
-                                    <ColumnDefinition />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
 
                                 <Image Height="60"
@@ -183,9 +190,36 @@
                                        RenderOptions.EdgeMode="Aliased"
                                        SnapsToDevicePixels="True"
                                        Source="{Binding ImageUrl, Mode=OneTime}" />
+
                                 <StackPanel Grid.Column="1" Margin="8,0,0,0">
-                                    <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}" Text="{Binding Title}" />
-                                    <TextBlock Style="{StaticResource MaterialDesignBody2TextBlock}" Text="{Binding ArtistsTitle}" />
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Style="{StaticResource MaterialDesignBody1TextBlock}" Text="{Binding Title}" />
+                                        <TextBlock Text="{Binding Version, StringFormat='{}  ({0})'}">
+                                            <TextBlock.Style>
+                                                <Style BasedOn="{StaticResource MaterialDesignCaptionTextBlock}" TargetType="{x:Type TextBlock}">
+                                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Version, Converter={wpf:IsNotNullOrWhiteSpace}}" Value="False">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Version, Converter={wpf:IsNotNullOrWhiteSpace}}" Value="True">
+                                                            <Setter Property="Visibility" Value="Visible" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock VerticalAlignment="Center"
+                                                   Style="{StaticResource MaterialDesignBody2TextBlock}"
+                                                   Text="{Binding ArtistsTitle}" />
+                                        <TextBlock VerticalAlignment="Center"
+                                                   Style="{StaticResource MaterialDesignBody2TextBlock}"
+                                                   Text="{Binding Release.Title, StringFormat='{} ({0})'}" />
+                                    </StackPanel>
+
                                     <TextBlock Style="{StaticResource MaterialDesignCaptionTextBlock}" Text="{Binding Brand}" />
                                 </StackPanel>
                             </Grid>

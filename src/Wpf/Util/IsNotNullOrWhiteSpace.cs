@@ -5,16 +5,16 @@ using System.Windows.Data;
 namespace SoftThorn.Monstercat.Browser.Wpf
 {
     /// <summary>
-    /// negate a boolean value
+    /// whether a string is not null or whitespace
     /// </summary>
-    [ValueConversion(typeof(bool), typeof(bool))]
-    public sealed class IsNot : ConverterMarkupExtension<IsNot>
+    [ValueConversion(typeof(string), typeof(bool))]
+    public sealed class IsNotNullOrWhiteSpace : ConverterMarkupExtension<IsNotNullOrWhiteSpace>
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is bool boolean)
+            if (value is string text)
             {
-                return !boolean;
+                return !string.IsNullOrWhiteSpace(text);
             }
 
             return false;
