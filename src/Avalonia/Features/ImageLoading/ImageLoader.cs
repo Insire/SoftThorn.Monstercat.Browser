@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media.Imaging;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IO;
 using SoftThorn.Monstercat.Browser.Core;
 using System;
@@ -13,7 +14,7 @@ namespace SoftThorn.Monstercat.Browser.Avalonia
     {
         public static RecyclableMemoryStreamManager Manager { get; set; } = new RecyclableMemoryStreamManager();
         public static IImageFactory<IBitmap> ImageFactory { get; set; } = new ImageFactory();
-        public static IAsyncImageLoader<IBitmap> AsyncImageLoader { get; set; } = new RamCachedWebImageLoader<IBitmap>(Manager, ImageFactory);
+        public static IAsyncImageLoader<IBitmap> AsyncImageLoader { get; set; } = new RamCachedWebImageLoader<IBitmap>(Serilog.Log.Logger, new MemoryCache(new MemoryCacheOptions()), Manager, ImageFactory);
 
         static ImageLoader()
         {
