@@ -8,7 +8,6 @@
                          xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
                          xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                          xmlns:wpf="clr-namespace:SoftThorn.Monstercat.Browser.Wpf"
-                         Title="About"
                          Width="800"
                          Height="820"
                          d:DataContext="{d:DesignInstance Type=core:AboutViewModel,
@@ -68,7 +67,7 @@
                                  Padding="16"
                                  materialDesign:ShadowAssist.ShadowDepth="Depth3">
 
-                <DataGrid ItemsSource="{Binding Packages}" IsReadOnly="True"/>
+                <DataGrid IsReadOnly="True" ItemsSource="{Binding Packages}" />
             </materialDesign:Card>
         </DockPanel>
     </materialDesign:TransitioningContent>
