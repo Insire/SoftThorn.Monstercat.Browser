@@ -33,7 +33,7 @@ The SoftThorn.Monstercat.Browser app (or SMB app for short) is my approach for d
   - Enable AssetSize Configuration (Download the art in the format and size you like)
 - AutoUpdate via Github releases
 - Playlist (manage playback via playlists)
-  - Playbackmode (shuffel, one, all, folder)
+  - Playbackmode (shuffle, one, all, folder)
 
 ### ToDo
 
