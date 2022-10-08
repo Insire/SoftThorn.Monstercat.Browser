@@ -10,7 +10,7 @@
 </div>
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/Insire/SoftThorn.Monstercat.Browser/blob/master/license.md)
-[![Build status](https://dev.azure.com/SoftThorn/SoftThorn.Monstercat.Browser/_apis/build/status/SoftThorn.Monstercat.Browser-CD)](https://dev.azure.com/SoftThorn/SoftThorn.Monstercat.Browser/_build/latest?definitionId=1)
+[![Build status](https://dev.azure.com/SoftThorn/Monstercat.Browser/_apis/build/status/Monstercat.Browser-CI)](https://dev.azure.com/SoftThorn/Monstercat.Browser/_build/latest?definitionId=6)
 [![CodeFactor](https://www.codefactor.io/repository/github/insire/SoftThorn.Monstercat.Browser/badge)](https://www.codefactor.io/repository/github/insire/SoftThorn.Monstercat.Browser)
 [![codecov](https://codecov.io/gh/Insire/SoftThorn.Monstercat.Browser/branch/master/graph/badge.svg)](https://codecov.io/gh/Insire/SoftThorn.Monstercat.Browser)
 
