@@ -795,12 +795,12 @@
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
 
-                            <Button Grid.Column="2"
+                            <!--<Button Grid.Column="2"
                                     Command="{Binding Playback.PreviousCommand}"
                                     Style="{StaticResource SecondaryPlaybackButton}"
                                     ToolTip="Previous">
                                 <iconpacks:PackIconFontAwesome Kind="BackwardSolid" />
-                            </Button>
+                            </Button>-->
 
                             <Button Grid.Column="4">
                                 <Button.Style>
@@ -892,29 +892,11 @@
                                 <DataTrigger Binding="{Binding IsLoading}" Value="false">
                                     <Setter Property="Visibility" Value="Visible" />
                                 </DataTrigger>
-
-                                <DataTrigger Binding="{Binding Downloads.IsDownLoading}" Value="True">
-                                    <Setter Property="Content">
-                                        <Setter.Value>
-                                            <materialDesign:Badged materialDesign:BadgedAssist.IsMiniBadge="True"
-                                                                   Badge="{Binding Downloads.TracksToDownload}"
-                                                                   BadgeBackground="{DynamicResource SecondaryHueLightBrush}">
-                                                <iconpacks:PackIconFontAwesome Kind="DownloadSolid" />
-                                            </materialDesign:Badged>
-                                        </Setter.Value>
-                                    </Setter>
-                                </DataTrigger>
-
-                                <DataTrigger Binding="{Binding Downloads.IsDownLoading}" Value="False">
-                                    <Setter Property="Content">
-                                        <Setter.Value>
-                                            <iconpacks:PackIconFontAwesome Kind="DownloadSolid" />
-                                        </Setter.Value>
-                                    </Setter>
-                                </DataTrigger>
                             </Style.Triggers>
                         </Style>
                     </Button.Style>
+
+                    <iconpacks:PackIconFontAwesome Kind="DownloadSolid" />
                 </Button>
             </Grid>
 
