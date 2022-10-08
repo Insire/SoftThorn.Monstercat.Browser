@@ -1,1 +1,191 @@
-[{"PackageName":"Avalonia","PackageVersion":"0.10.15","PackageUrl":"https://avaloniaui.net/","Copyright":"Copyright 2022 © The AvaloniaUI Project","Authors":["Avalonia"],"Description":"Avalonia is a cross-platform UI framework for .NET providing a flexible styling system and supporting a wide range of Operating Systems such as Windows, Linux, MacOS and with experimental support for Android, iOS and WebAssembly.","LicenseUrl":"https://licenses.nuget.org/MIT","LicenseType":"MIT"},{"PackageName":"Avalonia.Desktop","PackageVersion":"0.10.15","PackageUrl":"https://avaloniaui.net/","Copyright":"Copyright 2022 © The AvaloniaUI Project","Authors":["Avalonia.Desktop"],"Description":"Avalonia is a cross-platform UI framework for .NET providing a flexible styling system and supporting a wide range of Operating Systems such as Windows, Linux, MacOS and with experimental support for Android, iOS and WebAssembly.","LicenseUrl":"https://licenses.nuget.org/MIT","LicenseType":"MIT"},{"PackageName":"Avalonia.Diagnostics","PackageVersion":"0.10.15","PackageUrl":"https://avaloniaui.net/","Copyright":"Copyright 2022 © The AvaloniaUI Project","Authors":["Avalonia.Diagnostics"],"Description":"Avalonia is a cross-platform UI framework for .NET providing a flexible styling system and supporting a wide range of Operating Systems such as Windows, Linux, MacOS and with experimental support for Android, iOS and WebAssembly.","LicenseUrl":"https://licenses.nuget.org/MIT","LicenseType":"MIT"},{"PackageName":"DryIoc.dll","PackageVersion":"5.1.0","PackageUrl":"https://github.com/dadhi/DryIoc","Copyright":"Copyright © 2013-2022 Maksim Volkau","Authors":["Maksim Volkau"],"Description":"DryIoc is fast, small, full-featured IoC Container for .NET","LicenseUrl":"https://licenses.nuget.org/MIT","LicenseType":"MIT"},{"PackageName":"Material.Avalonia","PackageVersion":"3.0.0-rc0.90-nightly","PackageUrl":"https://github.com/AvaloniaCommunity/Material.Avalonia","Copyright":"","Authors":["Larymar","SKProCH","Appleneko2001"],"Description":"This repository is a set of styles that will help you customize your application in an appropriate material design.","LicenseUrl":"https://raw.githubusercontent.com/AvaloniaCommunity/Material.Avalonia/master/LICENSE","LicenseType":""},{"PackageName":"Material.Icons.Avalonia","PackageVersion":"1.0.2","PackageUrl":"https://github.com/AvaloniaUtils/Material.Icons.Avalonia/","Copyright":"","Authors":["SKProCH"],"Description":"Avalonia control for display material icons from Material.Icons","LicenseUrl":"https://github.com/AvaloniaUtils/Material.Icons.Avalonia/blob/master/LICENSE","LicenseType":""},{"PackageName":"Microsoft.Extensions.Configuration.Binder","PackageVersion":"6.0.0","PackageUrl":"https://dot.net/","Copyright":"© Microsoft Corporation. All rights reserved.","Authors":["Microsoft"],"Description":"Functionality to bind an object to data in configuration providers for Microsoft.Extensions.Configuration.","LicenseUrl":"https://licenses.nuget.org/MIT","LicenseType":"MIT"},{"PackageName":"Microsoft.Extensions.Configuration.CommandLine","PackageVersion":"6.0.0","PackageUrl":"https://dot.net/","Copyright":"© Microsoft Corporation. All rights reserved.","Authors":["Microsoft"],"Description":"Command line configuration provider implementation for Microsoft.Extensions.Configuration.","LicenseUrl":"https://licenses.nuget.org/MIT","LicenseType":"MIT"},{"PackageName":"Microsoft.Extensions.Configuration.EnvironmentVariables","PackageVersion":"6.0.1","PackageUrl":"https://dot.net/","Copyright":"© Microsoft Corporation. All rights reserved.","Authors":["Microsoft"],"Description":"Environment variables configuration provider implementation for Microsoft.Extensions.Configuration.","LicenseUrl":"https://licenses.nuget.org/MIT","LicenseType":"MIT"},{"PackageName":"Microsoft.Extensions.Configuration.Json","PackageVersion":"6.0.0","PackageUrl":"https://dot.net/","Copyright":"© Microsoft Corporation. All rights reserved.","Authors":["Microsoft"],"Description":"JSON configuration provider implementation for Microsoft.Extensions.Configuration.","LicenseUrl":"https://licenses.nuget.org/MIT","LicenseType":"MIT"},{"PackageName":"Microsoft.Extensions.Configuration.UserSecrets","PackageVersion":"6.0.1","PackageUrl":"https://dot.net/","Copyright":"© Microsoft Corporation. All rights reserved.","Authors":["Microsoft"],"Description":"User secrets configuration provider implementation for Microsoft.Extensions.Configuration.","LicenseUrl":"https://licenses.nuget.org/MIT","LicenseType":"MIT"},{"PackageName":"Nerdbank.GitVersioning","PackageVersion":"3.5.107","PackageUrl":"https://github.com/dotnet/Nerdbank.GitVersioning","Copyright":"","Authors":["Andrew Arnott"],"Description":"Stamps your assemblies with semver 2.0 compliant git commit specific version information and provides NuGet versioning information as well.","LicenseUrl":"https://licenses.nuget.org/MIT","LicenseType":"MIT"}]
+[
+    {
+        "PackageName": "Avalonia",
+        "PackageVersion": "0.10.17",
+        "PackageUrl": "https://avaloniaui.net/",
+        "Copyright": "Copyright 2022 © The AvaloniaUI Project",
+        "Authors": [
+            "Avalonia"
+        ],
+        "Description": "Avalonia is a cross-platform UI framework for .NET providing a flexible styling system and supporting a wide range of Operating Systems such as Windows, Linux, MacOS and with experimental support for Android, iOS and WebAssembly.",
+        "LicenseUrl": "https://licenses.nuget.org/MIT",
+        "LicenseType": "MIT",
+        "Repository": {
+            "Type": "git",
+            "Url": "https://github.com/AvaloniaUI/Avalonia/",
+            "Commit": "4a6a3a141bfc94f34b7563e89eff463a36601cd2"
+        }
+    },
+    {
+        "PackageName": "Avalonia.Desktop",
+        "PackageVersion": "0.10.17",
+        "PackageUrl": "https://avaloniaui.net/",
+        "Copyright": "Copyright 2022 © The AvaloniaUI Project",
+        "Authors": [
+            "Avalonia.Desktop"
+        ],
+        "Description": "Avalonia is a cross-platform UI framework for .NET providing a flexible styling system and supporting a wide range of Operating Systems such as Windows, Linux, MacOS and with experimental support for Android, iOS and WebAssembly.",
+        "LicenseUrl": "https://licenses.nuget.org/MIT",
+        "LicenseType": "MIT",
+        "Repository": {
+            "Type": "git",
+            "Url": "https://github.com/AvaloniaUI/Avalonia/",
+            "Commit": "4a6a3a141bfc94f34b7563e89eff463a36601cd2"
+        }
+    },
+    {
+        "PackageName": "Avalonia.Diagnostics",
+        "PackageVersion": "0.10.17",
+        "PackageUrl": "https://avaloniaui.net/",
+        "Copyright": "Copyright 2022 © The AvaloniaUI Project",
+        "Authors": [
+            "Avalonia.Diagnostics"
+        ],
+        "Description": "Avalonia is a cross-platform UI framework for .NET providing a flexible styling system and supporting a wide range of Operating Systems such as Windows, Linux, MacOS and with experimental support for Android, iOS and WebAssembly.",
+        "LicenseUrl": "https://licenses.nuget.org/MIT",
+        "LicenseType": "MIT",
+        "Repository": {
+            "Type": "git",
+            "Url": "https://github.com/AvaloniaUI/Avalonia/",
+            "Commit": "4a6a3a141bfc94f34b7563e89eff463a36601cd2"
+        }
+    },
+    {
+        "PackageName": "DryIoc.dll",
+        "PackageVersion": "5.2.2",
+        "PackageUrl": "https://github.com/dadhi/DryIoc",
+        "Copyright": "Copyright © 2013-2022 Maksim Volkau",
+        "Authors": [
+            "Maksim Volkau"
+        ],
+        "Description": "DryIoc is fast, small, full-featured IoC Container for .NET",
+        "LicenseUrl": "https://licenses.nuget.org/MIT",
+        "LicenseType": "MIT",
+        "Repository": {
+            "Type": "git",
+            "Url": "https://github.com/dadhi/DryIoc.git",
+            "Commit": "a6596a3b9e7873e489407275ff97baa0643b5761"
+        }
+    },
+    {
+        "PackageName": "Material.Avalonia",
+        "PackageVersion": "3.0.0-rc0.90-nightly",
+        "PackageUrl": "https://github.com/AvaloniaCommunity/Material.Avalonia",
+        "Copyright": "",
+        "Authors": [
+            "Larymar",
+            "SKProCH",
+            "Appleneko2001"
+        ],
+        "Description": "This repository is a set of styles that will help you customize your application in an appropriate material design.",
+        "LicenseUrl": "https://raw.githubusercontent.com/AvaloniaCommunity/Material.Avalonia/master/LICENSE",
+        "LicenseType": "",
+        "Repository": {
+            "Type": "git",
+            "Url": "https://github.com/AvaloniaCommunity/Material.Avalonia",
+            "Commit": ""
+        }
+    },
+    {
+        "PackageName": "Material.Icons.Avalonia",
+        "PackageVersion": "1.1.10",
+        "PackageUrl": "https://github.com/AvaloniaUtils/Material.Icons.Avalonia/",
+        "Copyright": "",
+        "Authors": [
+            "SKProCH"
+        ],
+        "Description": "Avalonia control for display material icons from Material.Icons",
+        "LicenseUrl": "https://github.com/AvaloniaUtils/Material.Icons.Avalonia/blob/master/LICENSE",
+        "LicenseType": "",
+        "Repository": {
+            "Type": "Git",
+            "Url": "https://github.com/AvaloniaUtils/Material.Icons.Avalonia.git",
+            "Commit": ""
+        }
+    },
+    {
+        "PackageName": "Microsoft.Extensions.Configuration.CommandLine",
+        "PackageVersion": "6.0.0",
+        "PackageUrl": "https://dot.net/",
+        "Copyright": "© Microsoft Corporation. All rights reserved.",
+        "Authors": [
+            "Microsoft"
+        ],
+        "Description": "Command line configuration provider implementation for Microsoft.Extensions.Configuration.",
+        "LicenseUrl": "https://licenses.nuget.org/MIT",
+        "LicenseType": "MIT",
+        "Repository": {
+            "Type": "git",
+            "Url": "https://github.com/dotnet/runtime",
+            "Commit": "4822e3c3aa77eb82b2fb33c9321f923cf11ddde6"
+        }
+    },
+    {
+        "PackageName": "Microsoft.Extensions.Configuration.EnvironmentVariables",
+        "PackageVersion": "6.0.1",
+        "PackageUrl": "https://dot.net/",
+        "Copyright": "© Microsoft Corporation. All rights reserved.",
+        "Authors": [
+            "Microsoft"
+        ],
+        "Description": "Environment variables configuration provider implementation for Microsoft.Extensions.Configuration.",
+        "LicenseUrl": "https://licenses.nuget.org/MIT",
+        "LicenseType": "MIT",
+        "Repository": {
+            "Type": "git",
+            "Url": "https://github.com/dotnet/runtime",
+            "Commit": "839cdfb0ecca5e0be3dbccd926e7651ef50fdf10"
+        }
+    },
+    {
+        "PackageName": "Microsoft.Extensions.Configuration.Json",
+        "PackageVersion": "6.0.0",
+        "PackageUrl": "https://dot.net/",
+        "Copyright": "© Microsoft Corporation. All rights reserved.",
+        "Authors": [
+            "Microsoft"
+        ],
+        "Description": "JSON configuration provider implementation for Microsoft.Extensions.Configuration.",
+        "LicenseUrl": "https://licenses.nuget.org/MIT",
+        "LicenseType": "MIT",
+        "Repository": {
+            "Type": "git",
+            "Url": "https://github.com/dotnet/runtime",
+            "Commit": "4822e3c3aa77eb82b2fb33c9321f923cf11ddde6"
+        }
+    },
+    {
+        "PackageName": "Microsoft.Extensions.Configuration.UserSecrets",
+        "PackageVersion": "6.0.1",
+        "PackageUrl": "https://dot.net/",
+        "Copyright": "© Microsoft Corporation. All rights reserved.",
+        "Authors": [
+            "Microsoft"
+        ],
+        "Description": "User secrets configuration provider implementation for Microsoft.Extensions.Configuration.",
+        "LicenseUrl": "https://licenses.nuget.org/MIT",
+        "LicenseType": "MIT",
+        "Repository": {
+            "Type": "git",
+            "Url": "https://github.com/dotnet/runtime",
+            "Commit": "839cdfb0ecca5e0be3dbccd926e7651ef50fdf10"
+        }
+    },
+    {
+        "PackageName": "Nerdbank.GitVersioning",
+        "PackageVersion": "3.5.113",
+        "PackageUrl": "https://github.com/dotnet/Nerdbank.GitVersioning",
+        "Copyright": "",
+        "Authors": [
+            "Andrew Arnott"
+        ],
+        "Description": "Stamps your assemblies with semver 2.0 compliant git commit specific version information and provides NuGet versioning information as well.",
+        "LicenseUrl": "https://licenses.nuget.org/MIT",
+        "LicenseType": "MIT",
+        "Repository": {
+            "Type": "git",
+            "Url": "https://github.com/dotnet/Nerdbank.GitVersioning.git",
+            "Commit": "a908c6d9d2ed9b032d63ff885b4ccc97fc32046d"
+        }
+    }
+]
