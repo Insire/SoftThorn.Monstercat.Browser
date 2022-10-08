@@ -20,6 +20,7 @@
     <ItemGroup>
         <PackageReference Include="DryIoc.dll" Version="5.2.2" />
         <PackageReference Include="Spectre.Console" Version="0.45.0" />
+        <PackageReference Include="Spectre.Console.Cli" Version="0.45.0" />
         <PackageReference Include="EmailValidation" Version="1.0.8" />
 
         <!--Logging-->
