@@ -5,14 +5,13 @@
   </a>
   <h1>SoftThorn.Monstercat.Browser</h1>
   <p>
-    Your tool for downloading the monstercat music libary on <code>Windows</code>, <code>MacOS</code> and <code>Linux</code>
+    Your tool for downloading the monstercat music libary on <code>Windows</code>.
   </p>
 </div>
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/Insire/SoftThorn.Monstercat.Browser/blob/master/license.md)
 [![Build status](https://dev.azure.com/SoftThorn/Monstercat.Browser/_apis/build/status/Monstercat.Browser-CI)](https://dev.azure.com/SoftThorn/Monstercat.Browser/_build/latest?definitionId=6)
 [![CodeFactor](https://www.codefactor.io/repository/github/insire/SoftThorn.Monstercat.Browser/badge)](https://www.codefactor.io/repository/github/insire/SoftThorn.Monstercat.Browser)
-[![codecov](https://codecov.io/gh/Insire/SoftThorn.Monstercat.Browser/branch/master/graph/badge.svg)](https://codecov.io/gh/Insire/SoftThorn.Monstercat.Browser)
 
 The SoftThorn.Monstercat.Browser app (or SMB app for short) is my approach for downloading music from [monstercat](https://www.monstercat.com/) in a convenient way. It is also my playground for trying our different XAML frontends in my spare time.
 
@@ -36,12 +35,13 @@ The SoftThorn.Monstercat.Browser app (or SMB app for short) is my approach for d
 - Playlist (manage playback via playlists)
   - Playbackmode (shuffel, one, all, folder)
 
- ### ToDo
- - Previous button doesnt work
- - Volume level isnt being saved
- - adjust style for playlist button?
- - download button doesnt show intermediate download progress
- - investigate naudio playback progress
+### ToDo
+
+- add Previous button for going back to the previous track
+- remember playback volume level
+- figure out how to show playback progress with NAudio
+- auto updates
+- sign my binaries
 
 ## Showcase
 
