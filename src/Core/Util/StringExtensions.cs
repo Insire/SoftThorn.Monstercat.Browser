@@ -1,5 +1,9 @@
+using System;
 using System.IO;
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SoftThorn.Monstercat.Browser.Core
 {
@@ -25,6 +29,16 @@ namespace SoftThorn.Monstercat.Browser.Core
             }
 
             return result;
+        }
+
+        public static async Task<string> CalculateMd5(this Stream data, CancellationToken token = default)
+        {
+            using (var instance = MD5.Create())
+            {
+                var hashBytes = await instance.ComputeHashAsync(data, token).ConfigureAwait(false);
+
+                return Convert.ToHexString(hashBytes);
+            }
         }
     }
 }

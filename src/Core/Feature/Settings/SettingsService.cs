@@ -59,7 +59,13 @@ namespace SoftThorn.Monstercat.Browser.Core
         /// </summary>
         public string? Password { get; set; }
 
-        public SettingsService(ISecureBlobCache secureBlobCache, IBlobCache blobCache, IConfiguration configuration, IMessenger messenger)
+        public string? MonstercatContentFileStorageDirectoryPath { get; set; }
+
+        public SettingsService(
+            ISecureBlobCache secureBlobCache,
+            IBlobCache blobCache,
+            IConfiguration configuration,
+            IMessenger messenger)
         {
             _secureBlobCache = secureBlobCache ?? throw new ArgumentNullException(nameof(secureBlobCache));
             _blobCache = blobCache ?? throw new ArgumentNullException(nameof(blobCache));
@@ -100,6 +106,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                     ReleasesCount = 10,
                     DownloadImagesPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.InternetCache), "SoftThorn.Monstercat.Browser.Wpf"),
                     DownloadTracksPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "SoftThorn.Monstercat.Browser.Wpf"),
+                    MonstercatContentFileStorageDirectoryPath = Path.Combine(GetCommonApplicationDataPath(), "RequestCache"),
                     ParallelDownloads = Math.Min(4, Environment.ProcessorCount),
                     DownloadFileFormat = FileFormat.flac,
                     ExcludedTags = new[]
@@ -195,6 +202,8 @@ namespace SoftThorn.Monstercat.Browser.Core
             GenresCount = settings.GenresCount;
             ReleasesCount = settings.ReleasesCount;
             TagsCount = settings.TagsCount;
+            MonstercatContentFileStorageDirectoryPath = settings.MonstercatContentFileStorageDirectoryPath ?? Path.Combine(GetCommonApplicationDataPath(), "RequestCache");
+            CreateDirectory(MonstercatContentFileStorageDirectoryPath);
 
             var sectionName = typeof(ApiCredentials).Name;
             var section = _configuration.GetSection(sectionName);
@@ -241,7 +250,9 @@ namespace SoftThorn.Monstercat.Browser.Core
                 ArtistsCount = ArtistsCount,
                 GenresCount = GenresCount,
                 ReleasesCount = ReleasesCount,
-                TagsCount = TagsCount
+                TagsCount = TagsCount,
+
+                MonstercatContentFileStorageDirectoryPath = MonstercatContentFileStorageDirectoryPath ?? Path.Combine(GetCommonApplicationDataPath(), "RequestCache"),
             };
 
             await SaveSettings(settings);
@@ -255,6 +266,11 @@ namespace SoftThorn.Monstercat.Browser.Core
             await SaveCredentials(credentials);
 
             _messenger.Send(new SettingsChangedMessage(settings));
+        }
+
+        private static string GetCommonApplicationDataPath()
+        {
+            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "SoftThorn", "SoftThorn.Monstercat.Browser.Wpf");
         }
     }
 }

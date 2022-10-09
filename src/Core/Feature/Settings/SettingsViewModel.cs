@@ -53,6 +53,9 @@ namespace SoftThorn.Monstercat.Browser.Core
         [ObservableProperty]
         private FileFormat _downloadFileFormat;
 
+        [ObservableProperty]
+        private string? _monstercatContentFileStorageDirectoryPath;
+
         public int MaxParallelDownloads { get; } = Environment.ProcessorCount;
         public ReadOnlyObservableCollection<TagViewModel> Tags { get; }
 
@@ -143,6 +146,8 @@ namespace SoftThorn.Monstercat.Browser.Core
             GenresCount = _settingsService.GenresCount;
             ReleasesCount = _settingsService.ReleasesCount;
             TagsCount = _settingsService.TagsCount;
+
+            MonstercatContentFileStorageDirectoryPath = _settingsService.MonstercatContentFileStorageDirectoryPath;
         }
 
         [RelayCommand]
@@ -165,6 +170,8 @@ namespace SoftThorn.Monstercat.Browser.Core
             _settingsService.GenresCount = GenresCount;
             _settingsService.ReleasesCount = ReleasesCount;
             _settingsService.TagsCount = TagsCount;
+
+            _settingsService.MonstercatContentFileStorageDirectoryPath = MonstercatContentFileStorageDirectoryPath;
 
             await _settingsService.Save();
 

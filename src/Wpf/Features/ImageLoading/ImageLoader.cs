@@ -12,8 +12,8 @@ namespace SoftThorn.Monstercat.Browser.Wpf
     // original idea and code from: https://github.com/AvaloniaUtils/AsyncImageLoader.Avalonia
     public static class ImageLoader
     {
-        public static RecyclableMemoryStreamManager Manager { get; set; } = new RecyclableMemoryStreamManager();
-        public static IImageFactory<BitmapSource> ImageFactory { get; set; } = new ImageFactory();
+        public static RecyclableMemoryStreamManager Manager { get; set; } = default!;
+        public static IImageFactory<BitmapSource> ImageFactory { get; set; } = default!;
         public static Lazy<IAsyncImageLoader<BitmapSource>> AsyncImageLoader { get; set; } = new Lazy<IAsyncImageLoader<BitmapSource>>(() => new DiskCachedWebImageLoader<BitmapSource>(Serilog.Log.Logger, new MemoryCache(new MemoryCacheOptions()), Manager, ImageFactory, GetCacheDirectory(), createFolder: true));
 
         private static string GetCacheDirectory()

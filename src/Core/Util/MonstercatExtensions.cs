@@ -122,16 +122,7 @@ namespace SoftThorn.Monstercat.Browser.Core
         internal static string GetFilePath(this TrackViewModel track, StringBuilder builder, string downloadPath, FileFormat fileFormat)
         {
             builder.Clear();
-            builder.Append(track.ArtistsTitle);
-            builder.Append(" - ");
-            builder.Append(track.Title);
-
-            if (!string.IsNullOrWhiteSpace(track.Version))
-            {
-                builder.Append('(');
-                builder.Append(track.Version);
-                builder.Append(')');
-            }
+            builder.Append(track.FileName);
 
             builder.Append(GetFileExtension(fileFormat));
 
@@ -149,11 +140,6 @@ namespace SoftThorn.Monstercat.Browser.Core
                 FileFormat.wav => ".wav",
                 _ => throw new NotImplementedException(),
             };
-        }
-
-        internal static string GetFilePath(this FileStorageOptions options)
-        {
-            return Path.Combine(options.DirectoryPath, options.FileName);
         }
     }
 }

@@ -1,10 +1,12 @@
 using DryIoc;
 using Jot;
+using Microsoft.IO;
 using SoftThorn.Monstercat.Browser.Core;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media.Imaging;
 
 namespace SoftThorn.Monstercat.Browser.Wpf
 {
@@ -30,6 +32,10 @@ namespace SoftThorn.Monstercat.Browser.Wpf
 
             // startup
             var container = _container = CompositionRoot.Get();
+            container.Resolve<AtlLogAdapter>(); // make sure playlist logging works
+
+            ImageLoader.Manager = container.Resolve<RecyclableMemoryStreamManager>();
+            ImageLoader.ImageFactory = container.Resolve<IImageFactory<BitmapSource>>();
 
             var settingsViewModel = container.Resolve<SettingsViewModel>();
             // the shellviewmodel has to exist, so that loading the settings updates its own and all of its dependencies initial state

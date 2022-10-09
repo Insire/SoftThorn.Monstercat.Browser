@@ -83,17 +83,7 @@ namespace SoftThorn.Monstercat.Browser.Core
             resultStream.Write(bytes, 0, bytes.Length);
             resultStream.Seek(0, SeekOrigin.Begin);
 
-            return await Calculate(resultStream);
-        }
-
-        private static async Task<string> Calculate(Stream data)
-        {
-            using (var instance = MD5.Create())
-            {
-                var hashBytes = await instance.ComputeHashAsync(data).ConfigureAwait(false);
-
-                return Convert.ToHexString(hashBytes);
-            }
+            return await resultStream.CalculateMd5();
         }
     }
 }

@@ -6,6 +6,7 @@ using Jot;
 using Jot.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.ObjectPool;
+using Microsoft.IO;
 using Serilog;
 using Serilog.Events;
 using SoftThorn.Monstercat.Browser.Core;
@@ -13,9 +14,9 @@ using SoftThorn.MonstercatNet;
 using System;
 using System.Net.Http;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Windows;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 
 namespace SoftThorn.Monstercat.Browser.Wpf
@@ -71,15 +72,18 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             container.Register<BrandViewModel<Uncaged>>(Reuse.Singleton);
             container.Register<BrandViewModel<Silk>>(Reuse.Singleton);
 
+            container.Register<PlaylistFormatsViewModel>(Reuse.Singleton);
+
             // services
             container.RegisterInstance<IConfiguration>(configuration);
             container.RegisterInstance(_api);
+            container.Register<IMonstercatApi, MonstercatApiCache>(setup: Setup.Decorator);
             container.RegisterInstance(_tracker);
             container.RegisterInstance(playbackTimer);
             container.RegisterInstance<IMessenger>(WeakReferenceMessenger.Default);
             container.RegisterInstance(SynchronizationContext.Current!);
+            container.Register<MonstercatContentStorageService>(Reuse.Singleton);
 
-            //container.Register<ITrackRepository, MockTrackRepository>(Reuse.Singleton);
             container.Register<ITrackRepository, TrackRepository>(Reuse.Singleton);
 
             container.Register<SearchViewModelFactory>(Reuse.Singleton);
@@ -110,7 +114,9 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             container.Register<AtlLogAdapter>(); // logging playlist writing
             Log.Logger = log;
 
-            // stringbuilder caching
+            // caching
+            container.RegisterInstance(new RecyclableMemoryStreamManager());
+            container.Register<IImageFactory<BitmapSource>, ImageFactory>(Reuse.Singleton);
             container.Register<ObjectPoolProvider, DefaultObjectPoolProvider>(Reuse.Singleton);
             container.Register<StringBuilderPooledObjectPolicy>(Reuse.Singleton);
             container.RegisterDelegate(context =>
