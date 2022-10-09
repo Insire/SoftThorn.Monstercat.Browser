@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Messaging;
 using Gress;
+using Microsoft.Extensions.ObjectPool;
 using Serilog;
 using SoftThorn.MonstercatNet;
 using System;
@@ -18,6 +19,7 @@ namespace SoftThorn.Monstercat.Browser.Core
         private readonly ILogger _log;
         private readonly DispatcherProgressFactory<Percentage> _dispatcherProgressFactory;
         private readonly DispatcherProgress<Percentage> _progressService;
+        private readonly ObjectPool<StringBuilder> _objectPool;
 
         private int _parallelDownloads;
         private string? _downloadTracksPath;
@@ -36,12 +38,19 @@ namespace SoftThorn.Monstercat.Browser.Core
 
         public ProgressContainer<Percentage> Progress { get; }
 
-        public DownloadViewModel(IMonstercatApi api, IMessenger messenger, ILogger log, DispatcherProgressFactory<Percentage> dispatcherProgressFactory)
+        public DownloadViewModel(
+            IMonstercatApi api,
+            IMessenger messenger,
+            ILogger log,
+            DispatcherProgressFactory<Percentage> dispatcherProgressFactory,
+            ObjectPool<StringBuilder> objectPool)
             : base(messenger)
         {
             _api = api ?? throw new ArgumentNullException(nameof(api));
-            _log = log.ForContext<DownloadViewModel>();
-            _dispatcherProgressFactory = dispatcherProgressFactory;
+            _log = log?.ForContext<DownloadViewModel>() ?? throw new ArgumentNullException(nameof(log));
+            _dispatcherProgressFactory = dispatcherProgressFactory ?? throw new ArgumentNullException(nameof(dispatcherProgressFactory));
+            _objectPool = objectPool ?? throw new ArgumentNullException(nameof(objectPool));
+
             Progress = new ProgressContainer<Percentage>();
             _progressService = _dispatcherProgressFactory.Create((p) => Progress.Report(p));
 
@@ -86,7 +95,6 @@ namespace SoftThorn.Monstercat.Browser.Core
                 {
                     tasks.Add(Task.Run(async () =>
                     {
-                        var builder = new StringBuilder();
                         foreach (var item in batch)
                         {
                             if (token.IsCancellationRequested)
@@ -94,7 +102,10 @@ namespace SoftThorn.Monstercat.Browser.Core
                                 return;
                             }
 
-                            var filePath = GetFilePath(builder, item, downloadPath, fileFormat);
+                            var builder = _objectPool.Get();
+                            var filePath = item.GetFilePath(builder, downloadPath, fileFormat);
+                            _objectPool.Return(builder);
+
                             if (File.Exists(filePath))
                             {
                                 current++;
@@ -132,38 +143,6 @@ namespace SoftThorn.Monstercat.Browser.Core
                 TracksToDownload = 0;
                 IsDownLoading = false;
             }
-        }
-
-        private static string GetFilePath(StringBuilder builder, TrackViewModel track, string downloadPath, FileFormat fileFormat)
-        {
-            builder.Clear();
-            builder.Append(track.ArtistsTitle);
-            builder.Append(" - ");
-            builder.Append(track.Title);
-
-            if (!string.IsNullOrWhiteSpace(track.Version))
-            {
-                builder.Append('(');
-                builder.Append(track.Version);
-                builder.Append(')');
-            }
-
-            builder.Append(GetFileExtension(fileFormat));
-
-            var fileName = builder.ToString().SanitizeAsFileName();
-
-            return Path.Combine(downloadPath, fileName!);
-        }
-
-        private static string GetFileExtension(FileFormat fileFormat)
-        {
-            return fileFormat switch
-            {
-                FileFormat.flac => ".flac",
-                FileFormat.mp3 => ".mp3",
-                FileFormat.wav => ".wav",
-                _ => throw new NotImplementedException(),
-            };
         }
 
         private void Dispose(bool disposing)

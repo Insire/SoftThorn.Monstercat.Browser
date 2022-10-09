@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using DynamicData;
 using DynamicData.Binding;
 using Gress;
+using Microsoft.Extensions.ObjectPool;
 using SoftThorn.MonstercatNet;
 using System;
 using System.Collections.Concurrent;
@@ -9,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace SoftThorn.Monstercat.Browser.Core
@@ -16,6 +18,7 @@ namespace SoftThorn.Monstercat.Browser.Core
     public sealed class TrackRepository : IDisposable, ITrackRepository
     {
         private readonly IMonstercatApi _api;
+        private readonly ObjectPool<StringBuilder> _objectPool;
         private readonly SourceCache<KeyValuePair<string, List<TrackViewModel>>, string> _tagCache;
         private readonly SourceCache<KeyValuePair<string, List<TrackViewModel>>, string> _genreCache;
         private readonly SourceCache<ArtistViewModel, Guid> _artistCache;
@@ -27,11 +30,11 @@ namespace SoftThorn.Monstercat.Browser.Core
         private string[] _excludedTagValues;
         private bool _disposedValue;
 
-        public TrackRepository(DispatcherProgress<Percentage> progressService, IMonstercatApi api, IMessenger messenger)
+        public TrackRepository(DispatcherProgress<Percentage> progressService, IMonstercatApi api, IMessenger messenger, ObjectPool<StringBuilder> objectPool)
         {
             _progressService = progressService ?? throw new ArgumentNullException(nameof(progressService));
             _api = api ?? throw new ArgumentNullException(nameof(api));
-
+            _objectPool = objectPool ?? throw new ArgumentNullException(nameof(objectPool));
             _excludedTagValues = Array.Empty<string>();
             _excludedTags = new SourceCache<TagViewModel, string>(p => p.Value);
             _trackCache = new SourceCache<TrackViewModel, string>(p => p.Key);
@@ -145,7 +148,7 @@ namespace SoftThorn.Monstercat.Browser.Core
 
             var count = result.Results.Length;
             _progressService.Report(count, total);
-            _trackCache.AddOrUpdate(result.Results.Select(p => p.ToViewModel()));
+            _trackCache.AddOrUpdate(result.Results.Select(p => p.ToViewModel(_objectPool)));
 
             var requests = new List<TrackSearchRequest>();
 
@@ -184,7 +187,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                             track.Tags = track.Tags?.Select(p => p.Trim().ToLowerInvariant()).ToArray();
 
                             // track
-                            var trackViewModel = track.ToViewModel();
+                            var trackViewModel = track.ToViewModel(_objectPool);
                             tracks.Add(trackViewModel);
                             if (trackViewModel.Tags.Count > 0)
                             {

@@ -10,11 +10,11 @@ namespace SoftThorn.Monstercat.Browser.Core
         private static readonly Regex removeInvalidChars = new Regex($"[{Regex.Escape(new string(Path.GetInvalidFileNameChars()))}]",
             RegexOptions.Singleline | RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
-        public static string? SanitizeAsFileName(this string? fileName, string replacement = "_")
+        public static string SanitizeAsFileName(this string? fileName, string replacement = "_")
         {
             if (fileName is null)
             {
-                return null;
+                return string.Empty;
             }
 
             var result = removeInvalidChars.Replace(fileName, replacement);

@@ -5,6 +5,7 @@ using Gress;
 using Jot;
 using Jot.Storage;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.ObjectPool;
 using Serilog;
 using Serilog.Events;
 using SoftThorn.Monstercat.Browser.Core;
@@ -12,6 +13,7 @@ using SoftThorn.MonstercatNet;
 using System;
 using System.Net.Http;
 using System.Reflection;
+using System.Text;
 using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
@@ -105,7 +107,19 @@ namespace SoftThorn.Monstercat.Browser.Wpf
                 .CreateLogger();
 
             container.RegisterInstance<ILogger>(log);
+            container.Register<AtlLogAdapter>(); // logging playlist writing
             Log.Logger = log;
+
+            // stringbuilder caching
+            container.Register<ObjectPoolProvider, DefaultObjectPoolProvider>(Reuse.Singleton);
+            container.Register<StringBuilderPooledObjectPolicy>(Reuse.Singleton);
+            container.RegisterDelegate(context =>
+            {
+                var policy = context.Resolve<StringBuilderPooledObjectPolicy>();
+                var provider = context.Resolve<ObjectPoolProvider>();
+
+                return provider.Create(policy);
+            });
 
             return container;
         }

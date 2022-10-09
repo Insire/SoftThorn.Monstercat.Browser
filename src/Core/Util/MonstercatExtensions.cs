@@ -1,8 +1,12 @@
 using DynamicData.Binding;
+using Microsoft.Extensions.ObjectPool;
 using SoftThorn.MonstercatNet;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace SoftThorn.Monstercat.Browser.Core
 {
@@ -29,12 +33,12 @@ namespace SoftThorn.Monstercat.Browser.Core
             return collection;
         }
 
-        public static TrackViewModel ToViewModel(this KeyValuePair<string, Track> pair)
+        public static TrackViewModel ToViewModel(this KeyValuePair<string, Track> pair, ObjectPool<StringBuilder> objectPool)
         {
-            return pair.Value.ToViewModel();
+            return pair.Value.ToViewModel(objectPool);
         }
 
-        public static TrackViewModel ToViewModel(this Track track)
+        public static TrackViewModel ToViewModel(this Track track, ObjectPool<StringBuilder> objectPool)
         {
             return new TrackViewModel()
             {
@@ -55,6 +59,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                 Tags = track.CreateTags(),
                 ImageUrl = track.Release.GetSmallCoverArtUri(),
                 Release = track.Release.ToViewModel(),
+                FileName = track.GetFileName(objectPool),
             };
         }
 
@@ -86,6 +91,69 @@ namespace SoftThorn.Monstercat.Browser.Core
                 Uri = artist.GetSmallArtistPhotoUri().ToString(),
                 Tracks = new ObservableCollectionExtended<TrackViewModel>(),
             };
+        }
+
+        internal static string GetFileName(this Track track, ObjectPool<StringBuilder> objectPool)
+        {
+            var builder = objectPool.Get();
+            try
+            {
+                builder.Clear();
+                builder.Append(track.ArtistsTitle);
+                builder.Append(" - ");
+                builder.Append(track.Title);
+
+                if (!string.IsNullOrWhiteSpace(track.Version))
+                {
+                    builder.Append('(');
+                    builder.Append(track.Version);
+                    builder.Append(')');
+                }
+
+                return builder.ToString().SanitizeAsFileName();
+            }
+            finally
+            {
+                builder.Clear();
+                objectPool.Return(builder);
+            }
+        }
+
+        internal static string GetFilePath(this TrackViewModel track, StringBuilder builder, string downloadPath, FileFormat fileFormat)
+        {
+            builder.Clear();
+            builder.Append(track.ArtistsTitle);
+            builder.Append(" - ");
+            builder.Append(track.Title);
+
+            if (!string.IsNullOrWhiteSpace(track.Version))
+            {
+                builder.Append('(');
+                builder.Append(track.Version);
+                builder.Append(')');
+            }
+
+            builder.Append(GetFileExtension(fileFormat));
+
+            var fileName = builder.ToString().SanitizeAsFileName();
+
+            return Path.Combine(downloadPath, fileName!);
+        }
+
+        private static string GetFileExtension(FileFormat fileFormat)
+        {
+            return fileFormat switch
+            {
+                FileFormat.flac => ".flac",
+                FileFormat.mp3 => ".mp3",
+                FileFormat.wav => ".wav",
+                _ => throw new NotImplementedException(),
+            };
+        }
+
+        internal static string GetFilePath(this FileStorageOptions options)
+        {
+            return Path.Combine(options.DirectoryPath, options.FileName);
         }
     }
 }
