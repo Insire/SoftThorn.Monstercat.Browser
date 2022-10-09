@@ -7,6 +7,7 @@ using SoftThorn.MonstercatNet;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -73,6 +74,7 @@ namespace SoftThorn.Monstercat.Browser.Core
             var parallelDownloads = _parallelDownloads;
             var fileFormat = _downloadFileFormat;
             var downloadPath = _downloadTracksPath;
+
             if (string.IsNullOrWhiteSpace(downloadPath))
             {
                 return;
@@ -85,6 +87,7 @@ namespace SoftThorn.Monstercat.Browser.Core
 
             IsDownLoading = true;
             TracksToDownload = tracks.Count;
+            var files = Directory.GetFiles(downloadPath, "*" + fileFormat.GetFileExtension());
 
             try
             {
@@ -106,7 +109,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                             var filePath = item.GetFilePath(builder, downloadPath, fileFormat);
                             _objectPool.Return(builder);
 
-                            if (File.Exists(filePath))
+                            if (files.Contains(filePath))
                             {
                                 current++;
                                 _progressService.Report(current, TracksToDownload);

@@ -131,7 +131,7 @@ namespace SoftThorn.Monstercat.Browser.Core
             return Path.Combine(downloadPath, fileName!);
         }
 
-        private static string GetFileExtension(FileFormat fileFormat)
+        internal static string GetFileExtension(this FileFormat fileFormat)
         {
             return fileFormat switch
             {
