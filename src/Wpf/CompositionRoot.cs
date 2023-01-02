@@ -56,7 +56,6 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             // viewmodels
             container.Register<ShellViewModel>(Reuse.Singleton);
             container.Register<LoginViewModel>(Reuse.Transient);
-            container.Register<SearchViewModel>(Reuse.Transient);
 
             container.Register<AboutViewModel>(Reuse.Singleton);
             container.Register<SettingsViewModel>(Reuse.Singleton);
@@ -67,6 +66,7 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             container.Register<TagsViewModel>(Reuse.Singleton);
             container.Register<GenresViewModel>(Reuse.Singleton);
             container.Register<ArtistsViewModel>(Reuse.Singleton);
+            container.Register<TracksViewModel>(Reuse.Singleton);
 
             container.Register<BrandViewModel<Instinct>>(Reuse.Singleton);
             container.Register<BrandViewModel<Uncaged>>(Reuse.Singleton);
@@ -126,6 +126,8 @@ namespace SoftThorn.Monstercat.Browser.Wpf
 
                 return provider.Create(policy);
             });
+
+            container.Validate();
 
             return container;
         }

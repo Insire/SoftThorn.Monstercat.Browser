@@ -14,7 +14,7 @@ using System.Threading;
 
 namespace SoftThorn.Monstercat.Browser.Core
 {
-    public sealed partial class SearchViewModel : ObservableRecipient
+    public sealed partial class SearchViewModel : ObservableRecipient, IDisposable
     {
         private readonly CompositeDisposable _subscription;
 

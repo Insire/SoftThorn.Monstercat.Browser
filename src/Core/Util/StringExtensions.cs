@@ -11,7 +11,7 @@ namespace SoftThorn.Monstercat.Browser.Core
     {
         // https://msdn.microsoft.com/en-us/library/aa365247.aspx#naming_conventions
         // http://stackoverflow.com/questions/146134/how-to-remove-illegal-characters-from-path-and-filenames
-        private static readonly Regex removeInvalidChars = new Regex($"[{Regex.Escape(new string(Path.GetInvalidFileNameChars()))}]",
+        private static readonly Regex _removeInvalidChars = new Regex($"[{Regex.Escape(new string(Path.GetInvalidFileNameChars()))}]",
             RegexOptions.Singleline | RegexOptions.Compiled | RegexOptions.CultureInvariant);
 
         public static string SanitizeAsFileName(this string? fileName, string replacement = "_")
@@ -21,7 +21,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                 return string.Empty;
             }
 
-            var result = removeInvalidChars.Replace(fileName, replacement);
+            var result = _removeInvalidChars.Replace(fileName, replacement);
 
             while (result.IndexOf("__") >= 0)
             {

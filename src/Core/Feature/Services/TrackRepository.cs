@@ -183,6 +183,9 @@ namespace SoftThorn.Monstercat.Browser.Core
 
                         foreach (var track in result.Results)
                         {
+                            track.DebutDate = track.DebutDate?.Date;
+                            track.Release.ReleaseDate = track.Release.ReleaseDate.Date;
+
                             // tags
                             track.Tags = track.Tags?.Select(p => p.Trim().ToLowerInvariant()).ToArray();
 

@@ -32,6 +32,8 @@ namespace SoftThorn.Monstercat.Browser.Core
 
         public int TagsCount { get; set; }
 
+        public int TracksCount { get; set; }
+
         // download settings
 
         /// <summary>
@@ -104,6 +106,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                     TagsCount = 10,
                     GenresCount = 10,
                     ReleasesCount = 10,
+                    TracksCount = 10,
                     DownloadImagesPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.InternetCache), "SoftThorn.Monstercat.Browser.Wpf"),
                     DownloadTracksPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "SoftThorn.Monstercat.Browser.Wpf"),
                     MonstercatContentFileStorageDirectoryPath = Path.Combine(GetCommonApplicationDataPath(), "RequestCache"),
@@ -198,10 +201,12 @@ namespace SoftThorn.Monstercat.Browser.Core
 
             ExcludedTags = settings.ExcludedTags;
 
-            ArtistsCount = settings.ArtistsCount;
-            GenresCount = settings.GenresCount;
-            ReleasesCount = settings.ReleasesCount;
-            TagsCount = settings.TagsCount;
+            ArtistsCount = settings.ArtistsCount <= 0 ? 10 : settings.ArtistsCount;
+            GenresCount = settings.GenresCount <= 0 ? 10 : settings.GenresCount;
+            ReleasesCount = settings.ReleasesCount <= 0 ? 10 : settings.ReleasesCount;
+            TagsCount = settings.TagsCount <= 0 ? 10 : settings.TagsCount;
+            TracksCount = settings.TracksCount <= 0 ? 10 : settings.TracksCount;
+
             MonstercatContentFileStorageDirectoryPath = settings.MonstercatContentFileStorageDirectoryPath ?? Path.Combine(GetCommonApplicationDataPath(), "RequestCache");
             CreateDirectory(MonstercatContentFileStorageDirectoryPath);
 
@@ -223,7 +228,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                 Password = credentials.Password;
             }
 
-            _messenger.Send(new SettingsChangedMessage(settings));
+            _messenger.Send(new SettingsChangedMessage(CreateModel(this)));
 
             static void CreateDirectory(string? directoryPath)
             {
@@ -238,22 +243,7 @@ namespace SoftThorn.Monstercat.Browser.Core
 
         public async Task Save()
         {
-            var settings = new SettingsModel
-            {
-                DownloadTracksPath = DownloadTracksPath,
-                DownloadImagesPath = DownloadImagesPath,
-                DownloadFileFormat = DownloadFileFormat,
-                ParallelDownloads = ParallelDownloads,
-
-                ExcludedTags = ExcludedTags,
-
-                ArtistsCount = ArtistsCount,
-                GenresCount = GenresCount,
-                ReleasesCount = ReleasesCount,
-                TagsCount = TagsCount,
-
-                MonstercatContentFileStorageDirectoryPath = MonstercatContentFileStorageDirectoryPath ?? Path.Combine(GetCommonApplicationDataPath(), "RequestCache"),
-            };
+            var settings = CreateModel(this);
 
             await SaveSettings(settings);
 
@@ -271,6 +261,27 @@ namespace SoftThorn.Monstercat.Browser.Core
         private static string GetCommonApplicationDataPath()
         {
             return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "SoftThorn", "SoftThorn.Monstercat.Browser.Wpf");
+        }
+
+        private static SettingsModel CreateModel(SettingsService service)
+        {
+            return new SettingsModel
+            {
+                DownloadTracksPath = service.DownloadTracksPath,
+                DownloadImagesPath = service.DownloadImagesPath,
+                DownloadFileFormat = service.DownloadFileFormat,
+                ParallelDownloads = service.ParallelDownloads,
+
+                ExcludedTags = service.ExcludedTags,
+
+                ArtistsCount = service.ArtistsCount,
+                GenresCount = service.GenresCount,
+                ReleasesCount = service.ReleasesCount,
+                TagsCount = service.TagsCount,
+                TracksCount = service.TracksCount,
+
+                MonstercatContentFileStorageDirectoryPath = service.MonstercatContentFileStorageDirectoryPath ?? Path.Combine(GetCommonApplicationDataPath(), "RequestCache"),
+            };
         }
     }
 }

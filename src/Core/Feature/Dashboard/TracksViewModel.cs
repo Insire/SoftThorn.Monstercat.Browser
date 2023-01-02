@@ -9,38 +9,35 @@ using System.Threading;
 
 namespace SoftThorn.Monstercat.Browser.Core
 {
-    /// <summary>
-    /// tracks and releases sorted by newest
-    /// </summary>
-    public sealed class ReleasesViewModel : ObservableRecipient, IDisposable
+    public sealed class TracksViewModel : ObservableRecipient, IDisposable
     {
-        private readonly ObservableCollectionExtended<ReleaseViewModel> _releases;
+        private readonly ObservableCollectionExtended<TrackViewModel> _tracks;
 
         private bool _disposedValue;
         private IDisposable? _subscription;
 
-        public ReadOnlyObservableCollection<ReleaseViewModel> Releases { get; }
+        public ReadOnlyObservableCollection<TrackViewModel> Tracks { get; }
 
-        public ReleasesViewModel(SynchronizationContext synchronizationContext, ITrackRepository trackRepository, IMessenger messenger)
-            : base(messenger)
+        public TracksViewModel(SynchronizationContext synchronizationContext, ITrackRepository trackRepository, IMessenger messenger)
+        : base(messenger)
         {
-            _releases = new ObservableCollectionExtended<ReleaseViewModel>();
-            Releases = new ReadOnlyObservableCollection<ReleaseViewModel>(_releases);
+            _tracks = new ObservableCollectionExtended<TrackViewModel>();
+            Tracks = new ReadOnlyObservableCollection<TrackViewModel>(_tracks);
 
             _subscription = CreateSubscription();
 
             // messages
-            Messenger.Register<ReleasesViewModel, SettingsChangedMessage>(this, (r, m) =>
+            Messenger.Register<TracksViewModel, SettingsChangedMessage>(this, (r, m) =>
             {
                 r._subscription?.Dispose();
-                r._subscription = CreateSubscription(m.Value.ReleasesCount);
+                r._subscription = CreateSubscription(m.Value.TracksCount);
             });
 
             IDisposable CreateSubscription(int size = 10)
             {
                 return trackRepository
-                    .ConnectReleases()
-                    .Sort(SortExpressionComparer<ReleaseViewModel>
+                    .ConnectTracks()
+                    .Sort(SortExpressionComparer<TrackViewModel>
                         .Descending(p => p.ReleaseDate)
                         .ThenByAscending(p => p.ArtistsTitle)
                         .ThenByAscending(p => p.Title)
@@ -48,7 +45,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                         .ThenByAscending(p => p.Id), SortOptimisations.ComparesImmutableValuesOnly)
                     .Top(size)
                     .ObserveOn(synchronizationContext)
-                    .Bind(_releases)
+                    .Bind(_tracks)
                     .Subscribe();
             }
         }

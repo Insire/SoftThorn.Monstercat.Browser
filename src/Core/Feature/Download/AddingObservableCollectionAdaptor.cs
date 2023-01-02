@@ -7,15 +7,12 @@ namespace SoftThorn.Monstercat.Browser.Core
     public class AddingObservableCollectionAdaptor<TObject, TKey> : IObservableCollectionAdaptor<TObject, TKey>
         where TKey : notnull
     {
-        private readonly int _refreshThreshold;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ObservableCollectionAdaptor{TObject, TKey}"/> class.
         /// </summary>
         /// <param name="refreshThreshold">The threshold before a reset notification is triggered.</param>
-        public AddingObservableCollectionAdaptor(int refreshThreshold = 25)
+        public AddingObservableCollectionAdaptor()
         {
-            _refreshThreshold = refreshThreshold;
         }
 
         /// <summary>

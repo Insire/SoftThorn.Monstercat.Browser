@@ -55,5 +55,12 @@ namespace SoftThorn.Monstercat.Browser.Core
 
             return new SearchViewModel(_synchronizationContext, _messenger, artist.Tracks.ToArray(), tags.Select(p => p.Current).ToArray());
         }
+
+        public async Task<SearchViewModel> CreateFromTrack(TrackViewModel track)
+        {
+            var tags = await _trackRepository.ConnectFilteredTagViewModels().FirstOrDefaultAsync();
+
+            return new SearchViewModel(_synchronizationContext, _messenger, new[] { track }, tags.Select(p => p.Current).ToArray());
+        }
     }
 }

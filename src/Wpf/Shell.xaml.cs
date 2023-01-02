@@ -45,6 +45,12 @@ namespace SoftThorn.Monstercat.Browser.Wpf
         }
 
         [RelayCommand]
+        private async Task DownloadTrack(TrackViewModel? track)
+        {
+            await _windowService.ShowSearchView<Silk>(this, track: track);
+        }
+
+        [RelayCommand]
         private void About()
         {
             _windowService.ShowAbout(this);

@@ -92,22 +92,22 @@ namespace SoftThorn.Monstercat.Browser.Core
         /// Receives image bytes from an internal source (for example, from the disk).
         /// This data will be NOT cached globally (because it is assumed that it is already in internal source and does not require global caching)
         /// </summary>
-        protected virtual Task<T?> LoadFromInternalAsync(Uri? url)
+        protected virtual async Task<T?> LoadFromInternalAsync(Uri? url)
         {
             if (url?.Scheme.Equals("HTTPS", StringComparison.InvariantCultureIgnoreCase) != false || url.Scheme.Equals("HTTP", StringComparison.InvariantCultureIgnoreCase))
             {
-                return Task.FromResult<T?>(null);
+                return null;
             }
 
             try
             {
                 Log.Verbose("[LOADINTERNAL] {Url}", url);
-                return Task.Run(() => ImageFactory.From(url))!;
+                return await Task.Run(() => ImageFactory.From(url))!;
             }
             catch (Exception ex)
             {
                 Log.Error(ex, "[LOADINTERNAL] {Url} failed", url);
-                return Task.FromResult<T?>(null);
+                return null;
             }
         }
 
@@ -117,16 +117,16 @@ namespace SoftThorn.Monstercat.Browser.Core
         /// </summary>
         /// <param name="url">Target url</param>
         /// <returns>Image bytes</returns>
-        protected virtual Task<Stream?> LoadDataFromExternalAsync(Uri? url)
+        protected virtual async Task<Stream?> LoadDataFromExternalAsync(Uri? url)
         {
             if (url is null)
             {
-                return Task.FromResult<Stream?>(null);
+                return null;
             }
 
             try
             {
-                return Task.Run<Stream?>(async () =>
+                return await Task.Run<Stream?>(async () =>
                 {
                     Log.Verbose("[LOADEXTERNAL] for {Url}", url);
                     var resultStream = StreamManager.GetStream();
@@ -143,7 +143,7 @@ namespace SoftThorn.Monstercat.Browser.Core
             catch (Exception ex)
             {
                 Log.Error(ex, "[LOADEXTERNAL] {Url} failed", url);
-                return Task.FromResult<Stream?>(null);
+                return null;
             }
         }
 

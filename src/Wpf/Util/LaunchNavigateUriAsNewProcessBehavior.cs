@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.Xaml.Behaviors;
 using System;
 using System.Diagnostics;
@@ -53,9 +53,7 @@ namespace SoftThorn.Monstercat.Browser.Wpf
 
         private bool CanExecuteImpl()
         {
-            var value = AssociatedObject.NavigateUri;
-
-            return value is Uri;
+            return AssociatedObject.NavigateUri is not null;
         }
     }
 }

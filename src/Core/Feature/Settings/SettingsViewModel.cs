@@ -51,6 +51,9 @@ namespace SoftThorn.Monstercat.Browser.Core
         private int _tagsCount;
 
         [ObservableProperty]
+        private int _tracksCount;
+
+        [ObservableProperty]
         private FileFormat _downloadFileFormat;
 
         [ObservableProperty]
@@ -146,6 +149,7 @@ namespace SoftThorn.Monstercat.Browser.Core
             GenresCount = _settingsService.GenresCount;
             ReleasesCount = _settingsService.ReleasesCount;
             TagsCount = _settingsService.TagsCount;
+            TracksCount = _settingsService.TracksCount;
 
             MonstercatContentFileStorageDirectoryPath = _settingsService.MonstercatContentFileStorageDirectoryPath;
         }
@@ -170,6 +174,7 @@ namespace SoftThorn.Monstercat.Browser.Core
             _settingsService.GenresCount = GenresCount;
             _settingsService.ReleasesCount = ReleasesCount;
             _settingsService.TagsCount = TagsCount;
+            _settingsService.TracksCount = TracksCount;
 
             _settingsService.MonstercatContentFileStorageDirectoryPath = MonstercatContentFileStorageDirectoryPath;
 

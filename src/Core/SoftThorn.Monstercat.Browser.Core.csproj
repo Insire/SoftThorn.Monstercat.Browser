@@ -8,7 +8,7 @@
     <ItemGroup>
         <PackageReference Include="akavache" Version="9.0.1" />
         <PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0" />
-        <PackageReference Include="DynamicData" Version="7.10.2" />
+        <PackageReference Include="DynamicData" Version="7.12.11" />
         <PackageReference Include="Gress" Version="2.0.1" />
         <PackageReference Include="MonstercatNet" Version="3.0.41" />
         <PackageReference Include="NAudio.Core" Version="2.1.0" />
@@ -17,16 +17,19 @@
         <PackageReference Include="LiveChartsCore.SkiaSharpView" Version="2.0.0-beta.300" />
 
         <PackageReference Include="Microsoft.IO.RecyclableMemoryStream" Version="2.2.1" />
-        <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="6.0.9" />
+        <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="7.0.1" />
 
         <PackageReference Include="Serilog" Version="2.12.0" />
 
-        <PackageReference Include="System.Text.Json" Version="6.0.6" />
+        <PackageReference Include="System.Text.Json" Version="7.0.1" />
         
-        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="6.0.1" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0-preview.1.22076.8" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="7.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.1" />
+
+        <PackageReference Include="Nerdbank.GitVersioning" Version="3.5.113">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
-
-
 </Project>

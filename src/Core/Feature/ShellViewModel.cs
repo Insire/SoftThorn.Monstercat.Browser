@@ -41,6 +41,8 @@ namespace SoftThorn.Monstercat.Browser.Core
 
         public TagsViewModel Tags { get; }
 
+        public TracksViewModel Tracks { get; }
+
         public ArtistsViewModel Artists { get; }
 
         public PlaybackViewModel Playback { get; }
@@ -59,6 +61,7 @@ namespace SoftThorn.Monstercat.Browser.Core
             SettingsViewModel settings,
             ReleasesViewModel releases,
             TagsViewModel tags,
+            TracksViewModel tracks,
             GenresViewModel genres,
             ArtistsViewModel artists,
             ITrackRepository trackRepository,
@@ -75,6 +78,7 @@ namespace SoftThorn.Monstercat.Browser.Core
             Settings = settings ?? throw new ArgumentNullException(nameof(settings));
             Releases = releases ?? throw new ArgumentNullException(nameof(releases));
             Tags = tags ?? throw new ArgumentNullException(nameof(tags));
+            Tracks = tracks ?? throw new ArgumentNullException(nameof(tracks));
             Genres = genres ?? throw new ArgumentNullException(nameof(genres));
             Artists = artists ?? throw new ArgumentNullException(nameof(artists));
             _trackRepository = trackRepository ?? throw new ArgumentNullException(nameof(trackRepository));

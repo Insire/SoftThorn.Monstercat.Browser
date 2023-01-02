@@ -29,7 +29,7 @@ namespace SoftThorn.Monstercat.Browser.Cli.Services
 
         public void RegisterLazy(Type service, Func<object> factory)
         {
-            _container.RegisterDelegate(service, r => factory());
+            _container.RegisterDelegate(service, _ => factory());
         }
     }
 }

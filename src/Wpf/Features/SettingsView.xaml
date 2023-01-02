@@ -160,7 +160,6 @@
                                       ItemsSource="{Binding Source={wpf:EnumBindingSourceExtension {x:Type monstercatnet:FileFormat}}, Mode=OneTime}"
                                       SelectedItem="{Binding DownloadFileFormat, Mode=TwoWay}" />
 
-
                             <Slider Grid.Row="6"
                                     Grid.Column="0"
                                     Grid.ColumnSpan="3"
@@ -171,7 +170,6 @@
                                     TickPlacement="BottomRight"
                                     ToolTip="Select how many tracks will be downloaded in parallel"
                                     Value="{Binding ParallelDownloads}" />
-
                         </Grid>
                     </materialDesign:Card>
 
@@ -190,9 +188,31 @@
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="16" />
                                 <RowDefinition Height="Auto" />
+                                <RowDefinition Height="16" />
+                                <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
 
                             <DockPanel>
+                                <materialDesign:PackIcon Width="24"
+                                                         Height="24"
+                                                         Margin="0,0,8,0"
+                                                         VerticalAlignment="Center"
+                                                         DockPanel.Dock="Left"
+                                                         Foreground="{DynamicResource MaterialDesignCheckBoxOff}"
+                                                         Kind="Music" />
+                                <TextBlock DockPanel.Dock="Top" Text="{Binding TracksCount, StringFormat='{}Show {0} latest tracks'}" />
+
+                                <Slider Grid.Row="0"
+                                        Margin="0,8,0,0"
+                                        Maximum="50"
+                                        Minimum="5"
+                                        Style="{StaticResource MaterialDesignDiscreteSlider}"
+                                        TickFrequency="1"
+                                        TickPlacement="None"
+                                        Value="{Binding TracksCount}" />
+                            </DockPanel>
+
+                            <DockPanel Grid.Row="2">
                                 <materialDesign:PackIcon Width="24"
                                                          Height="24"
                                                          Margin="0,0,8,0"
@@ -212,7 +232,7 @@
                                         Value="{Binding ReleasesCount}" />
                             </DockPanel>
 
-                            <DockPanel Grid.Row="2">
+                            <DockPanel Grid.Row="4">
                                 <materialDesign:PackIcon Width="24"
                                                          Height="24"
                                                          Margin="0,0,8,0"
@@ -231,7 +251,7 @@
                                         Value="{Binding TagsCount}" />
                             </DockPanel>
 
-                            <DockPanel Grid.Row="4">
+                            <DockPanel Grid.Row="6">
                                 <materialDesign:PackIcon Width="24"
                                                          Height="24"
                                                          Margin="0,0,8,0"
@@ -251,7 +271,7 @@
                                         Value="{Binding ArtistsCount}" />
                             </DockPanel>
 
-                            <DockPanel Grid.Row="6">
+                            <DockPanel Grid.Row="8">
                                 <materialDesign:PackIcon Width="24"
                                                          Height="24"
                                                          Margin="0,0,8,0"

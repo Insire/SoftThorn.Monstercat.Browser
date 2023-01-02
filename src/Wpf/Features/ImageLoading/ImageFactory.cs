@@ -13,16 +13,12 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             var img = Resize(new MagickImage(stream));
             img.Freeze();
 
-            img.Freeze();
-
             return img;
         }
 
         public BitmapSource From(Uri uri)
         {
             var img = Resize(new MagickImage(uri.OriginalString));
-            img.Freeze();
-
             img.Freeze();
 
             return img;

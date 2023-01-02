@@ -4,15 +4,15 @@ using System.IO;
 
 namespace SoftThorn.Monstercat.Browser.Core
 {
-    public class ReadFullyStream : Stream
+    public sealed class ReadFullyStream : Stream
     {
         private readonly Stream _sourceStream;
         private readonly ILogger _logger;
         private readonly byte[] _readAheadBuffer;
 
-        private long pos; // psuedo-position
-        private int readAheadLength;
-        private int readAheadOffset;
+        private long _pos; // psuedo-position
+        private int _readAheadLength;
+        private int _readAheadOffset;
 
         public override bool CanRead => true;
 
@@ -20,13 +20,13 @@ namespace SoftThorn.Monstercat.Browser.Core
 
         public override bool CanWrite => false;
 
-        public override long Length => pos;
+        public override long Length => _pos;
 
         public override long Position
         {
             get
             {
-                return pos;
+                return _pos;
             }
             set
             {
@@ -46,27 +46,27 @@ namespace SoftThorn.Monstercat.Browser.Core
             var bytesRead = 0;
             while (bytesRead < count)
             {
-                var readAheadAvailableBytes = readAheadLength - readAheadOffset;
+                var readAheadAvailableBytes = _readAheadLength - _readAheadOffset;
                 var bytesRequired = count - bytesRead;
                 if (readAheadAvailableBytes > 0)
                 {
                     var toCopy = Math.Min(readAheadAvailableBytes, bytesRequired);
-                    Array.Copy(_readAheadBuffer, readAheadOffset, buffer, offset + bytesRead, toCopy);
+                    Array.Copy(_readAheadBuffer, _readAheadOffset, buffer, offset + bytesRead, toCopy);
                     bytesRead += toCopy;
-                    readAheadOffset += toCopy;
+                    _readAheadOffset += toCopy;
                 }
                 else
                 {
-                    readAheadOffset = 0;
-                    readAheadLength = _sourceStream.Read(_readAheadBuffer, 0, _readAheadBuffer.Length);
-                    _logger.Verbose("Read {ReadAheadLength} bytes (requested {Bytes})", readAheadLength, _readAheadBuffer.Length);
-                    if (readAheadLength == 0)
+                    _readAheadOffset = 0;
+                    _readAheadLength = _sourceStream.Read(_readAheadBuffer, 0, _readAheadBuffer.Length);
+                    _logger.Verbose("Read {ReadAheadLength} bytes (requested {Bytes})", _readAheadLength, _readAheadBuffer.Length);
+                    if (_readAheadLength == 0)
                     {
                         break;
                     }
                 }
             }
-            pos += bytesRead;
+            _pos += bytesRead;
             return bytesRead;
         }
 
