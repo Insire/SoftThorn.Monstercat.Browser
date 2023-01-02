@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using DynamicData;
 using DynamicData.Binding;
+using FuzzySharp;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -133,8 +134,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                     return _ => true;
                 }
 
-                return vm => vm.Title.IndexOf(searchText, StringComparison.CurrentCultureIgnoreCase) > -1
-                    || vm.ArtistsTitle.IndexOf(searchText, StringComparison.CurrentCultureIgnoreCase) > -1;
+                return vm => Search.Fuzzy(vm, searchText);
             }
         }
 

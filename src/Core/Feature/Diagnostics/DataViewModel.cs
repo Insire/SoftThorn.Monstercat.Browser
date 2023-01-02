@@ -1,6 +1,9 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using DynamicData;
 using DynamicData.Binding;
+using FuzzySharp;
+using FuzzySharp.SimilarityRatio.Scorer.StrategySensitive;
+using FuzzySharp.SimilarityRatio;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -57,18 +60,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                     return _ => true;
                 }
 
-                return vm => vm.Title.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) > -1
-                    || vm.Brand.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) > -1
-                    || vm.GenrePrimary.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) > -1
-                    || vm.GenreSecondary.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) > -1
-                    || vm.Type?.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) > -1
-                    || vm.Version.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) > -1
-                    || vm.Release.Version.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) > -1
-                    || vm.Release.Description.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) > -1
-                    || vm.Release.ArtistsTitle.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) > -1
-                    || vm.Release.CatalogId.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) > -1
-                    || vm.Release.Type.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) > -1
-                    || vm.Release?.Tags?.Any(p => p.IndexOf(searchText, StringComparison.OrdinalIgnoreCase) > -1) == true;
+                return vm => Search.Fuzzy(vm, searchText);
             }
         }
 
