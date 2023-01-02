@@ -175,6 +175,10 @@
             <Button Command="{Binding AboutCommand, ElementName=rootWindow}" ToolTip="About">
                 <iconpacks:FontAwesome Kind="GlobeSolid" />
             </Button>
+
+            <Button Command="{Binding DataCommand, ElementName=rootWindow}" ToolTip="Debug" x:Name="DiagnosticsButton">
+                <iconpacks:FontAwesome Kind="BugSolid" />
+            </Button>
         </mah:WindowCommands>
     </mah:MetroWindow.RightWindowCommands>
 

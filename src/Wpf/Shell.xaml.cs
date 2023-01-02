@@ -24,6 +24,14 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             InitializeComponent();
 
             tracker.Track(this);
+
+#if DEBUG
+            DiagnosticsButton.Visibility = System.Windows.Visibility.Visible;
+
+#else
+            DiagnosticsButton.Visibility = System.Windows.Visibility.Collapsed;
+
+#endif
         }
 
         [RelayCommand]
@@ -60,6 +68,12 @@ namespace SoftThorn.Monstercat.Browser.Wpf
         private void Settings()
         {
             _windowService.ShowSettings(this);
+        }
+
+        [RelayCommand]
+        private void Data()
+        {
+            _windowService.ShowData(this);
         }
 
         [RelayCommand]

@@ -2,7 +2,6 @@ using DynamicData.Binding;
 using Microsoft.Extensions.ObjectPool;
 using SoftThorn.MonstercatNet;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -33,9 +32,36 @@ namespace SoftThorn.Monstercat.Browser.Core
             return collection;
         }
 
-        public static TrackViewModel ToViewModel(this KeyValuePair<string, Track> pair, ObjectPool<StringBuilder> objectPool)
+        public static DataViewModelEntry ToViewModel(this TrackViewModel track)
         {
-            return pair.Value.ToViewModel(objectPool);
+            return new DataViewModelEntry()
+            {
+                Title = track.Title,
+                Key = track.Key,
+                ArtistsTitle = track.ArtistsTitle,
+                Brand = track.Brand,
+                CatalogId = track.CatalogId,
+                DebutDate = track.DebutDate,
+                Downloadable = track.Downloadable,
+                GenrePrimary = track.GenrePrimary,
+                GenreSecondary = track.GenreSecondary,
+                Id = track.Id,
+                InEarlyAccess = track.InEarlyAccess,
+
+                Streamable = track.Streamable,
+                Type = track.Type,
+                Upc = track.Release.Upc,
+                Version = track.Version,
+
+                ReleaseCatalogId = track.Release.CatalogId,
+                ReleaseDate = track.ReleaseDate,
+                ReleaseId = track.Release.Id,
+                ReleaseTitle = track.Release.Title,
+                ReleaseType = track.Release.Type,
+                ReleaseVersion = track.Release.Version,
+                ReleaseArtistTitle = track.Release.ArtistsTitle,
+                Description = track.Release.Description,
+            };
         }
 
         public static TrackViewModel ToViewModel(this Track track, ObjectPool<StringBuilder> objectPool)
