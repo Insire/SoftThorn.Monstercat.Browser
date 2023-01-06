@@ -65,7 +65,7 @@ namespace SoftThorn.Monstercat.Browser.Core
 
             Messenger.Register<DownloadViewModel, DownloadTracksMessage>(this, async (r, m) =>
             {
-                await r.Download(m.Value, CancellationToken.None);
+                await Task.Run(async () => await r.Download(m.Value, CancellationToken.None));
             });
         }
 
@@ -87,34 +87,50 @@ namespace SoftThorn.Monstercat.Browser.Core
 
             IsDownLoading = true;
             TracksToDownload = tracks.Count;
-            var files = Directory.GetFiles(downloadPath, "*" + fileFormat.GetFileExtension());
+
+            var fileLookup = Directory
+                .GetFiles(downloadPath, "*" + fileFormat.GetFileExtension())
+                .ToDictionary(p => p.ToLowerInvariant());
+
+            var notDownloadedTracks = tracks
+                .Select(item =>
+                {
+                    var builder = _objectPool.Get();
+                    var filePath = item.GetFilePath(builder, downloadPath, fileFormat);
+
+                    builder.Clear();
+                    _objectPool.Return(builder);
+
+                    return (filePath, item);
+                })
+                .Where(tuple => !fileLookup.ContainsKey(tuple.filePath.ToLowerInvariant()))
+                .ToList();
 
             try
             {
                 var current = 0;
-
-                var tasks = new List<Task>();
-                foreach (var batch in tracks.Batch(TracksToDownload / parallelDownloads))
+                var batchSize = 1;
+                if (notDownloadedTracks.Count > parallelDownloads)
                 {
+                    batchSize = Convert.ToInt32(Math.Round(Convert.ToDouble(notDownloadedTracks.Count) / Convert.ToDouble(parallelDownloads), MidpointRounding.AwayFromZero));
+                }
+
+                var batches = notDownloadedTracks.Batch(batchSize).ToList();
+                var tasks = new List<Task>();
+                for (var i = 0; i < batches.Count; i++)
+                {
+                    var batch = batches[i];
                     tasks.Add(Task.Run(async () =>
                     {
-                        foreach (var item in batch)
+                        foreach (var tuple in batch)
                         {
                             if (token.IsCancellationRequested)
                             {
                                 return;
                             }
 
-                            var builder = _objectPool.Get();
-                            var filePath = item.GetFilePath(builder, downloadPath, fileFormat);
-                            _objectPool.Return(builder);
-
-                            if (files.Contains(filePath))
-                            {
-                                current++;
-                                _progressService.Report(current, TracksToDownload);
-                                continue;
-                            }
+                            var item = tuple.item;
+                            var filePath = tuple.filePath;
 
                             _log.Information("Downloading {TrackId} {ReleaseId} to {FilePath}", item.Release.Id, item.Id, filePath);
                             using var stream = await _api.DownloadTrackAsStream(new TrackDownloadRequest()
@@ -134,7 +150,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                             await stream.CopyToAsync(writeStream);
 
                             current++;
-                            _progressService.Report(current, TracksToDownload);
+                            _progressService.Report(current, notDownloadedTracks.Count);
                         }
                     }, token));
                 }
