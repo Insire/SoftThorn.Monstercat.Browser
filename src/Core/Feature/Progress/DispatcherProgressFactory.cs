@@ -2,35 +2,35 @@ using Gress;
 using Serilog;
 using System;
 using System.Collections.Generic;
-using System.Threading;
+using System.Reactive.Concurrency;
 
 namespace SoftThorn.Monstercat.Browser.Core
 {
     public sealed class DispatcherProgressFactory<T> : IDispatcherProgressFactory<T>
     {
-        private readonly SynchronizationContext _synchronizationContext;
         private readonly ILogger _log;
+        private readonly IScheduler _scheduler;
         private readonly ProgressContainer<T> _progress;
         private readonly List<Action<T>> _callbacks;
 
-        public DispatcherProgressFactory(SynchronizationContext synchronizationContext, ILogger log, ProgressContainer<T> progress)
+        public DispatcherProgressFactory(IScheduler scheduler, ILogger log, ProgressContainer<T> progress)
         {
-            _synchronizationContext = synchronizationContext ?? throw new ArgumentNullException(nameof(synchronizationContext));
             _log = log.ForContext<DispatcherProgressFactory<T>>();
+            _scheduler = scheduler;
             _progress = progress ?? throw new ArgumentNullException(nameof(progress));
             _callbacks = new List<Action<T>>();
         }
 
         public DispatcherProgress<T> Create()
         {
-            return new DispatcherProgress<T>(_synchronizationContext, (p) => Report(p), TimeSpan.FromMilliseconds(250));
+            return new DispatcherProgress<T>(_scheduler, (p) => Report(p), TimeSpan.FromMilliseconds(250));
         }
 
         public DispatcherProgress<T> Create(Action<T> callback)
         {
             _callbacks.Add(callback);
 
-            return new DispatcherProgress<T>(_synchronizationContext, (p) => Report(p), TimeSpan.FromMilliseconds(250), new CallbackDisposeable(callback, _callbacks));
+            return new DispatcherProgress<T>(_scheduler, (p) => Report(p), TimeSpan.FromMilliseconds(250), new CallbackDisposeable(callback, _callbacks));
         }
 
         private void Report(T value)

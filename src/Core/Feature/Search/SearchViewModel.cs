@@ -3,7 +3,6 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using DynamicData;
 using DynamicData.Binding;
-using FuzzySharp;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -11,7 +10,6 @@ using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Threading;
 
 namespace SoftThorn.Monstercat.Browser.Core
 {
@@ -39,19 +37,9 @@ namespace SoftThorn.Monstercat.Browser.Core
 
         public Action? OnDownloadStarted { get; set; }
 
-        public SearchViewModel(SynchronizationContext synchronizationContext, IMessenger messenger, IReadOnlyCollection<TrackViewModel> tracks, IReadOnlyCollection<TagViewModel> tags)
+        public SearchViewModel(IScheduler scheduler, IMessenger messenger, IReadOnlyCollection<TrackViewModel> tracks, IReadOnlyCollection<TagViewModel> tags)
             : base(messenger)
         {
-            if (synchronizationContext is null)
-            {
-                throw new ArgumentNullException(nameof(synchronizationContext));
-            }
-
-            if (messenger is null)
-            {
-                throw new ArgumentNullException(nameof(messenger));
-            }
-
             _tagCache = new SourceCache<TagViewModel, string>(vm => vm.Value);
             _tagCache.AddOrUpdate(tags);
 
@@ -78,7 +66,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                 .DistinctUntilChanged()
                 .AutoRefresh()
                 .Filter(x => x.IsSelected)
-                .ObserveOn(synchronizationContext)
+                .ObserveOn(scheduler)
                 .Bind(_selectedTags)
                 .Subscribe();
 
@@ -88,7 +76,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                 .DistinctUntilChanged()
                 .Sort(SortExpressionComparer<TagViewModel>
                     .Ascending(p => p.Value))
-                .ObserveOn(synchronizationContext)
+                .ObserveOn(scheduler)
                 .Bind(_tags, new AddingObservableCollectionAdaptor<TagViewModel, string>())
                 .Subscribe();
 
@@ -103,7 +91,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                     .Ascending(p => p.Title)
                     .ThenByAscending(p => p.ArtistsTitle)
                     .ThenByAscending(p => p.CatalogId))
-                .ObserveOn(synchronizationContext)
+                .ObserveOn(scheduler)
                 .Bind(_tracks)
                 .Subscribe(_ => DownloadCommand.NotifyCanExecuteChanged());
 

@@ -9,8 +9,8 @@ using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
-using System.Threading;
 
 namespace SoftThorn.Monstercat.Browser.Core
 {
@@ -29,7 +29,7 @@ namespace SoftThorn.Monstercat.Browser.Core
         public Axis[] XAxes { get; }
         public Axis[] YAxes { get; }
 
-        public TagsViewModel(SynchronizationContext synchronizationContext, ITrackRepository trackRepository, IMessenger messenger)
+        public TagsViewModel(IScheduler scheduler, ITrackRepository trackRepository, IMessenger messenger)
             : base(messenger)
         {
             _seriesCollection = new ObservableCollectionExtended<ISeries>();
@@ -74,7 +74,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                         Fill = new SolidColorPaint(SKColor.Parse("#FF673AB7")),
                         MaxBarWidth = 24,
                     })
-                    .ObserveOn(synchronizationContext)
+                    .ObserveOn(scheduler)
                     .Bind(_seriesCollection)
                     .Subscribe();
             }

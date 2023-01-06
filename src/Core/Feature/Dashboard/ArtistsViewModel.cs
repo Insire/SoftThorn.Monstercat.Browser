@@ -4,8 +4,8 @@ using DynamicData;
 using DynamicData.Binding;
 using System;
 using System.Collections.ObjectModel;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
-using System.Threading;
 
 namespace SoftThorn.Monstercat.Browser.Core
 {
@@ -21,7 +21,7 @@ namespace SoftThorn.Monstercat.Browser.Core
 
         public ReadOnlyObservableCollection<ArtistViewModel> Artists { get; }
 
-        public ArtistsViewModel(SynchronizationContext synchronizationContext, ITrackRepository trackRepository, IMessenger messenger)
+        public ArtistsViewModel(IScheduler scheduler, ITrackRepository trackRepository, IMessenger messenger)
             : base(messenger)
         {
             _artists = new ObservableCollectionExtended<ArtistViewModel>();
@@ -41,7 +41,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                     .Top(SortExpressionComparer<ArtistViewModel>
                         .Descending(p => p.LatestReleaseDate)
                         .ThenByAscending(p => p.Tracks.Count), size)
-                    .ObserveOn(synchronizationContext)
+                    .ObserveOn(scheduler)
                     .Bind(_artists)
                     .Subscribe();
             }

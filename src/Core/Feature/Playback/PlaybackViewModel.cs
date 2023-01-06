@@ -11,14 +11,13 @@ using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Threading;
 
 namespace SoftThorn.Monstercat.Browser.Core
 {
     public sealed partial class PlaybackViewModel : ObservableObject, IDisposable
     {
         private readonly SourceCache<PlaybackItemViewModel, long> _sourceCache;
-        private readonly SynchronizationContext _synchronizationContext;
+        private readonly IScheduler _scheduler;
         private readonly IPlaybackService _playbackService;
         private readonly IMessenger _messenger;
         private readonly ILogger _logger;
@@ -64,10 +63,10 @@ namespace SoftThorn.Monstercat.Browser.Core
 
         public IObservableCollection<PlaybackItemViewModel> Items { get; }
 
-        public PlaybackViewModel(SynchronizationContext synchronizationContext, IPlaybackService playbackService, IMessenger messenger, ILogger logger)
+        public PlaybackViewModel(IScheduler scheduler, IPlaybackService playbackService, IMessenger messenger, ILogger logger)
         {
             _sourceCache = new SourceCache<PlaybackItemViewModel, long>(vm => vm.Sequence);
-            _synchronizationContext = synchronizationContext;
+            _scheduler = scheduler;
             _playbackService = playbackService;
             _messenger = messenger;
             _logger = logger.ForContext<PlaybackViewModel>();
@@ -87,7 +86,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                     .ObserveOn(TaskPoolScheduler.Default)
                     .DistinctUntilChanged()
                     .SortBy(p => p.Sequence, SortDirection.Ascending, SortOptimisations.ComparesImmutableValuesOnly)
-                    .ObserveOn(_synchronizationContext)
+                    .ObserveOn(scheduler)
                     .Bind(Items)
                     .DisposeMany()
                     .Subscribe(),
@@ -95,7 +94,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                 this.WhenPropertyChanged(p => p.Volume)
                     .ObserveOn(TaskPoolScheduler.Default)
                     .Throttle(TimeSpan.FromMilliseconds(250))
-                    .ObserveOn(_synchronizationContext)
+                    .ObserveOn(scheduler)
                     .Subscribe(p => _playbackService.SetVolume(p.Value)),
             });
         }
@@ -165,12 +164,12 @@ namespace SoftThorn.Monstercat.Browser.Core
                 }
             }
 
-            _synchronizationContext.Post(this, o =>
+            _scheduler.Schedule(() =>
             {
-                o.ResumePlayCommand.NotifyCanExecuteChanged();
-                o.NextCommand.NotifyCanExecuteChanged();
-                o.PreviousCommand.NotifyCanExecuteChanged();
-                o.PauseCommand.NotifyCanExecuteChanged();
+                ResumePlayCommand.NotifyCanExecuteChanged();
+                NextCommand.NotifyCanExecuteChanged();
+                PreviousCommand.NotifyCanExecuteChanged();
+                PauseCommand.NotifyCanExecuteChanged();
             });
         }
 

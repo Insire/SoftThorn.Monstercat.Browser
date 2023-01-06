@@ -1,8 +1,8 @@
 using System;
 using System.Reactive;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Threading;
 
 namespace SoftThorn.Monstercat.Browser.Core
 {
@@ -16,7 +16,7 @@ namespace SoftThorn.Monstercat.Browser.Core
 
         private bool _disposed;
 
-        public DispatcherProgress(SynchronizationContext synchronizationContext, Action<T> callback, TimeSpan interval)
+        public DispatcherProgress(IScheduler scheduler, Action<T> callback, TimeSpan interval)
         {
             _callback = callback ?? throw new ArgumentNullException(nameof(callback));
 
@@ -25,13 +25,13 @@ namespace SoftThorn.Monstercat.Browser.Core
                 fsHandler => ProgressChanged -= fsHandler);
 
             _disposable = new CompositeDisposable(_observable
-                .ObserveOn(System.Reactive.Concurrency.TaskPoolScheduler.Default)
+                .ObserveOn(TaskPoolScheduler.Default)
                 .Sample(interval)
-                .ObserveOn(synchronizationContext)
+                .ObserveOn(scheduler)
                 .Subscribe(e => ReportInternal(e.EventArgs)));
         }
 
-        public DispatcherProgress(SynchronizationContext synchronizationContext, Action<T> callback, TimeSpan interval, IDisposable disposable)
+        public DispatcherProgress(IScheduler scheduler, Action<T> callback, TimeSpan interval, IDisposable disposable)
         {
             _callback = callback ?? throw new ArgumentNullException(nameof(callback));
 
@@ -40,9 +40,9 @@ namespace SoftThorn.Monstercat.Browser.Core
                 fsHandler => ProgressChanged -= fsHandler);
 
             _disposable = new CompositeDisposable(_observable
-                .ObserveOn(System.Reactive.Concurrency.TaskPoolScheduler.Default)
+                .ObserveOn(TaskPoolScheduler.Default)
                 .Sample(interval)
-                .ObserveOn(synchronizationContext)
+                .ObserveOn(scheduler)
                 .Subscribe(e => ReportInternal(e.EventArgs)), disposable);
         }
 

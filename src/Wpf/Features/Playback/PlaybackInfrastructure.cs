@@ -1,16 +1,14 @@
 using NAudio.Wave;
-using System;
-using System.Threading;
-using SoftThorn.Monstercat.Browser.Core;
 using Serilog;
+using SoftThorn.Monstercat.Browser.Core;
+using System;
 using System.IO;
+using System.Reactive.Concurrency;
 
 namespace SoftThorn.Monstercat.Browser.Wpf
 {
     internal sealed class PlaybackInfrastructure : IDisposable
     {
-        private readonly SynchronizationContext _synchronizationContext;
-
         private static IMp3FrameDecompressor CreateFrameDecompressor(Mp3Frame frame)
         {
             var channelCount = frame.ChannelMode == ChannelMode.Mono
@@ -21,7 +19,7 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             return new AcmMp3FrameDecompressor(waveFormat);
         }
 
-        public static PlaybackInfrastructure Create(SynchronizationContext synchronizationContext, ILogger logger, Mp3Frame frame, int volume)
+        public static PlaybackInfrastructure Create(IScheduler scheduler, ILogger logger, Mp3Frame frame, int volume)
         {
             // don't think these details matter too much - just help ACM select the right codec
             // however, the buffered provider doesn't know what sample rate it is working at
@@ -37,7 +35,7 @@ namespace SoftThorn.Monstercat.Browser.Wpf
                 Volume = 0.5f,
             };
 
-            var instance = new PlaybackInfrastructure(synchronizationContext, bufferedWaveProvider, decompressor, volumeProvider, logger);
+            var instance = new PlaybackInfrastructure(scheduler, bufferedWaveProvider, decompressor, volumeProvider, logger);
 
             instance.Initialize();
             instance.SetVolume(volume);
@@ -47,6 +45,7 @@ namespace SoftThorn.Monstercat.Browser.Wpf
 
         private readonly byte[] _buffer;
         private readonly ILogger _logger;
+        private readonly IScheduler _scheduler;
 
         public BufferedWaveProvider BufferedWaveProvider { get; }
         public IMp3FrameDecompressor FrameDecompressor { get; }
@@ -56,13 +55,13 @@ namespace SoftThorn.Monstercat.Browser.Wpf
         public double TotalSeconds => BufferedWaveProvider.BufferedDuration.TotalSeconds;
 
         private PlaybackInfrastructure(
-            SynchronizationContext synchronizationContext,
+            IScheduler scheduler,
             BufferedWaveProvider bufferedWaveProvider,
             IMp3FrameDecompressor frameDecompressor,
             VolumeWaveProvider16 volumeProvider,
             ILogger logger)
         {
-            _synchronizationContext = synchronizationContext;
+            _scheduler = scheduler;
             BufferedWaveProvider = bufferedWaveProvider;
             FrameDecompressor = frameDecompressor;
             VolumeProvider = volumeProvider;
@@ -73,10 +72,10 @@ namespace SoftThorn.Monstercat.Browser.Wpf
 
         private void Initialize()
         {
-            _synchronizationContext.Send(this, o =>
+            _scheduler.Schedule(() =>
             {
-                o.WaveOut = new WaveOut();
-                o.WaveOut.Init(o.VolumeProvider);
+                WaveOut = new WaveOut();
+                WaveOut.Init(VolumeProvider);
             });
         }
 

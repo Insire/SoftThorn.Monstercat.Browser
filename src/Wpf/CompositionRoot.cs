@@ -1,4 +1,5 @@
 using Akavache;
+using ATL.Playlist;
 using CommunityToolkit.Mvvm.Messaging;
 using DryIoc;
 using Gress;
@@ -13,6 +14,7 @@ using SoftThorn.Monstercat.Browser.Core;
 using SoftThorn.MonstercatNet;
 using System;
 using System.Net.Http;
+using System.Reactive.Concurrency;
 using System.Reflection;
 using System.Threading;
 using System.Windows;
@@ -72,6 +74,7 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             container.Register<BrandViewModel<Uncaged>>(Reuse.Singleton);
             container.Register<BrandViewModel<Silk>>(Reuse.Singleton);
 
+            container.Register<PlaylistIOFactory>(Reuse.Singleton, made: Made.Of(() => PlaylistIOFactory.GetInstance()));
             container.Register<PlaylistFormatsViewModel>(Reuse.Singleton);
 
             // services
@@ -81,7 +84,7 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             container.RegisterInstance(_tracker);
             container.RegisterInstance(playbackTimer);
             container.RegisterInstance<IMessenger>(WeakReferenceMessenger.Default);
-            container.RegisterInstance(SynchronizationContext.Current!);
+            container.RegisterInstance<IScheduler>(new SynchronizationContextScheduler(SynchronizationContext.Current!));
             container.Register<MonstercatContentStorageService>(Reuse.Singleton);
 
             container.Register<ITrackRepository, TrackRepository>(Reuse.Singleton);

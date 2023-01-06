@@ -6,6 +6,7 @@ using SoftThorn.Monstercat.Browser.Core;
 using SoftThorn.MonstercatNet;
 using System;
 using System.IO;
+using System.Reactive.Concurrency;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,7 +16,7 @@ namespace SoftThorn.Monstercat.Browser.Wpf
 {
     internal sealed class PlaybackService : IPlaybackService
     {
-        private readonly SynchronizationContext _synchronizationContext;
+        private readonly IScheduler _scheduler;
         private readonly DispatcherTimer _timer;
         private readonly IMessenger _messenger;
         private readonly ILogger _logger;
@@ -28,10 +29,10 @@ namespace SoftThorn.Monstercat.Browser.Wpf
         private PlaybackInfrastructure? _playbackInfrastructure;
         private Task _playbackLoop;
 
-        public PlaybackService(SynchronizationContext synchronizationContext, DispatcherTimer timer, IMessenger messenger, ILogger logger, IMonstercatApi api)
+        public PlaybackService(IScheduler scheduler, DispatcherTimer timer, IMessenger messenger, ILogger logger, IMonstercatApi api)
         {
             _api = api;
-            _synchronizationContext = synchronizationContext;
+            _scheduler = scheduler;
             _timer = timer;
             _messenger = messenger;
             _logger = logger.ForContext<PlaybackService>();
@@ -115,7 +116,7 @@ namespace SoftThorn.Monstercat.Browser.Wpf
 
                         if (infrastructure is null)
                         {
-                            _playbackInfrastructure = infrastructure = PlaybackInfrastructure.Create(_synchronizationContext, _logger, frame, volume);
+                            _playbackInfrastructure = infrastructure = PlaybackInfrastructure.Create(_scheduler, _logger, frame, volume);
                         }
 
                         if (token.IsCancellationRequested)

@@ -4,8 +4,8 @@ using DynamicData.Binding;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
-using System.Threading;
 
 namespace SoftThorn.Monstercat.Browser.Core
 {
@@ -26,7 +26,7 @@ namespace SoftThorn.Monstercat.Browser.Core
 
         public ReadOnlyObservableCollection<TrackViewModel> Releases { get; }
 
-        public BrandViewModel(SynchronizationContext synchronizationContext, ITrackRepository trackRepository)
+        public BrandViewModel(IScheduler scheduler, ITrackRepository trackRepository)
         {
             _brand = new T();
             _releases = new ObservableCollectionExtended<TrackViewModel>();
@@ -46,7 +46,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                         _latestRelease = vm;
                     }
                 })
-                .ObserveOn(synchronizationContext)
+                .ObserveOn(scheduler)
                 .Bind(_releases)
                 .Subscribe(_ => OnPropertyChanged(nameof(LatestRelease)));
         }

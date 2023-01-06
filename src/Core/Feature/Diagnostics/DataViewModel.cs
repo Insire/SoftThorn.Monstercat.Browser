@@ -1,15 +1,12 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using DynamicData;
 using DynamicData.Binding;
-using FuzzySharp;
-using FuzzySharp.SimilarityRatio.Scorer.StrategySensitive;
-using FuzzySharp.SimilarityRatio;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Threading;
 
 namespace SoftThorn.Monstercat.Browser.Core
 {
@@ -26,7 +23,7 @@ namespace SoftThorn.Monstercat.Browser.Core
 
         public ReadOnlyObservableCollection<DataViewModelEntry> Tracks { get; }
 
-        public DataViewModel(SynchronizationContext synchronizationContext, ITrackRepository trackRepository)
+        public DataViewModel(IScheduler scheduler, ITrackRepository trackRepository)
         {
             _tracks = new ObservableCollectionExtended<DataViewModelEntry>();
             Tracks = new ReadOnlyObservableCollection<DataViewModelEntry>(_tracks);
@@ -47,7 +44,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                     .ThenByAscending(p => p.CatalogId)
                     .ThenByAscending(p => p.Key), SortOptimisations.ComparesImmutableValuesOnly)
                 .Transform(p => p.ToViewModel())
-                .ObserveOn(synchronizationContext)
+                .ObserveOn(scheduler)
                 .Bind(_tracks)
                 .Subscribe();
 

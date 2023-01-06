@@ -10,7 +10,6 @@ using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace SoftThorn.Monstercat.Browser.Core
@@ -69,26 +68,11 @@ namespace SoftThorn.Monstercat.Browser.Core
         public Action? OnSuccssfulSave { get; set; }
 
         public SettingsViewModel(
-            SynchronizationContext synchronizationContext,
+            IScheduler scheduler,
             SettingsService settingsService,
             ITrackRepository trackRepository,
             IMessenger messenger)
         {
-            if (synchronizationContext is null)
-            {
-                throw new ArgumentNullException(nameof(synchronizationContext));
-            }
-
-            if (trackRepository is null)
-            {
-                throw new ArgumentNullException(nameof(trackRepository));
-            }
-
-            if (messenger is null)
-            {
-                throw new ArgumentNullException(nameof(messenger));
-            }
-
             _settingsService = settingsService ?? throw new ArgumentNullException(nameof(settingsService));
             _tags = new ObservableCollectionExtended<TagViewModel>();
             _selectedTags = new ObservableCollectionExtended<TagViewModel>();
@@ -106,7 +90,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                 .DistinctUntilChanged()
                 .AutoRefresh()
                 .Filter(x => x.IsSelected)
-                .ObserveOn(synchronizationContext)
+                .ObserveOn(scheduler)
                 .Bind(_selectedTags)
                 .Subscribe();
 
@@ -116,7 +100,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                 .DistinctUntilChanged()
                 .Sort(SortExpressionComparer<TagViewModel>
                     .Ascending(p => p.Value))
-                .ObserveOn(synchronizationContext)
+                .ObserveOn(scheduler)
                 .Bind(_tags, new AddingObservableCollectionAdaptor<TagViewModel, string>())
                 .Subscribe();
 

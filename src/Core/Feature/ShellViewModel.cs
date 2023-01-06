@@ -3,8 +3,8 @@ using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using Gress;
 using System;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace SoftThorn.Monstercat.Browser.Core
@@ -56,7 +56,7 @@ namespace SoftThorn.Monstercat.Browser.Core
         public BrandViewModel<Instinct> Instinct { get; }
 
         public ShellViewModel(
-            SynchronizationContext synchronizationContext,
+            IScheduler scheduler,
             AboutViewModel about,
             SettingsViewModel settings,
             ReleasesViewModel releases,
@@ -97,7 +97,7 @@ namespace SoftThorn.Monstercat.Browser.Core
             _subscription = _trackRepository
                 .ConnectTracks()
                 .Throttle(TimeSpan.FromMilliseconds(500))
-                .ObserveOn(synchronizationContext)
+                .ObserveOn(scheduler)
                 .Do(_ => PlayCommand.NotifyCanExecuteChanged())
                 .Subscribe();
         }

@@ -1,6 +1,7 @@
 using Ookii.Dialogs.Wpf;
 using SoftThorn.Monstercat.Browser.Core;
 using System;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,19 +28,19 @@ namespace SoftThorn.Monstercat.Browser.Wpf
         private readonly ShellViewModel _shellViewModel;
         private readonly Func<LoginViewModel> _loginViewModelFactory;
         private readonly SearchViewModelFactory _searchViewModelFactory;
-        private readonly SynchronizationContext _synchronizationContext;
+        private readonly IScheduler _scheduler;
         private readonly ITrackRepository _trackRepository;
 
         public WindowService(
             ShellViewModel shellViewModel,
             Func<LoginViewModel> loginViewModelFactory,
             SearchViewModelFactory searchViewModelFactory,
-            SynchronizationContext synchronizationContext,
+            IScheduler scheduler,
             ITrackRepository trackRepository)
         {
             _shellViewModel = shellViewModel ?? throw new ArgumentNullException(nameof(shellViewModel));
             _searchViewModelFactory = searchViewModelFactory ?? throw new ArgumentNullException(nameof(searchViewModelFactory));
-            _synchronizationContext = synchronizationContext ?? throw new ArgumentNullException(nameof(synchronizationContext));
+            _scheduler = scheduler;
             _trackRepository = trackRepository ?? throw new ArgumentNullException(nameof(trackRepository));
             _loginViewModelFactory = loginViewModelFactory ?? throw new ArgumentNullException(nameof(loginViewModelFactory));
         }
@@ -130,7 +131,7 @@ namespace SoftThorn.Monstercat.Browser.Wpf
 
         public void ShowData(Window owner)
         {
-            var wnd = new DataView(new DataViewModel(_synchronizationContext, _trackRepository))
+            var wnd = new DataView(new DataViewModel(_scheduler, _trackRepository))
             {
                 Owner = owner,
             };
