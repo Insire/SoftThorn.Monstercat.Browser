@@ -9,7 +9,7 @@ namespace Build
     public sealed class GenerateLicenseFileTask : FrostingTask<BuildContext>
     {
         private const string DotnetToolName = "dotnet-project-licenses";
-        private const string DotnetToolVersion = "2.4.0";
+        private const string DotnetToolVersion = "2.5.0";
 
         public override void Run(BuildContext context)
         {

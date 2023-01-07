@@ -7,12 +7,12 @@ using System.Reflection;
 
 [assembly: AssemblyCompany("SoftThorn")]
 [assembly: AssemblyProduct("SoftThorn.Monstercat.Browser")]
-[assembly: AssemblyCopyright("© 2022 Insire")]
+[assembly: AssemblyCopyright("© 2023 Insire")]
 [assembly: AssemblyTrademark("")]
 
 // Metadata Attributes
 [assembly: AssemblyMetadata("Platform", "AnyCPU")]
-[assembly: AssemblyMetadata("CompileDate", "[UTC]24.04.2022 09:44:27")]
-[assembly: AssemblyMetadata("Branch", "main")]
-[assembly: AssemblyMetadata("Commit", "8dc2bd64c029af2f375d85fd062ed563907fc9f9")]
-[assembly: AssemblyMetadata("Version", "0.1.6-g8dc2bd64c0")]
+[assembly: AssemblyMetadata("CompileDate", "[UTC]07.01.2023 10:41:00")]
+[assembly: AssemblyMetadata("Branch", "development/wpf")]
+[assembly: AssemblyMetadata("Commit", "fa6132c46a0edaa7e0ca180a5c22fffbb9fa64d7")]
+[assembly: AssemblyMetadata("Version", "1.0.46-gfa6132c46a")]
