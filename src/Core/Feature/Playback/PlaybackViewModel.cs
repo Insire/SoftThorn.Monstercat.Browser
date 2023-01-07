@@ -8,6 +8,7 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -22,7 +23,6 @@ namespace SoftThorn.Monstercat.Browser.Core
         private readonly IMessenger _messenger;
         private readonly ILogger _logger;
         private readonly CompositeDisposable _subscription;
-        private readonly LinkedList<PlaybackItemViewModel> _history; // replace with linked list
 
         private bool _disposedValue;
         private long _currentSequence;
@@ -71,13 +71,20 @@ namespace SoftThorn.Monstercat.Browser.Core
             _messenger = messenger;
             _logger = logger.ForContext<PlaybackViewModel>();
 
-            _history = new LinkedList<PlaybackItemViewModel>();
             _currentSequence = 0;
             _volume = _playbackService.GetVolume();
 
             _messenger.Register<PlaybackViewModel, ValueChangedMessage<(StreamingPlaybackState, PlaybackIntent)>>(this, (r, m) => r.OnStreamingPlaybackStateChanged(m.Value));
 
             Items = new ObservableCollectionExtended<PlaybackItemViewModel>();
+
+            var currentChanged = this.WhenPropertyChanged(p => p.Current)
+                .Where(p => p.Value is null)
+                .Select(_ => Unit.Default);
+
+            var countChanged = _sourceCache.CountChanged
+                .Where(p => p == 0)
+                .Select(_ => Unit.Default);
 
             _subscription = new CompositeDisposable(new[]
             {
@@ -96,6 +103,12 @@ namespace SoftThorn.Monstercat.Browser.Core
                     .Throttle(TimeSpan.FromMilliseconds(250))
                     .ObserveOn(scheduler)
                     .Subscribe(p => _playbackService.SetVolume(p.Value)),
+
+                currentChanged
+                    .CombineLatest(countChanged, (_, __) => Unit.Default)
+                    .ObserveOn(TaskPoolScheduler.Default)
+                    .Throttle(TimeSpan.FromMilliseconds(250))
+                    .Subscribe(_ => IsPlaybackAvailable = false)
             });
         }
 
@@ -106,7 +119,7 @@ namespace SoftThorn.Monstercat.Browser.Core
 
             if (CanPlay())
             {
-                Play(item, PlaybackIntent.User, true);
+                Play(item, PlaybackIntent.User);
             }
         }
 
@@ -132,7 +145,7 @@ namespace SoftThorn.Monstercat.Browser.Core
 
             if (firstEntry is not null && CanPlay())
             {
-                Play(firstEntry, PlaybackIntent.User, true);
+                Play(firstEntry, PlaybackIntent.User);
             }
         }
 
@@ -152,15 +165,24 @@ namespace SoftThorn.Monstercat.Browser.Core
         {
             OnPropertyChanged(nameof(PlaybackState));
 
+            // seamless playback
             if (tuple.Intent == PlaybackIntent.Auto && tuple.State == StreamingPlaybackState.Stopped)
             {
+                var current = _current;
                 var nextEntry = _sourceCache.Items
-                 .Where(p => p != _current)
-                 .MaxBy(p => p.Sequence);
+                    .Where(p => p != current)
+                    .MaxBy(p => p.Sequence);
 
                 if (nextEntry != null)
                 {
-                    Play(nextEntry, PlaybackIntent.Auto, true);
+                    Play(nextEntry, PlaybackIntent.Auto);
+                }
+                else
+                {
+                    if (current != null)
+                    {
+                        Remove(current);
+                    }
                 }
             }
 
@@ -168,12 +190,11 @@ namespace SoftThorn.Monstercat.Browser.Core
             {
                 ResumePlayCommand.NotifyCanExecuteChanged();
                 NextCommand.NotifyCanExecuteChanged();
-                PreviousCommand.NotifyCanExecuteChanged();
                 PauseCommand.NotifyCanExecuteChanged();
             });
         }
 
-        private void Play(PlaybackItemViewModel item, PlaybackIntent intent, bool trackHistory)
+        private void Play(PlaybackItemViewModel item, PlaybackIntent intent)
         {
             var current = _current;
             if (current is not null)
@@ -183,11 +204,6 @@ namespace SoftThorn.Monstercat.Browser.Core
 
             IsPlaybackAvailable = true;
             Current = item;
-
-            if (trackHistory)
-            {
-                _history.AddLast(item);
-            }
 
             _logger.Debug("Now playing [{Sequence}]{Title} by {Artist} ({ID})", item.Sequence, item.Track.Title, item.Track.ArtistsTitle, item.Track.Id);
             _playbackService.Play(item, intent, _volume);
@@ -237,7 +253,7 @@ namespace SoftThorn.Monstercat.Browser.Core
 
                 if (nextEntry is not null)
                 {
-                    Play(nextEntry, PlaybackIntent.User, true);
+                    Play(nextEntry, PlaybackIntent.User);
                 }
             }
         }
@@ -248,74 +264,6 @@ namespace SoftThorn.Monstercat.Browser.Core
                     .Where(p => p != _current)
                     .OrderBy(p => p.Sequence)
                     .Any();
-        }
-
-        [RelayCommand(CanExecute = nameof(CanPrevious))]
-        private void Previous()
-        {
-            if (CanPrevious())
-            {
-                if (_history.Count == 0)
-                {
-                    return;
-                }
-
-                var current = _current;
-                var first = _history.First!.Value;
-
-                if (_history.Count == 1)
-                {
-                    if (current is null) // currently not playing
-                    {
-                        _sourceCache.AddOrUpdate(first);
-                        Play(first, PlaybackIntent.User, false);
-                    }
-                    else
-                    {
-                        Play(current, PlaybackIntent.User, false);
-                    }
-
-                    return;
-                }
-
-                var previous = _history.Last!.Previous!.Value;
-                var last = _history.Last.Value;
-
-                if (current is null) // currently not playing
-                {
-                    _sourceCache.Edit(o =>
-                    {
-                        // ToDo update all Sequences
-
-                        // the last played entry should already be gone from the SoureCache
-                        o.AddOrUpdate(previous);
-                        // we immediately go to the previous track and dont reset playback to the last played one
-
-                        _history.RemoveLast();
-
-                        Play(previous, PlaybackIntent.User, false);
-                    });
-                }
-                else
-                {
-                    _sourceCache.Edit(o =>
-                    {
-                        // ToDo update all Sequences
-                        o.Remove(last);
-                        o.AddOrUpdate(previous);
-                        o.AddOrUpdate(CreatePlaybackItem(last.Track));
-
-                        _history.RemoveLast();
-
-                        Play(previous, PlaybackIntent.User, false);
-                    });
-                }
-            }
-        }
-
-        private bool CanPrevious()
-        {
-            return _history.Count > 1;
         }
 
         [RelayCommand(CanExecute = nameof(CanRemove))]
