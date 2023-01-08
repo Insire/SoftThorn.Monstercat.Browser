@@ -1,6 +1,5 @@
 using CommunityToolkit.Mvvm.Messaging;
 using CommunityToolkit.Mvvm.Messaging.Messages;
-using NAudio.Wave;
 using Serilog;
 using SoftThorn.Monstercat.Browser.Core;
 using SoftThorn.MonstercatNet;
@@ -77,7 +76,6 @@ namespace SoftThorn.Monstercat.Browser.Wpf
 
             SetPlaybackState(StreamingPlaybackState.Buffering, intent);
 
-            //using (var stream = File.OpenRead(@"C:\Users\peter\OneDrive\Desktop\mixkit-crickets-and-insects-in-the-wild-ambience-39.mp3"))
             using (var stream = await _api.StreamTrackAsStream(item.GetStreamRequest(), _cancellationTokenSource.Token))
             {
                 _playbackLoop = Task.Run(() => PlayBackLoop(stream, volume, _cancellationTokenSource.Token), _cancellationTokenSource.Token);

@@ -21,6 +21,7 @@ namespace SoftThorn.Monstercat.Browser.Core
         private readonly IScheduler _scheduler;
         private readonly IPlaybackService _playbackService;
         private readonly IMessenger _messenger;
+        private readonly IToastService _toastService;
         private readonly ILogger _logger;
         private readonly CompositeDisposable _subscription;
 
@@ -63,12 +64,18 @@ namespace SoftThorn.Monstercat.Browser.Core
 
         public IObservableCollection<PlaybackItemViewModel> Items { get; }
 
-        public PlaybackViewModel(IScheduler scheduler, IPlaybackService playbackService, IMessenger messenger, ILogger logger)
+        public PlaybackViewModel(
+            IScheduler scheduler,
+            IPlaybackService playbackService,
+            IMessenger messenger,
+            ILogger logger,
+            IToastService toastService)
         {
             _sourceCache = new SourceCache<PlaybackItemViewModel, long>(vm => vm.Sequence);
             _scheduler = scheduler;
             _playbackService = playbackService;
             _messenger = messenger;
+            _toastService = toastService;
             _logger = logger.ForContext<PlaybackViewModel>();
 
             _currentSequence = 0;
@@ -207,6 +214,7 @@ namespace SoftThorn.Monstercat.Browser.Core
 
             _logger.Debug("Now playing [{Sequence}]{Title} by {Artist} ({ID})", item.Sequence, item.Track.Title, item.Track.ArtistsTitle, item.Track.Id);
             _playbackService.Play(item, intent, _volume);
+            _toastService.Show(new ToastViewModel(item.Track.Title, $"by {item.Track.ArtistsTitle}", ToastType.Information, false));
         }
 
         private bool CanPlay()

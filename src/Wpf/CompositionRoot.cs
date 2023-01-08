@@ -86,6 +86,8 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             container.RegisterInstance<IMessenger>(WeakReferenceMessenger.Default);
             container.RegisterInstance<IScheduler>(new SynchronizationContextScheduler(SynchronizationContext.Current!));
             container.Register<MonstercatContentStorageService>(Reuse.Singleton);
+            container.Register<IToastService, ToastService>(Reuse.Singleton);
+            container.RegisterInstance(new ToastServiceConfiguration());
 
             container.Register<ITrackRepository, TrackRepository>(Reuse.Singleton);
 

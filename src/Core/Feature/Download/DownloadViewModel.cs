@@ -17,6 +17,7 @@ namespace SoftThorn.Monstercat.Browser.Core
     public sealed partial class DownloadViewModel : ObservableRecipient, IDisposable
     {
         private readonly IMonstercatApi _api;
+        private readonly IToastService _toastService;
         private readonly ILogger _log;
         private readonly DispatcherProgressFactory<Percentage> _dispatcherProgressFactory;
         private readonly DispatcherProgress<Percentage> _progressService;
@@ -43,14 +44,16 @@ namespace SoftThorn.Monstercat.Browser.Core
             IMonstercatApi api,
             IMessenger messenger,
             ILogger log,
+            IToastService toastService,
             DispatcherProgressFactory<Percentage> dispatcherProgressFactory,
             ObjectPool<StringBuilder> objectPool)
             : base(messenger)
         {
-            _api = api ?? throw new ArgumentNullException(nameof(api));
-            _log = log?.ForContext<DownloadViewModel>() ?? throw new ArgumentNullException(nameof(log));
-            _dispatcherProgressFactory = dispatcherProgressFactory ?? throw new ArgumentNullException(nameof(dispatcherProgressFactory));
-            _objectPool = objectPool ?? throw new ArgumentNullException(nameof(objectPool));
+            _api = api;
+            _toastService = toastService;
+            _log = log.ForContext<DownloadViewModel>();
+            _dispatcherProgressFactory = dispatcherProgressFactory;
+            _objectPool = objectPool;
 
             Progress = new ProgressContainer<Percentage>();
             _progressService = _dispatcherProgressFactory.Create((p) => Progress.Report(p));
@@ -156,6 +159,21 @@ namespace SoftThorn.Monstercat.Browser.Core
                 }
 
                 await Task.WhenAll(tasks);
+
+                switch (notDownloadedTracks.Count)
+                {
+                    case 0:
+                        _toastService.Show(new ToastViewModel("Downloading finished", "You were already up to date", ToastType.Information, true));
+                        break;
+
+                    case 1:
+                        _toastService.Show(new ToastViewModel("Download complete", "1 track downloaded", ToastType.Information, true));
+                        break;
+
+                    default:
+                        _toastService.Show(new ToastViewModel("Download complete", $"{notDownloadedTracks.Count} tracks downloaded", ToastType.Information, true));
+                        break;
+                }
             }
             finally
             {

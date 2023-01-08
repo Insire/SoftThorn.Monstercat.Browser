@@ -2,7 +2,6 @@ using Ookii.Dialogs.Wpf;
 using SoftThorn.Monstercat.Browser.Core;
 using System;
 using System.Reactive.Concurrency;
-using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
