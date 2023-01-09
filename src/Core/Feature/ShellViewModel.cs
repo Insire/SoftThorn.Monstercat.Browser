@@ -94,6 +94,7 @@ namespace SoftThorn.Monstercat.Browser.Core
             // messages
             messenger.Register<ShellViewModel, LoginChangedMessage>(this, (r, m) => r.IsLoggedIn = m.IsLoggedIn);
 
+            _isLoading= true;
             _subscription = _trackRepository
                 .ConnectTracks()
                 .Throttle(TimeSpan.FromMilliseconds(500))

@@ -138,16 +138,31 @@ namespace SoftThorn.Monstercat.Browser.Core
             var filePath = Path.Combine("SoftThorn", "SoftThorn.Monstercat.Browser.Wpf", _settingsService.MonstercatContentFileStorageDirectoryPath, md5);
             var fileInfo = new FileInfo(filePath);
 
-            if (!fileInfo.Exists || (fileInfo.LastWriteTime.Date == DateTime.Today && (DateTime.Now - fileInfo.LastWriteTime) > TimeSpan.FromMinutes(5)))
+            if (fileInfo.Exists)
+            {
+                var delta = DateTime.Now - fileInfo.LastWriteTime;
+                if (delta > TimeSpan.FromMinutes(5))
+                {
+                    return await Fetch(fileInfo);
+                }
+                else
+                {
+                    return await _monstercatContentStorageService.Read(filePath, token);
+                }
+            }
+            else
+            {
+                return await Fetch(fileInfo);
+            }
+
+            async Task<TrackSearchResult> Fetch(FileInfo fileInfo)
             {
                 _logger.Verbose("[CACHEMISS] for {Url}", "SearchTracks");
                 var results = await _monstercatApi.SearchTracks(request, token);
-                await _monstercatContentStorageService.Write(filePath, results, fileInfo.Exists, token);
+                await _monstercatContentStorageService.Write(fileInfo.FullName, results, fileInfo.Exists, token);
 
                 return results;
             }
-
-            return await _monstercatContentStorageService.Read(filePath, token);
         }
 
         private async Task<string> GetMd5HashFor(TrackSearchRequest request, CancellationToken token)

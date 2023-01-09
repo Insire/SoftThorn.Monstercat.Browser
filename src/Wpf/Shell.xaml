@@ -176,7 +176,9 @@
                 <iconpacks:FontAwesome Kind="GlobeSolid" />
             </Button>
 
-            <Button Command="{Binding DataCommand, ElementName=rootWindow}" ToolTip="Debug" x:Name="DiagnosticsButton">
+            <Button x:Name="DiagnosticsButton"
+                    Command="{Binding DataCommand, ElementName=rootWindow}"
+                    ToolTip="Debug">
                 <iconpacks:FontAwesome Kind="BugSolid" />
             </Button>
         </mah:WindowCommands>
@@ -996,17 +998,21 @@
                         materialDesign:ButtonProgressAssist.Value="{Binding Downloads.Progress.Current.Value}"
                         xf:Animations.Primary="{xf:Animate BasedOn={StaticResource FadeIn},
                                                            Event=Visibility}"
-                        Command="{Binding DownloadAllCommand, ElementName=rootWindow}"
-                        ToolTip="Download all Tracks now">
+                        Command="{Binding DownloadAllCommand, ElementName=rootWindow}">
 
                     <Button.Style>
                         <Style BasedOn="{StaticResource MaterialDesignFloatingActionAccentButton}" TargetType="{x:Type Button}">
+                            <Setter Property="ToolTip" Value="Download all Tracks now" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsLoading}" Value="true">
                                     <Setter Property="Visibility" Value="Hidden" />
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding IsLoading}" Value="false">
                                     <Setter Property="Visibility" Value="Visible" />
+                                </DataTrigger>
+
+                                <DataTrigger Binding="{Binding Downloads.IsDownLoading}" Value="True">
+                                    <Setter Property="ToolTip" Value="{Binding Downloads.Progress.Current}" />
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
