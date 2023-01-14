@@ -9,7 +9,7 @@ using System.Text;
 
 namespace SoftThorn.Monstercat.Browser.Core
 {
-    internal static class MonstercatExtensions
+    public static class MonstercatExtensions
     {
         public static ObservableCollection<string> CreateTags(this Track track)
         {
@@ -157,7 +157,7 @@ namespace SoftThorn.Monstercat.Browser.Core
             return Path.Combine(downloadPath, fileName!);
         }
 
-        internal static string GetFileExtension(this FileFormat fileFormat)
+        public static string GetFileExtension(this FileFormat fileFormat)
         {
             return fileFormat switch
             {

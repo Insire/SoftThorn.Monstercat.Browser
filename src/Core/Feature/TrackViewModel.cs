@@ -61,6 +61,8 @@ namespace SoftThorn.Monstercat.Browser.Core
 
         public Uri? ImageUrl { get; init; }
 
+        public string FileName { get; init; } = default!;
+
         private string GetDebuggerDisplay()
         {
             return $"{Title} by {ArtistsTitle} ({Id})";

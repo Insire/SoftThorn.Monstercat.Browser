@@ -89,6 +89,8 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             container.Register<IToastService, ToastService>(Reuse.Singleton);
             container.RegisterInstance(new ToastServiceConfiguration());
 
+            container.Register<IFileSystemService, FileSystemService>(Reuse.Singleton);
+            container.Register<DownloadService>(Reuse.Singleton);
             container.Register<ITrackRepository, TrackRepository>(Reuse.Singleton);
 
             container.Register<SearchViewModelFactory>(Reuse.Singleton);
