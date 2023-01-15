@@ -18,6 +18,7 @@ The SoftThorn.Monstercat.Browser app (or SMB app for short) is my approach for d
 ## Features
 
 - Browse the latest tracks and releases from [monstercat](https://www.monstercat.com/)
+- Stream/Play music directly from [monstercat](https://www.monstercat.com/)
 - Download any/all of their music to your local device (You need an active Gold Subscription for that!)
 - Settings
   - Download locations
@@ -28,12 +29,8 @@ The SoftThorn.Monstercat.Browser app (or SMB app for short) is my approach for d
 
 ### Planned
 
-- Settings Storage (persist configuration between app restarts)
-  - color selection?
-  - Enable AssetSize Configuration (Download the art in the format and size you like)
 - AutoUpdate via Github releases
-- Playlist (manage playback via playlists)
-  - Playbackmode (shuffel, one, all, folder)
+- Playlist export based on recents downloads
 
 ### ToDo
 
@@ -52,6 +49,6 @@ This app uses SDK-style project files, which means you are required to use [Visu
 For anyone not wishing to install that, they atleast need:
 
 - Windows 10 (older versions work probably too, but the repository is not configured for those)
-- [Net 6.0](https://dotnet.microsoft.com/download/dotnet-core/6.0)
+- [Net 7.0](https://dotnet.microsoft.com/download/dotnet-core/7.0)
 - [Visual Studio Code](https://code.visualstudio.com/) with the [C# Extension](https://github.com/OmniSharp/omnisharp-vscode) provided by Microsoft
 - [git](https://git-scm.com/)
