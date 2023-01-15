@@ -35,6 +35,8 @@ namespace SoftThorn.Monstercat.Browser.Core
 
         public async Task Download(DownloadOptions options, IProgress<Percentage> progressService, CancellationToken token)
         {
+            progressService.Report(0, 1);
+
             var fileLookup = _fileSystemService
                 .DirectoryGetFiles(options.DownloadTracksPath, "*" + options.DownloadFileFormat.GetFileExtension())
                 .ToDictionary(p => p.ToLowerInvariant());
@@ -53,7 +55,8 @@ namespace SoftThorn.Monstercat.Browser.Core
                 .Where(tuple => !fileLookup.ContainsKey(tuple.filePath.ToLowerInvariant()))
                 .ToList();
 
-            var current = 0;
+            var currentProgress = 0;
+            var totalPogress = notDownloadedTracks.Count * 2;
             var batchSize = 1;
             if (notDownloadedTracks.Count > options.ParallelDownloads)
             {
@@ -78,6 +81,9 @@ namespace SoftThorn.Monstercat.Browser.Core
                         var filePath = tuple.filePath;
 
                         _log.Information("Downloading {TrackId} {ReleaseId} to {FilePath}", item.Release.Id, item.Id, filePath);
+                        currentProgress++;
+                        progressService.Report(currentProgress, totalPogress);
+
                         using var stream = await _api.DownloadTrackAsStream(new TrackDownloadRequest()
                         {
                             Format = options.DownloadFileFormat,
@@ -94,8 +100,8 @@ namespace SoftThorn.Monstercat.Browser.Core
 
                         await stream.CopyToAsync(writeStream);
 
-                        current++;
-                        progressService.Report(current, notDownloadedTracks.Count);
+                        currentProgress++;
+                        progressService.Report(currentProgress, totalPogress);
                     }
                 }, token));
             }

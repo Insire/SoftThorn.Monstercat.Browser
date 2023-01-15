@@ -128,7 +128,7 @@ namespace SoftThorn.Monstercat.UnitTests
                     .Should()
                     .HaveCount(filesToDownloadCount);
 
-                percentages.Should().HaveCount(filesToDownloadCount);
+                percentages.Should().HaveCount((filesToDownloadCount * 2) + 1);
             }
         }
     }
