@@ -32,7 +32,6 @@ namespace SoftThorn.Monstercat.Browser.Wpf
 
             // startup
             var container = _container = CompositionRoot.Get();
-            container.Resolve<AtlLogAdapter>(); // make sure playlist logging works
 
             ImageLoader.Manager = container.Resolve<RecyclableMemoryStreamManager>();
             ImageLoader.ImageFactory = container.Resolve<IImageFactory<BitmapSource>>();
@@ -44,12 +43,24 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             await settingsViewModel.Load();
 
             var shell = container.Resolve<Shell>();
+            shell.Closing += OnShellClosing;
             shell.Show();
 
             var loginViewModel = container.Resolve<LoginViewModel>();
             await loginViewModel.TryLogin(null, CancellationToken.None);
 
             await shellViewModel.Refresh();
+        }
+
+        private async void OnShellClosing(object? sender, System.ComponentModel.CancelEventArgs e)
+        {
+            var settings = _container?.Resolve<SettingsService>();
+            if (settings == null)
+            {
+                return;
+            }
+
+            await settings.Save();
         }
 
         protected override void OnExit(ExitEventArgs e)

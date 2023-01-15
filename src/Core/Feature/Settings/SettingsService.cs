@@ -63,6 +63,8 @@ namespace SoftThorn.Monstercat.Browser.Core
 
         public string? MonstercatContentFileStorageDirectoryPath { get; set; }
 
+        public int Volume { get; set; }
+
         public SettingsService(
             ISecureBlobCache secureBlobCache,
             IBlobCache blobCache,
@@ -107,6 +109,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                     GenresCount = 10,
                     ReleasesCount = 10,
                     TracksCount = 10,
+                    Volume = 50,
                     DownloadImagesPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.InternetCache), "SoftThorn.Monstercat.Browser.Wpf"),
                     DownloadTracksPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "SoftThorn.Monstercat.Browser.Wpf"),
                     MonstercatContentFileStorageDirectoryPath = Path.Combine(GetCommonApplicationDataPath(), "RequestCache"),
@@ -173,9 +176,9 @@ namespace SoftThorn.Monstercat.Browser.Core
             }
         }
 
-        private async Task SaveSettings(SettingsModel credentials)
+        private async Task SaveSettings(SettingsModel settings)
         {
-            await _blobCache.InsertObject(nameof(SettingsModel), credentials);
+            await _blobCache.InsertObject(nameof(SettingsModel), settings);
         }
 
         public async Task ResetSettings()
@@ -206,6 +209,11 @@ namespace SoftThorn.Monstercat.Browser.Core
             ReleasesCount = settings.ReleasesCount <= 0 ? 10 : settings.ReleasesCount;
             TagsCount = settings.TagsCount <= 0 ? 10 : settings.TagsCount;
             TracksCount = settings.TracksCount <= 0 ? 10 : settings.TracksCount;
+            Volume = settings.Volume <= 0
+                            ? 50
+                            : settings.Volume > 100
+                                ? 50
+                                : settings.Volume;
 
             MonstercatContentFileStorageDirectoryPath = settings.MonstercatContentFileStorageDirectoryPath ?? Path.Combine(GetCommonApplicationDataPath(), "RequestCache");
             CreateDirectory(MonstercatContentFileStorageDirectoryPath);
@@ -281,6 +289,7 @@ namespace SoftThorn.Monstercat.Browser.Core
                 TracksCount = service.TracksCount,
 
                 MonstercatContentFileStorageDirectoryPath = service.MonstercatContentFileStorageDirectoryPath ?? Path.Combine(GetCommonApplicationDataPath(), "RequestCache"),
+                Volume = service.Volume,
             };
         }
     }

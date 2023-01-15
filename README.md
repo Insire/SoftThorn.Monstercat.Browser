@@ -37,8 +37,6 @@ The SoftThorn.Monstercat.Browser app (or SMB app for short) is my approach for d
 
 ### ToDo
 
-- add Previous button for going back to the previous track
-- remember playback volume level
 - figure out how to show playback progress with NAudio
 - auto updates
 - sign my binaries

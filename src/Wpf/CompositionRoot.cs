@@ -1,5 +1,4 @@
 using Akavache;
-using ATL.Playlist;
 using CommunityToolkit.Mvvm.Messaging;
 using DryIoc;
 using Gress;
@@ -74,9 +73,6 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             container.Register<BrandViewModel<Uncaged>>(Reuse.Singleton);
             container.Register<BrandViewModel<Silk>>(Reuse.Singleton);
 
-            container.Register<PlaylistIOFactory>(Reuse.Singleton, made: Made.Of(() => PlaylistIOFactory.GetInstance()));
-            container.Register<PlaylistFormatsViewModel>(Reuse.Singleton);
-
             // services
             container.RegisterInstance<IConfiguration>(configuration);
             container.RegisterInstance(_api);
@@ -118,7 +114,6 @@ namespace SoftThorn.Monstercat.Browser.Wpf
                 .CreateLogger();
 
             container.RegisterInstance<ILogger>(log);
-            container.Register<AtlLogAdapter>(); // logging playlist writing
             Log.Logger = log;
 
             // caching

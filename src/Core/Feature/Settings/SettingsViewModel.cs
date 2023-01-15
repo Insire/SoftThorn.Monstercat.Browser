@@ -59,6 +59,7 @@ namespace SoftThorn.Monstercat.Browser.Core
         private string? _monstercatContentFileStorageDirectoryPath;
 
         public int MaxParallelDownloads { get; } = Environment.ProcessorCount;
+
         public ReadOnlyObservableCollection<TagViewModel> Tags { get; }
 
         public ReadOnlyObservableCollection<TagViewModel> SelectedTags { get; }

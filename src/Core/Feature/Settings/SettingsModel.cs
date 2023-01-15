@@ -22,8 +22,11 @@ namespace SoftThorn.Monstercat.Browser.Core
         public int ReleasesCount { get; init; }
 
         public int TagsCount { get; init; }
+
         public int TracksCount { get; init; }
 
         public string? MonstercatContentFileStorageDirectoryPath { get; init; }
+
+        public int Volume { get; init; }
     }
 }

@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.Messaging;
 using EmailValidation;
 using Gress;
 using SoftThorn.Monstercat.Browser.Core;
+using SoftThorn.MonstercatNet;
 using Spectre.Console;
 using Spectre.Console.Cli;
 using System.ComponentModel;
@@ -17,7 +18,7 @@ namespace SoftThorn.Monstercat.Browser.Cli.Commands
         private readonly ShellViewModel _shellViewModel;
         private readonly LoginViewModel _loginViewModel;
         private readonly DispatcherProgressFactory<Percentage> _progressFactory;
-        private readonly DownloadViewModel _downloadViewModel;
+        private readonly DownloadService _downloadService;
 
         public DownloadCommand(
             ITrackRepository trackRepository,
@@ -26,7 +27,7 @@ namespace SoftThorn.Monstercat.Browser.Cli.Commands
             ShellViewModel shellViewModel,
             LoginViewModel loginViewModel,
             DispatcherProgressFactory<Percentage> progressFactory,
-            DownloadViewModel downloadViewModel)
+            DownloadService downloadService)
         {
             _trackRepository = trackRepository;
             _messenger = messenger;
@@ -34,7 +35,7 @@ namespace SoftThorn.Monstercat.Browser.Cli.Commands
             _shellViewModel = shellViewModel;
             _loginViewModel = loginViewModel;
             _progressFactory = progressFactory;
-            _downloadViewModel = downloadViewModel;
+            _downloadService = downloadService;
         }
 
         public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
@@ -97,9 +98,16 @@ namespace SoftThorn.Monstercat.Browser.Cli.Commands
                         task1.Value = 100;
                     }
 
-                    using (_progressFactory.Create((percentage) => task2.Value = percentage.Value))
+                    using (var progress = _progressFactory.Create((percentage) => task2.Value = percentage.Value))
                     {
-                        await _downloadViewModel.Download(tracksToDownload, CancellationToken.None);
+                        var options = new DownloadOptions()
+                        {
+                            DownloadFileFormat = (FileFormat)settings.DownloadFileFormat,
+                            DownloadTracksPath = settings.DownloadLocation,
+                            ParallelDownloads = settings.ConcurrentDownloads,
+                            Tracks = tracksToDownload,
+                        };
+                        await _downloadService.Download(options, progress, CancellationToken.None);
                         task2.Value = 100;
                     }
                 });

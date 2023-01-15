@@ -22,11 +22,13 @@ namespace SoftThorn.Monstercat.Browser.Core
         private readonly IPlaybackService _playbackService;
         private readonly IMessenger _messenger;
         private readonly IToastService _toastService;
+        private readonly SettingsService _settingsService;
         private readonly ILogger _logger;
         private readonly CompositeDisposable _subscription;
 
         private bool _disposedValue;
         private long _currentSequence;
+        private bool _isVolumeLoaded;
 
         public StreamingPlaybackState PlaybackState => _playbackService.GetPlaybackState();
 
@@ -69,17 +71,18 @@ namespace SoftThorn.Monstercat.Browser.Core
             IPlaybackService playbackService,
             IMessenger messenger,
             ILogger logger,
-            IToastService toastService)
+            IToastService toastService,
+            SettingsService settingsService)
         {
             _sourceCache = new SourceCache<PlaybackItemViewModel, long>(vm => vm.Sequence);
             _scheduler = scheduler;
             _playbackService = playbackService;
             _messenger = messenger;
             _toastService = toastService;
+            _settingsService = settingsService;
             _logger = logger.ForContext<PlaybackViewModel>();
 
             _currentSequence = 0;
-            _volume = _playbackService.GetVolume();
 
             _messenger.Register<PlaybackViewModel, ValueChangedMessage<(StreamingPlaybackState, PlaybackIntent)>>(this, (r, m) => r.OnStreamingPlaybackStateChanged(m.Value));
 
@@ -105,11 +108,15 @@ namespace SoftThorn.Monstercat.Browser.Core
                     .DisposeMany()
                     .Subscribe(),
 
-                this.WhenPropertyChanged(p => p.Volume)
+                this.WhenPropertyChanged(p => p.Volume, notifyOnInitialValue:false)
                     .ObserveOn(TaskPoolScheduler.Default)
                     .Throttle(TimeSpan.FromMilliseconds(250))
                     .ObserveOn(scheduler)
-                    .Subscribe(p => _playbackService.SetVolume(p.Value)),
+                    .Subscribe(p =>
+                    {
+                        _playbackService.SetVolume(p.Value);
+                        settingsService.Volume = p.Value;
+                    }),
 
                 currentChanged
                     .CombineLatest(countChanged, (_, __) => Unit.Default)
@@ -207,6 +214,12 @@ namespace SoftThorn.Monstercat.Browser.Core
             if (current is not null)
             {
                 _sourceCache.Remove(current);
+            }
+
+            if (!_isVolumeLoaded)
+            {
+                Volume = _settingsService.Volume;
+                _isVolumeLoaded = true;
             }
 
             IsPlaybackAvailable = true;
