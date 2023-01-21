@@ -12,7 +12,6 @@ namespace SoftThorn.Monstercat.Browser.Core
 {
     public sealed partial class DownloadViewModel : ObservableRecipient, IDisposable
     {
-        private readonly ILogger _log;
         private readonly DownloadService _downloadService;
         private readonly DispatcherProgressFactory<Percentage> _dispatcherProgressFactory;
         private readonly DispatcherProgress<Percentage> _progressService;
@@ -36,12 +35,10 @@ namespace SoftThorn.Monstercat.Browser.Core
 
         public DownloadViewModel(
             IMessenger messenger,
-            ILogger log,
             DownloadService downloadService,
             DispatcherProgressFactory<Percentage> dispatcherProgressFactory)
             : base(messenger)
         {
-            _log = log.ForContext<DownloadViewModel>();
             _downloadService = downloadService;
             _dispatcherProgressFactory = dispatcherProgressFactory;
 
@@ -56,10 +53,8 @@ namespace SoftThorn.Monstercat.Browser.Core
                 r._parallelDownloads = m.Value.ParallelDownloads;
             });
 
-            Messenger.Register<DownloadViewModel, DownloadTracksMessage>(this, async (r, m) =>
-            {
-                await Task.Run(async () => await r.Download(m.Value, CancellationToken.None));
-            });
+            Messenger.Register<DownloadViewModel, DownloadTracksMessage>(this, async (r, m)
+                => await Task.Run(async () => await r.Download(m.Value, CancellationToken.None)));
         }
 
         private async Task Download(IReadOnlyCollection<TrackViewModel> tracks, CancellationToken token)

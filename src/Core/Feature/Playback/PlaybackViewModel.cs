@@ -226,7 +226,7 @@ namespace SoftThorn.Monstercat.Browser.Core
             Current = item;
 
             _logger.Debug("Now playing [{Sequence}]{Title} by {Artist} ({ID})", item.Sequence, item.Track.Title, item.Track.ArtistsTitle, item.Track.Id);
-            _playbackService.Play(item, intent, _volume);
+            _playbackService.Play(item, intent, Volume);
             _toastService.Show(new ToastViewModel(item.Track.Title, $"by {item.Track.ArtistsTitle}", ToastType.Information, false));
         }
 
