@@ -1,6 +1,5 @@
 using NAudio.Wave;
 using Serilog;
-using SoftThorn.Monstercat.Browser.Core;
 using System;
 using System.IO;
 using System.Reactive.Concurrency;
@@ -89,7 +88,7 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             return FrameDecompressor.DecompressFrame(frame, _buffer, 0);
         }
 
-        public static bool TryGetMp3Frame(ReadFullyStream stream, out Mp3Frame frame)
+        public static bool TryGetMp3Frame(Stream stream, out Mp3Frame frame)
         {
             frame = null!;
 
@@ -106,7 +105,15 @@ namespace SoftThorn.Monstercat.Browser.Wpf
 
         public void ProcessFrame(Mp3Frame frame)
         {
-            AddSamples(DecompressFrame(frame));
+            try
+            {
+                var sampleCount = DecompressFrame(frame);
+                AddSamples(sampleCount);
+            }
+            catch (NAudio.MmException ex)
+            {
+                _logger.Error(ex, "Something unexpectedly went wrong while processing a MP3 frame");
+            }
         }
 
         public bool IsBufferNearlyFull()
