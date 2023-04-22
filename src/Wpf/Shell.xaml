@@ -456,13 +456,14 @@
                         <GroupBox.Header>
                             <TextBlock Foreground="{DynamicResource MaterialDesignDarkForeground}">
                                 <Run Text="Top" />
-                                <Run Text="{Binding Tags.SeriesCollection.Count, FallbackValue=0, Mode=OneWay}" />
+                                <Run Text="{Binding Tags.Entries.Count, FallbackValue=0, Mode=OneWay}" />
                                 <Run Text="Most Popular Tags" />
                             </TextBlock>
                         </GroupBox.Header>
                         <Grid>
                             <lvc:CartesianChart xf:Animations.Primary="{xf:Animate BasedOn={StaticResource FadeIn},
                                                                                    Event=Visibility}"
+                                                ChartPointPointerDownCommand="{Binding DownloadTagCommand, ElementName=rootWindow}"
                                                 Series="{Binding Tags.SeriesCollection}"
                                                 TooltipPosition="Right"
                                                 XAxes="{Binding Tags.XAxes}">
@@ -832,7 +833,7 @@
                         <GroupBox.Header>
                             <TextBlock Foreground="{DynamicResource MaterialDesignDarkForeground}">
                                 <Run Text="Top" />
-                                <Run Text="{Binding Genres.SeriesCollection.Count, FallbackValue=0, Mode=OneWay}" />
+                                <Run Text="{Binding Genres.Entries.Count, FallbackValue=0, Mode=OneWay}" />
                                 <Run Text="Most Popular Genres" />
                             </TextBlock>
                         </GroupBox.Header>
@@ -842,6 +843,7 @@
                                             Grid.ColumnSpan="5"
                                             xf:Animations.Primary="{xf:Animate BasedOn={StaticResource FadeIn},
                                                                                Event=Visibility}"
+                                            ChartPointPointerDownCommand="{Binding DownloadGenreCommand, ElementName=rootWindow}"
                                             Series="{Binding Genres.SeriesCollection}"
                                             XAxes="{Binding Genres.XAxes}">
                             <lvc:CartesianChart.Style>

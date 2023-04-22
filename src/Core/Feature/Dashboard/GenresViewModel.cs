@@ -1,14 +1,17 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using CommunityToolkit.Mvvm.Messaging;
 using DynamicData;
 using DynamicData.Binding;
 using LiveChartsCore;
+using LiveChartsCore.Kernel;
 using LiveChartsCore.SkiaSharpView;
 using LiveChartsCore.SkiaSharpView.Painting;
 using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 
@@ -19,11 +22,14 @@ namespace SoftThorn.Monstercat.Browser.Core
     /// </summary>
     public sealed class GenresViewModel : ObservableRecipient, IDisposable
     {
+        private readonly ColumnSeries<GenreGroupViewModel> _series;
+        private readonly ObservableCollectionExtended<GenreGroupViewModel> _entries;
         private readonly ObservableCollectionExtended<ISeries> _seriesCollection;
 
         private IDisposable? _subscription;
         private bool _disposedValue;
 
+        public ReadOnlyObservableCollection<GenreGroupViewModel> Entries { get; }
         public ReadOnlyObservableCollection<ISeries> SeriesCollection { get; }
 
         public Axis[] XAxes { get; }
@@ -32,7 +38,27 @@ namespace SoftThorn.Monstercat.Browser.Core
         public GenresViewModel(IScheduler scheduler, ITrackRepository trackRepository, IMessenger messenger)
             : base(messenger)
         {
-            _seriesCollection = new ObservableCollectionExtended<ISeries>();
+            _entries = new ObservableCollectionExtended<GenreGroupViewModel>();
+            Entries = new ReadOnlyObservableCollection<GenreGroupViewModel>(_entries);
+
+            _series = new ColumnSeries<GenreGroupViewModel>()
+            {
+                Name = "Genre",
+                Values = _entries,
+                Fill = new SolidColorPaint(SKColor.Parse("#FF673AB7")),
+                MaxBarWidth = 24,
+                TooltipLabelFormatter = point => $"{point.Model?.Name} {point.Model?.Count} Tracks",
+                Mapping = (group, point) =>
+                {
+                    point.PrimaryValue = group.Count;
+                    point.SecondaryValue = point.Context.Index;
+                }
+            };
+
+            _seriesCollection = new ObservableCollectionExtended<ISeries>()
+            {
+                _series,
+            };
             SeriesCollection = new ReadOnlyObservableCollection<ISeries>(_seriesCollection);
 
             XAxes = new[]
@@ -67,15 +93,13 @@ namespace SoftThorn.Monstercat.Browser.Core
                     .Top(SortExpressionComparer<KeyValuePair<string, List<TrackViewModel>>>
                         .Descending(p => p.Value.Count)
                         .ThenByAscending(p => p.Key), size)
-                    .Transform(p => (ISeries)new ColumnSeries<int>()
+                    .Transform(p => new GenreGroupViewModel(p.Value)
                     {
                         Name = p.Key,
-                        Values = new[] { p.Value.Count },
-                        Fill = new SolidColorPaint(SKColor.Parse("#FF673AB7")),
-                        MaxBarWidth = 24,
+                        Count = p.Value.Count,
                     })
                     .ObserveOn(scheduler)
-                    .Bind(_seriesCollection)
+                    .Bind(_entries)
                     .Subscribe();
             }
         }

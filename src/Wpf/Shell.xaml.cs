@@ -1,7 +1,10 @@
 using CommunityToolkit.Mvvm.Input;
 using Jot;
+using LiveChartsCore.Kernel;
 using SoftThorn.Monstercat.Browser.Core;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace SoftThorn.Monstercat.Browser.Wpf
@@ -56,6 +59,28 @@ namespace SoftThorn.Monstercat.Browser.Wpf
         private async Task DownloadTrack(TrackViewModel? track)
         {
             await _windowService.ShowSearchView<Silk>(this, track: track);
+        }
+
+        [RelayCommand]
+        private async Task DownloadGenre(ChartPoint? point)
+        {
+            if (point?.Context?.DataSource is not GenreGroupViewModel genre)
+            {
+                return;
+            }
+
+            await _windowService.ShowSearchView<Silk>(this, genre: genre);
+        }
+
+        [RelayCommand]
+        private async Task DownloadTag(ChartPoint? point)
+        {
+            if (point?.Context?.DataSource is not TagGroupViewModel tag)
+            {
+                return;
+            }
+
+            await _windowService.ShowSearchView<Silk>(this, tag: tag);
         }
 
         [RelayCommand]

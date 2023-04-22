@@ -62,7 +62,9 @@ namespace SoftThorn.Monstercat.Browser.Wpf
             BrandViewModel<TBrand>? brand = null,
             ReleaseViewModel? release = null,
             ArtistViewModel? artist = null,
-            TrackViewModel? track = null)
+            TrackViewModel? track = null,
+            GenreGroupViewModel? genre = null,
+            TagGroupViewModel? tag = null)
             where TBrand : Brand, new()
         {
             var wasLoggedIn = _shellViewModel.IsLoggedIn;
@@ -78,7 +80,9 @@ namespace SoftThorn.Monstercat.Browser.Wpf
                 await _shellViewModel.Refresh();
             }
 
-            using var search = track is null
+            using var search = tag is null
+                ? genre is null
+                ? track is null
                 ? brand is null
                 ? release is null
                 ? artist is null
@@ -86,7 +90,9 @@ namespace SoftThorn.Monstercat.Browser.Wpf
                 : await _searchViewModelFactory.CreateFromArtist(artist)
                 : await _searchViewModelFactory.CreateFromRelease(release)
                 : await _searchViewModelFactory.CreateFromBrand(brand)
-                : await _searchViewModelFactory.CreateFromTrack(track);
+                : await _searchViewModelFactory.CreateFromTrack(track)
+                : await _searchViewModelFactory.CreateFromGenere(genre)
+                : await _searchViewModelFactory.CreateFromTag(tag);
 
             var wnd = new SearchView(search)
             {
